@@ -325,6 +325,9 @@ mark{background:var(--warn-soft);color:inherit;padding:0;border-radius:2px}
 .gh-where summary span{color:var(--text);font-family:"JetBrains Mono",ui-monospace,Consolas,monospace;font-size:13px}
 .gh-where .field{margin-top:10px}
 .gh-readme{margin:10px 0 4px;font-size:14px}.gh-readme summary{cursor:pointer;color:var(--muted)}.gh-readme .field{margin-top:10px}
+html[data-net-publish] .gh-card{background:none;border:0;box-shadow:none;padding:0;margin:14px 0 6px}
+html[data-net-publish] .gh-card .card-h,html[data-net-publish] .gh-card p.meta,html[data-net-publish] [data-gh-checks],html[data-net-publish] .gh-where,html[data-net-publish] .gh-readme,html[data-net-publish] [data-act="gh-write"],html[data-net-publish] [data-act="gh-template"],html[data-net-publish] [data-act="gh-zip"]{display:none!important}
+html[data-net-publish] .gh-card .btn-row{margin-top:0}
 .gh-net .linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .view .gh-mode{margin:-4px 0 8px;max-width:none}
 /* portfolio projects */
@@ -38061,7 +38064,7 @@ if sys.platform == "emscripten":
       NET.on = !!(d && d.configured && !d.error); NET.connected = !!(NET.on && d.connected);
       NET.user = NET.connected ? d.user : null; NET.csrf = NET.connected ? d.csrf : null;
       NET.repos = NET.connected && Array.isArray(d.repositories) ? d.repositories : []; NET.installUrl = d && d.installUrl || null;
-      if (NET.on) document.documentElement.setAttribute("data-cl-publish", "");
+      if (NET.on){ document.documentElement.setAttribute("data-cl-publish", ""); document.documentElement.setAttribute("data-net-publish", ""); }
       if (typeof NET.onchange === "function") NET.onchange();
     });
   }
@@ -39723,8 +39726,15 @@ if sys.platform == "emscripten":
       });
     }
     readmeIn.value = mode === "auto" ? autoText() : saved.readme;
+    function placeCard(){
+      // Hosted site: put the Publish button straight under the code and its output (exercises and projects).
+      var res = view.querySelector("#result"); if (!NET.on || !res || card.dataset.moved) return;
+      var top = res; while (top.parentElement && top.parentElement !== view) top = top.parentElement;
+      if (top.parentElement === view){ top.after(card); card.dataset.moved = "1"; }
+    }
     NET.onchange = function(){
       if (!document.body.contains(card)) return;
+      placeCard();
       if (NET.connected && NET.user && NET.user.login.toLowerCase() !== GH_OWNER.toLowerCase() && repoIn.value.trim() === GH_DEFAULT_REPO && NET.repos.length){ repoIn.value = NET.repos[0].full_name; persist(); paintDest(); }
       refresh();
       var j = NET.just; NET.just = "";
@@ -39793,7 +39803,7 @@ if sys.platform == "emscripten":
         card.querySelector(".gh-where").open = true; return;
       }
       var warn = ex.pub || c.passed === c.total ? "" : "\n\nNot every check passes yet, so the README calls it a work in progress.";
-      if (!confirm("Publish " + Object.keys(files).length + " files to github.com/" + repo + " in the folder " + folder + "? If the repository is public, anyone can see them." + warn)) return;
+      if (!NET.on && !confirm("Publish " + Object.keys(files).length + " files to github.com/" + repo + " in the folder " + folder + "? If the repository is public, anyone can see them." + warn)) return;
       if (NET.on){
         publishBtn.disabled = true; st.textContent = "Publishing to GitHub…";
         fetch("/api/github/publish", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-FDE-CSRF": NET.csrf || "" },
