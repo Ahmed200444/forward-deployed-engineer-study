@@ -1,5 +1,11 @@
 # Forward Deployed Engineer Study
 
+[![Live site](https://img.shields.io/badge/live%20site-ahmed--fde--study.netlify.app-3b5bdb?style=flat-square)](https://ahmed-fde-study.netlify.app)
+![Python in the browser](https://img.shields.io/badge/Python-Pyodide%20(WebAssembly)-3776AB?style=flat-square&logo=python&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-Web%20Worker%20runner-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+![No backend](https://img.shields.io/badge/backend-none-2d784c?style=flat-square)
+![Tested with Playwright](https://img.shields.io/badge/tested%20with-Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white)
+
 **A study platform I built to train myself as a forward deployed engineer (FDE): 161 lessons, 234 auto-graded exercises in Python and JavaScript, and 12 projects. Everything runs in the browser, with no install, no backend and no sign-up.**
 
 **Live site: [ahmed-fde-study.netlify.app](https://ahmed-fde-study.netlify.app)**
@@ -80,6 +86,15 @@ Before each release I run these checks in headless Chromium (Playwright):
 - Layouts are checked at 320, 375, 390, 430, 768, 1024 and 1440 px in light and dark themes.
 - Progress saved by the previous version still loads after courses are renumbered.
 - The JavaScript test files the site exports pass under `node --test`.
+
+## Repository layout
+
+```
+index.html                       the whole site: content, styles and app code in one file
+netlify.toml                     static hosting config and security headers
+docs/FDE-RESEARCH-AND-GAPS.md    job-posting research, gap check and learning order
+docs/screenshots/                images used in this README
+```
 
 ## Run it locally
 
