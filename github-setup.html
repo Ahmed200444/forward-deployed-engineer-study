@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>GitHub publishing setup</title>
+<style>
+:root{--bg:#fff;--text:#1d2433;--muted:#5a6478;--card:#f6f8fb;--line:#d9dee8;--accent:#3b5bdb}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1420;--text:#e6e9f0;--muted:#9aa4b8;--card:#171d2b;--line:#2b3447;--accent:#8ea6ff}}
+body{font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);max-width:720px;margin:0 auto;padding:32px 16px}
+h1{font-size:28px;line-height:1.25;margin:0 0 8px}.muted{color:var(--muted)}
+ol{padding-left:22px}li{margin:6px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:20px 0}
+button{font:inherit;font-weight:600;background:var(--accent);color:#fff;border:0;border-radius:9px;padding:11px 18px;cursor:pointer}
+@media (prefers-color-scheme:dark){button{color:#0f1420}}
+code{font-family:ui-monospace,Consolas,monospace;font-size:14px;overflow-wrap:anywhere}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<p><a href="/">← Back to the study site</a></p>
+<h1>Set up one-button GitHub publishing</h1>
+<p class="muted">You do this once, as the site owner. It takes about five minutes.</p>
+<div class="card">
+<ol>
+<li>Sign in to github.com in this browser.</li>
+<li>Press the button below. GitHub opens a page for a new GitHub App with every setting filled in. Choose <b>Create GitHub App</b>.</li>
+<li>GitHub sends you back to a page on this site that shows four values once. Paste them into Netlify's environment variables and redeploy.</li>
+<li>Install the app on your portfolio repository. Then <b>Publish to GitHub</b> works on every exercise, lesson and project.</li>
+</ol>
+<form id="f" method="post" action="https://github.com/settings/apps/new">
+<input type="hidden" name="manifest" id="manifest">
+<button type="submit">Create the GitHub App</button>
+</form>
+</div>
+<p class="muted">The app asks for one repository permission, <b>Contents: read and write</b>, and only on the repositories you choose when you install it. It has no webhooks. Your sign-in is kept in an encrypted, HttpOnly cookie; the app's secret stays in Netlify and never reaches the browser.</p>
+<script>
+(function(){
+  var o = location.origin, tag = Math.random().toString(36).slice(2, 7);
+  var manifest = {
+    name: "FDE Study Publisher " + tag,
+    url: o,
+    redirect_url: o + "/api/github/setup",
+    callback_urls: [o + "/api/github/callback"],
+    setup_url: o + "/?github=installed",
+    public: false,
+    request_oauth_on_install: false,
+    hook_attributes: { url: o, active: false },
+    default_permissions: { contents: "write", metadata: "read" },
+    default_events: []
+  };
+  document.getElementById("manifest").value = JSON.stringify(manifest);
+})();
+</script>
+</body>
+</html>

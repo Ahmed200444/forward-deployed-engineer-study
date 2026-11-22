@@ -62,7 +62,7 @@ This course covers the customer half of the job, which most AI curricula skip:
 - **Edit and run any lesson example.** Code blocks open in an editor next to the text. Examples that can't run in a browser, such as servers, say why and can be downloaded.
 - **Progress that stays.** Progress, notes and drafts are saved in the browser, with backup and restore to a file.
 - **Spaced review** of missed quiz questions, full-text search and a study log.
-- **Export to GitHub.** Any exercise or project downloads as a ready-to-push folder with a generated README, the tests (`pytest`, or `node --test` for JavaScript) and a `package.json` where needed.
+- **One-button publish to GitHub.** Press **Publish to GitHub** on any exercise, lesson or project: the site signs you in with GitHub once, writes the README from your code, test results and notes, and commits the code, data, tests and README to your portfolio repository in a single commit. Every item can also be downloaded as a ready-to-push .zip (tests run with `pytest`, or `node --test` for JavaScript).
 - **Responsive and accessible.** Fixed navigation on desktop, a collapsible "Course contents" menu on mobile, light and dark themes, keyboard support and ARIA live regions for results.
 
 <p align="center"><img src="docs/screenshots/exercise.jpg" alt="An exercise with all tests passing" width="70%"> <img src="docs/screenshots/mobile-dark.jpg" alt="Mobile layout in dark mode" width="24%"></p>
@@ -76,6 +76,7 @@ This course covers the customer half of the job, which most AI curricula skip:
 | Pyodide loaded on the first Run | Real CPython semantics and real libraries, with $0 hosting | The first run downloads about 10 MB; later runs are instant |
 | JavaScript graded in a Web Worker | Isolated from the page, and an endless loop can be stopped | Browser JavaScript, not Node: no `fs` or `require` in exercises |
 | `localStorage` for progress | Private and needs no account or server | Progress lives in one browser; backup and restore covers moving it |
+| Publishing through 6 small Netlify Functions and a GitHub App | One button, no tokens in the browser: the sign-in is an encrypted HttpOnly cookie, the app only gets Contents access to repositories you pick, and each publish is one atomic commit (Git Data API) | Needs a one-time GitHub App setup; publishing only works on the hosted site, not when `index.html` is opened from disk |
 
 ## Quality checks
 
@@ -91,7 +92,9 @@ Before each release I run these checks in headless Chromium (Playwright):
 
 ```
 index.html                       the whole site: content, styles and app code in one file
-netlify.toml                     static hosting config and security headers
+netlify.toml                     hosting config, API routes and security headers
+netlify/functions/               GitHub sign-in, status, publish, sign-out and one-time app setup
+github-setup.html                one-time GitHub App setup page (for the site owner)
 docs/FDE-RESEARCH-AND-GAPS.md    job-posting research, gap check and learning order
 docs/screenshots/                images used in this README
 ```

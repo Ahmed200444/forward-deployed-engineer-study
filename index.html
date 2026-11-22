@@ -324,6 +324,8 @@ mark{background:var(--warn-soft);color:inherit;padding:0;border-radius:2px}
 .gh-where summary{cursor:pointer;color:var(--muted);overflow-wrap:anywhere}
 .gh-where summary span{color:var(--text);font-family:"JetBrains Mono",ui-monospace,Consolas,monospace;font-size:13px}
 .gh-where .field{margin-top:10px}
+.gh-readme{margin:10px 0 4px;font-size:14px}.gh-readme summary{cursor:pointer;color:var(--muted)}.gh-readme .field{margin-top:10px}
+.gh-net .linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .view .gh-mode{margin:-4px 0 8px;max-width:none}
 /* portfolio projects */
 .pf-back{margin:0 0 6px}
@@ -38051,11 +38053,28 @@ if sys.platform == "emscripten":
 
   // CL.publish: db + mcp (Publish to GitHub). CL.sample: a real model (Rewrite README with Claude, real-model lab).
   // Until they resolve, and everywhere off claude.ai, the CSS hides those controls (html has no data-cl-* attribute).
+  // NET: publishing through this site's own Netlify functions (GitHub App sign-in). Off on claude.ai and locally.
+  var NET = { on: false, connected: false, user: null, csrf: null, repos: [], installUrl: null, just: "", onchange: null };
+  function netLoad(){
+    return fetch("/api/github/status", { credentials: "same-origin", cache: "no-store" }).then(function(r){
+      return r.ok && /json/.test(r.headers.get("content-type") || "") ? r.json() : null; }).catch(function(){ return null; }).then(function(d){
+      NET.on = !!(d && d.configured && !d.error); NET.connected = !!(NET.on && d.connected);
+      NET.user = NET.connected ? d.user : null; NET.csrf = NET.connected ? d.csrf : null;
+      NET.repos = NET.connected && Array.isArray(d.repositories) ? d.repositories : []; NET.installUrl = d && d.installUrl || null;
+      if (NET.on) document.documentElement.setAttribute("data-cl-publish", "");
+      if (typeof NET.onchange === "function") NET.onchange();
+    });
+  }
+  if (!window.claude && location.protocol === "https:"){
+    var ghq = location.search.match(/[?&]github=([a-z-]+)/);
+    if (ghq){ NET.just = ghq[1]; try { history.replaceState(null, "", location.pathname + location.hash); } catch(e){} }
+    netLoad();
+  }
   var CL = { publish: false, sample: false, known: false };
   Promise.all([claudeUse("db"), claudeUse("mcp"), claudeUse("sample")]).then(function(c){
     CL.publish = !!(c[0] && c[1]); CL.sample = typeof c[2] === "function"; CL.known = true;
     var h = document.documentElement;
-    if (CL.publish) h.setAttribute("data-cl-publish", ""); else h.removeAttribute("data-cl-publish");
+    if (CL.publish || NET.on) h.setAttribute("data-cl-publish", ""); else h.removeAttribute("data-cl-publish");
     if (CL.sample) h.setAttribute("data-cl-sample", ""); else h.removeAttribute("data-cl-sample");
     if (CL.sample && typeof paintPager === "function") paintPager(currentRoute());
   });
@@ -38701,8 +38720,15 @@ if sys.platform == "emscripten":
       var key = l.id + "#" + i, spec = SNIP.blocks[key] || { mode: "none", why: "" };
       var original = spec.code || pre.textContent.replace(/\s+$/, "") + "\n", dk = "snip:" + key;
       var code = state.drafts[dk] != null ? state.drafts[dk] : original, ext = snippetExt(spec, code);
-      var near = pre.previousElementSibling, label = near && /^H[23]$/.test(near.tagName) ? near.textContent.trim() : "";
+      var top = pre; while (top.parentElement && top.parentElement !== d) top = top.parentElement;
+      var near = top.previousElementSibling; while (near && !/^H[23]$/.test(near.tagName)) near = near.previousElementSibling;
+      var label = near ? near.textContent.trim() : "";
+      if (ext === "sh" && (/PowerShell/i.test(label) || /^\s*(Get-|Set-Location|New-Item|Remove-Item|\$env:)/m.test(code))) ext = "ps1";
       return { i: i, key: key, spec: spec, code: code, edited: state.drafts[dk] != null, ext: ext, name: "examples/example-" + (i + 1) + "." + ext, label: label };
+    }).map(function(x, i, all){
+      var same = all.filter(function(y){ return y.label && y.label === x.label; });
+      if (same.length > 1) x.label += " (part " + (same.indexOf(x) + 1) + ")";
+      return x;
     });
   }
   function lessonPub(l){
@@ -38734,11 +38760,16 @@ if sys.platform == "emscripten":
         if (n) md += "## What I learned\n\n" + n + "\n\n";
         if (s.length){
           md += "## Code examples\n\n| File | Topic | Runs with |\n|---|---|---|\n" + s.map(function(x){
-            var how = x.ext === "py" ? "`python " + x.name + "`" : x.ext === "sql" ? "SQLite: `sqlite3 :memory: < " + x.name + "`" : x.ext === "sh" ? "a terminal (commands)" : "read only";
+            var how = x.ext === "py" ? "`python " + x.name + "`" : x.ext === "sql" ? "SQLite: `sqlite3 :memory: < " + x.name + "`" : x.ext === "sh" ? "a terminal (commands)" : x.ext === "ps1" ? "PowerShell (commands)" : "read only";
             return "| `" + x.name + "` | " + (x.label || "Example " + (x.i + 1)) + (x.edited ? " (my version)" : "") + " | " + how + " |";
           }).join("\n") + "\n\n";
           var py = s.filter(function(x){ return x.ext === "py"; });
-          if (py.length) md += "## How to run\n\n```bash\npython " + py[0].name + "\n```\n\nSome examples use NumPy, pandas or scikit-learn: `pip install numpy pandas scikit-learn`.\n\n";
+          if (py.length){
+            var libs = [["numpy", "numpy", "NumPy"], ["pandas", "pandas", "pandas"], ["sklearn", "scikit-learn", "scikit-learn"], ["matplotlib", "matplotlib", "matplotlib"]].filter(function(L){
+              return py.some(function(x){ return new RegExp("^\\s*(import|from)\\s+" + L[0] + "\\b", "m").test(x.code); }); });
+            md += "## How to run\n\n```bash\n" + (libs.length ? "pip install " + libs.map(function(L){ return L[1]; }).join(" ") + "\n" : "") + "python " + py[0].name + "\n```\n\n" +
+              (libs.length ? "The examples use " + libs.map(function(L){ return L[2]; }).join(", ") + "; the rest is the Python standard library.\n\n" : "Only the Python standard library is needed.\n\n");
+          }
         }
         md += "---\n\n_Generated by my forward deployed engineer study site from the lesson and my notes._\n";
         return md;
@@ -39276,7 +39307,11 @@ if sys.platform == "emscripten":
     return firstSentence(textOf(problemOf(ex.prompt)));
   }
   function problemOf(html){ var d = document.createElement("div"); d.innerHTML = html; var p = d.querySelector(".qbox-problem"); return p ? p.innerHTML : html; }
-  function textOf(html){ var d = document.createElement("div"); d.innerHTML = html; return d.textContent.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim(); }
+  function textOf(html){ var d = document.createElement("div"); d.innerHTML = html;
+    d.querySelectorAll("br").forEach(function(x){ x.replaceWith("\n"); });
+    d.querySelectorAll("li").forEach(function(x){ var ol = x.parentElement && x.parentElement.tagName === "OL"; x.insertBefore(document.createTextNode("\n" + (ol ? (Array.prototype.indexOf.call(x.parentElement.children, x) + 1) + ". " : "- ")), x.firstChild); });
+    d.querySelectorAll("p,div,ul,ol,pre,h1,h2,h3,h4,table,tr").forEach(function(x){ x.appendChild(document.createTextNode("\n\n")); });
+    return d.textContent.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim(); }
   function nodeTestFile(ex){
     return "// The site's automated checks for main.js, run with Node's built-in test runner: npm test\n" +
       "const test = require(\"node:test\");\nconst fs = require(\"node:fs\");\nconst path = require(\"node:path\");\n\n" +
@@ -39354,7 +39389,7 @@ if sys.platform == "emscripten":
           (shared.length ? "    global " + shared.join(", ") + "\n" : "") + body + "\n";
       }).join("");
   }
-  function validRepo(v){ return new RegExp("^" + GH_OWNER + "/[A-Za-z0-9._-]+$").test(v) && !/\/\.+$/.test(v); }
+  function validRepo(v){ if (NET.on) return /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(v) && !/\/\.+$/.test(v); return new RegExp("^" + GH_OWNER + "/[A-Za-z0-9._-]+$").test(v) && !/\/\.+$/.test(v); }
   function validFolder(v){
     if (!v || v.length > 120 || /\\/.test(v) || /^\//.test(v) || /\/$/.test(v)) return false;
     return v.split("/").every(function(seg){ return /^[A-Za-z0-9_-][A-Za-z0-9._-]*$/.test(seg); });
@@ -39447,7 +39482,8 @@ if sys.platform == "emscripten":
     if (note) md += "\n## What I learned\n\n" + note + "\n";
     var next = [];
     if (s.signals.indexOf("errors") < 0 && s.signals.indexOf("validation") < 0) next.push("Validate input and handle errors explicitly.");
-    if (!/\bdef\s+test_|\bassert\b|\bpytest\b|\bunittest\b/.test(code)) next.push("Add a small pytest suite with normal, edge and failure cases.");
+    if (ex.tests.length) next.push("Add more edge cases to `tests/test_main.py`, such as empty, very large and malformed input.");
+    else if (!/\bdef\s+test_|\bassert\b|\bpytest\b|\bunittest\b/.test(code)) next.push("Add a small pytest suite with normal, edge and failure cases.");
     if (s.signals.indexOf("types") < 0 && s.fns.length) next.push("Add type hints to the function signatures.");
     if (s.signals.indexOf("entry") < 0) next.push("Add an `if __name__ == \"__main__\":` entry point so the functions can be imported without side effects.");
     next.push("Try it on larger and messier real-world input.");
@@ -39593,12 +39629,14 @@ if sys.platform == "emscripten":
       '<p class="meta cl-nopub">Download ' + (ex.pub ? 'the files' : '<code>main.py</code>, its data files') + ' and the README below as a .zip. To put them on GitHub, open your repository on github.com and choose <b>Add file → Upload files</b>.</p>' +
       '<p class="gh-checks" data-gh-checks></p>' +
       '<p class="gh-state" data-gh-state></p>' +
+      '<p class="meta gh-net" data-gh-net hidden></p>' +
       '<details class="gh-where"><summary>Where it goes: <span data-gh-dest></span></summary>' +
         '<label class="field"><span>Repository</span><input id="gh-repo" autocomplete="off" spellcheck="false" autocapitalize="off"></label>' +
         '<label class="field"><span>Folder in the repository</span><input id="gh-folder" autocomplete="off" spellcheck="false" autocapitalize="off"></label>' +
       '</details>' +
-      '<label class="field"><span>README.md, written automatically from your code</span><textarea class="notes-box readme-box" id="gh-readme" spellcheck="true"></textarea></label>' +
-      '<p class="meta gh-mode" data-gh-mode></p>' +
+      '<details class="gh-readme"><summary>README.md is written for you from your code. Open to read or edit it.</summary>' +
+      '<label class="field"><span>README.md</span><textarea class="notes-box readme-box" id="gh-readme" spellcheck="true"></textarea></label>' +
+      '<p class="meta gh-mode" data-gh-mode></p></details>' +
       '<p class="meta" data-gh-files></p>' +
       '<div class="btn-row"><button class="btn primary" type="button" data-act="gh-publish">Publish to GitHub</button>' +
         '<button class="btn" type="button" data-act="gh-write">Rewrite README with Claude</button>' +
@@ -39662,6 +39700,10 @@ if sys.platform == "emscripten":
         '<a href="' + esc(it.repoUrl || "https://github.com/" + it.repo) + '" target="_blank" rel="noopener">Open your portfolio</a>. Publish again to update it.';
       else if (it.status === "failed") html = "The last publish did not work: " + esc(it.error || "unknown error") + " Fix it and press Publish again.";
       stateLine.innerHTML = html;
+      var netLine = card.querySelector("[data-gh-net]");
+      netLine.hidden = !NET.on;
+      if (NET.on) netLine.innerHTML = NET.connected ? "Signed in to GitHub as <b>" + esc(NET.user.login) + "</b>. " + '<button type="button" class="linkbtn" data-act="gh-signout">Sign out</button>'
+        : "The first time you publish, GitHub asks you to sign in and allow this site.";
     }
     function watch(id){
       claudeUse("db").then(function(db){
@@ -39681,6 +39723,22 @@ if sys.platform == "emscripten":
       });
     }
     readmeIn.value = mode === "auto" ? autoText() : saved.readme;
+    NET.onchange = function(){
+      if (!document.body.contains(card)) return;
+      if (NET.connected && NET.user && NET.user.login.toLowerCase() !== GH_OWNER.toLowerCase() && repoIn.value.trim() === GH_DEFAULT_REPO && NET.repos.length){ repoIn.value = NET.repos[0].full_name; persist(); paintDest(); }
+      refresh();
+      var j = NET.just; NET.just = "";
+      if (j === "connected" && NET.connected) st.textContent = "Signed in to GitHub as " + NET.user.login + ". Press Publish to GitHub to finish.";
+      else if (j === "installed") st.textContent = "The publishing app is installed. Press Publish to GitHub.";
+      else if (j === "error") st.textContent = "GitHub sign-in did not finish. Press Publish to GitHub to try again.";
+    };
+    if (NET.on) setTimeout(NET.onchange, 0);
+    card.addEventListener("click", function(e){
+      if (!e.target.closest('[data-act="gh-signout"]')) return;
+      fetch("/api/github/disconnect", { method: "POST", credentials: "same-origin", headers: { "X-FDE-CSRF": NET.csrf || "" } }).catch(function(){}).then(function(){
+        NET.connected = false; NET.user = null; NET.csrf = null; NET.repos = []; refresh(); st.textContent = "Signed out of GitHub.";
+      });
+    });
     [repoIn, folderIn].forEach(function(el){ el.addEventListener("input", function(){ persist(); paintDest(); }); });
     readmeIn.addEventListener("input", function(){ if (mode === "auto"){ mode = "edited"; paintMode(); } persist(); });
     ta.addEventListener("input", regenSoon); ta.addEventListener("code-replaced", regen); readmeIn.addEventListener("regen", regenSoon);
@@ -39720,16 +39778,42 @@ if sys.platform == "emscripten":
       regen();
       var repo = repoIn.value.trim(), folder = folderIn.value.trim(), readme = readmeIn.value, c = checks();
       if (!ex.pub && !ta.value.trim()){ st.textContent = "Write some code first."; ta.focus(); return; }
-      if (!validRepo(repo)){ st.textContent = "Write the repository as " + GH_OWNER + "/name, for one of your own repositories."; card.querySelector(".gh-where").open = true; repoIn.focus(); return; }
+      if (!validRepo(repo)){ st.textContent = NET.on ? "Write the repository as owner/name, for example " + GH_DEFAULT_REPO + "." : "Write the repository as " + GH_OWNER + "/name, for one of your own repositories."; card.querySelector(".gh-where").open = true; repoIn.focus(); return; }
       if (!validFolder(folder)){ st.textContent = "Use a folder like exercises/phase-1/my-exercise: letters, numbers, - and _, separated by /."; card.querySelector(".gh-where").open = true; folderIn.focus(); return; }
       if (!readme.trim()){ st.textContent = "The README is empty. Press Go back to the automatic README, or write one."; readmeIn.focus(); return; }
       var files = publishFiles(ex, ta.value, readme);
       var body = { kind: "ai-study-publish", status: "queued", repo: repo, folder: folder, title: itemTitle(ex),
         message: "Publish " + itemTitle(ex) + (ex.portfolio ? " (portfolio project)" : ex.phase ? " (Phase " + PHASE_BY_ID[ex.phase].n + ")" : ""), files: files, source: ex.id,
         section: sectionOf(ex), summary: summaryOf(ex).slice(0, 240), createdAt: Date.now() };
-      if (bytesOf(JSON.stringify(body)) > GH_MAX_BYTES){ st.textContent = "These files are too large to publish from here. Download the .zip and upload it on github.com instead."; return; }
+      if (bytesOf(JSON.stringify(body)) > (NET.on ? 1900000 : GH_MAX_BYTES)){ st.textContent = "These files are too large to publish from here. Download the .zip and upload it on github.com instead."; return; }
+      if (NET.on && !NET.connected){ st.textContent = "Opening GitHub to sign in…"; location.assign("/api/github/authorize?return=" + encodeURIComponent(location.hash)); return; }
+      if (NET.on && !NET.repos.some(function(r){ return r.full_name.toLowerCase() === repo.toLowerCase(); })){
+        st.innerHTML = "The publishing app can't write to <b>" + esc(repo) + "</b> yet. " + (NET.installUrl ? '<a href="' + esc(NET.installUrl) + '" target="_blank" rel="noopener">Give it access to that repository</a>, then press Publish again.' : "Install the app on that repository, then press Publish again.") +
+          (NET.repos.length ? " It can write to: " + NET.repos.map(function(r){ return esc(r.full_name); }).join(", ") + "." : "");
+        card.querySelector(".gh-where").open = true; return;
+      }
       var warn = ex.pub || c.passed === c.total ? "" : "\n\nNot every check passes yet, so the README calls it a work in progress.";
       if (!confirm("Publish " + Object.keys(files).length + " files to github.com/" + repo + " in the folder " + folder + "? If the repository is public, anyone can see them." + warn)) return;
+      if (NET.on){
+        publishBtn.disabled = true; st.textContent = "Publishing to GitHub…";
+        fetch("/api/github/publish", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-FDE-CSRF": NET.csrf || "" },
+          body: JSON.stringify({ repository: repo, folder: folder, files: files, message: body.message }) }).then(function(r){
+          return r.json().catch(function(){ return {}; }).then(function(d){ return { status: r.status, d: d }; });
+        }).then(function(x){
+          var it = item(); it.repo = repo; it.folder = folder; it.sentAt = Date.now(); it.requestId = "";
+          if (x.status === 200 && x.d.ok){
+            it.status = "published"; it.url = x.d.folderUrl || ""; it.repoUrl = x.d.repoUrl || ""; it.commitUrl = x.d.commitUrl || ""; it.doneAt = Date.now(); it.error = ""; save(); refresh();
+            st.textContent = x.d.unchanged ? "GitHub already has exactly these files, so nothing new was committed." : "Published " + x.d.files + " files to GitHub in one commit.";
+          } else if (x.status === 401){
+            NET.connected = false; NET.csrf = null; refresh(); st.textContent = "Your GitHub sign-in has expired. Press Publish to GitHub to sign in again.";
+          } else {
+            it.status = "failed"; it.error = String(x.d.error || "GitHub returned an error (" + x.status + ").").slice(0, 300); save(); refresh();
+            st.textContent = "Not published. " + it.error;
+          }
+        }, function(){ st.textContent = "Could not reach the publishing service. Check your connection and try again. Nothing was published."; })
+        .then(function(){ publishBtn.disabled = false; });
+        return;
+      }
       publishBtn.disabled = true; st.textContent = "Connecting…";
       Promise.all([claudeUse("db"), claudeUse("mcp")]).then(function(cc){
         var db = cc[0], mcp = cc[1];

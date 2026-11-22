@@ -1,5 +1,34 @@
 [build]
   publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/github/authorize"
+  to = "/.netlify/functions/github-authorize"
+  status = 200
+[[redirects]]
+  from = "/api/github/callback"
+  to = "/.netlify/functions/github-callback"
+  status = 200
+[[redirects]]
+  from = "/api/github/status"
+  to = "/.netlify/functions/github-status"
+  status = 200
+[[redirects]]
+  from = "/api/github/publish"
+  to = "/.netlify/functions/github-publish"
+  status = 200
+[[redirects]]
+  from = "/api/github/disconnect"
+  to = "/.netlify/functions/github-disconnect"
+  status = 200
+[[redirects]]
+  from = "/api/github/setup"
+  to = "/.netlify/functions/github-setup"
+  status = 200
 
 [[headers]]
   for = "/*"
