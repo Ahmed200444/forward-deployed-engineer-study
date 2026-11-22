@@ -58,7 +58,7 @@ This course covers the customer half of the job, which most AI curricula skip:
 ## Features
 
 - **Real code in the browser.** Python runs through [Pyodide](https://pyodide.org) (CPython compiled to WebAssembly), including NumPy, pandas and scikit-learn. JavaScript runs in a Web Worker with a 5-second limit, so an endless loop can't freeze the page.
-- **Auto-graded exercises.** Each exercise opens with a worked example from its lesson that you can edit and run, then the question and your own editor, which starts from the function header. It has named tests, three hints that open one at a time, and a model solution with a note on every line, hidden until you press **Show solution**.
+- **Auto-graded exercises.** Each exercise opens with a worked example from its lesson that you can edit and run, then the question and your own editor, which starts from the function header. It has named tests, three hints that open one at a time, and a model solution with a note on every line, hidden until you press **Show solution**. The solution and the pre-written starter are editors too, and every lesson ends with its exercises as numbered practice questions. Lesson code opens as an editor straight away.
 - **Edit and run any lesson example.** Code blocks open in an editor next to the text. Examples that can't run in a browser, such as servers, say why and can be downloaded.
 - **Progress that stays.** Progress, notes and drafts are saved in the browser, with backup and restore to a file.
 - **Spaced review** of missed quiz questions, full-text search and a study log.

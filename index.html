@@ -296,6 +296,12 @@ mark{background:var(--warn-soft);color:inherit;padding:0;border-radius:2px}
 .given-code pre,.sol-code{overflow-x:auto;max-width:100%}
 .sol-panel{border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:18px 0;min-width:0;background:var(--surface)}
 .sol-panel h2{margin-top:0}
+.pq-list{margin-top:32px;min-width:0}
+.pq{border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:16px 0;background:var(--surface);min-width:0}
+.pq-h{margin-top:0}
+.pq-prompt{min-width:0}
+.pq-prompt pre{overflow-x:auto;max-width:100%}
+.pq .sol-panel h4{margin-top:0}
 /* runnable lesson code */
 .snip-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:8px 0 18px}
 .snip-bar .btn{padding:6px 12px;font-size:13.5px}
@@ -41229,6 +41235,7 @@ if sys.platform == "emscripten":
     var done = !!state.lessons[l.id];
     var lab = fdeLabel(l.id);
     view.innerHTML = '<div class="eyebrow">Phase ' + ph.n + ' · Lesson ' + r.n + '<span class="fde-chip ' + (lab === "core" ? "core" : lab === "interview" ? "int" : "opt") + '">' + FDE_NAMES[lab] + '</span></div><h1>' + esc(l.title) + '</h1>' + l.html +
+      '<div data-pq-host></div>' +
       notesHTML("lesson") +
       '<div class="card"><div class="btn-row" style="margin:0;align-items:center">' +
       (done ? '<span class="done-badge">✓ Marked as read</span><button class="btn" type="button" data-act="unread">Mark as not read</button>'
@@ -41238,6 +41245,10 @@ if sys.platform == "emscripten":
       '</div>';
     wireSnippets(l);
     wireLineNotes(l);
+    openLessonEditors();
+    // The questions go in after the lesson code is wired, so their sample blocks stay plain text.
+    var pqHost = view.querySelector("[data-pq-host]"); if (pqHost) pqHost.outerHTML = practiceListHTML(exs);
+    exs.forEach(function(id, i){ wirePractice(EX[id], i + 1); });
     wireNotes(r.id);
     var lessonRefresh = function(){};
     snippetHook = function(){ lessonRefresh(); var b = view.querySelector("#gh-readme"); if (b) b.dispatchEvent(new Event("regen")); };
@@ -41246,6 +41257,69 @@ if sys.platform == "emscripten":
       var read = b.dataset.act === "read";
       if (read && !state.lessons[l.id]) logEvent("lessons");
       state.lessons[l.id] = read; save(); render(); });
+  }
+
+  /* ---------- practice questions inside a lesson ---------- */
+  // Each exercise of the lesson as "Question N": the question, an editor that shares its draft with the exercise page,
+  // Run and check (counts exactly like the exercise page), and a solution that stays hidden until Show solution.
+  function practiceListHTML(ids){
+    if (!ids.length) return "";
+    return '<section class="pq-list" aria-labelledby="pq-h"><h2 id="pq-h">Practice questions</h2><p class="meta">Write your own code for each question, press Run and check, and open the solution only when you want it.</p>' +
+      ids.map(function(id, i){ return practiceHTML(EX[id], i + 1); }).join("") + '</section>';
+  }
+  function practiceHTML(ex, n){
+    var file = ex.lang === "js" ? "main.js" : "main.py";
+    return '<div class="pq" id="pq-' + n + '"><h3 class="pq-h">Question ' + n + ': ' + esc(ex.title) + (state.ex[ex.id] ? ' <span class="done-badge">✓ Passed</span>' : '') + '</h3>' +
+      '<div class="pq-prompt">' + ex.prompt + '</div>' +
+      editorHTML("pq-code-" + n, file) +
+      '<div class="btn-row"><button class="btn primary" type="button" data-pq="run">▶ Run and check</button>' +
+      '<button class="btn" type="button" data-pq="sol" aria-expanded="false" aria-controls="pq-sol-' + n + '">Show solution</button>' +
+      '<button class="btn" type="button" data-pq="reset">Reset code</button>' +
+      '<a class="btn" href="#/ex/' + ex.id + '">Hints and notes →</a></div>' +
+      '<p class="status" data-pq-status role="status" aria-live="polite"></p><div data-pq-result></div>' +
+      '<div class="sol-panel" id="pq-sol-' + n + '" hidden><h4>Solution</h4>' + editorHTML("pq-solcode-" + n, ex.lang === "js" ? "solution.js" : "solution.py") +
+      '<p class="meta">You can change the solution and run it. It never counts as your pass.</p>' +
+      '<div class="btn-row"><button class="btn" type="button" data-pq="sol-run">▶ Run the solution</button><button class="btn" type="button" data-pq="sol-reset">Reset solution</button><button class="btn" type="button" data-pq="sol-hide">Hide solution</button></div>' +
+      '<p class="status" data-pq-solstatus role="status" aria-live="polite"></p><div data-pq-solresult></div></div></div>';
+  }
+  function wirePractice(ex, n){
+    var box = view.querySelector("#pq-" + n); if (!box) return;
+    var ta = box.querySelector("#pq-code-" + n), sta = box.querySelector("#pq-solcode-" + n);
+    var status = box.querySelector("[data-pq-status]"), result = box.querySelector("[data-pq-result]");
+    var runBtn = box.querySelector('[data-pq="run"]'), solBtn = box.querySelector('[data-pq="sol"]'), panel = box.querySelector("#pq-sol-" + n);
+    ta.value = state.drafts[ex.id] != null ? state.drafts[ex.id] : ex.starter;
+    sta.value = state.drafts["sol:" + ex.id] != null ? state.drafts["sol:" + ex.id] : ex.solution;
+    [ta, sta].forEach(function(t){ t.rows = Math.min(Math.max(t.value.split("\n").length + 1, 4), 22); });
+    var js = ex.lang === "js";
+    function run(code, st, host, mine, done){
+      st.textContent = js || runner.ready ? "Running…" : "Loading Python (first run only, about 10 MB)…";
+      var started = Date.now();
+      (js ? jsRunner : runner).run(ex, code, function(msg){ st.textContent = msg; started = Date.now(); }).then(function(res){
+        st.textContent = mine ? "Finished in " + ((Date.now() - started) / 1000).toFixed(1) + " s." : "This is the solution's output. It does not count as your pass.";
+        if (mine){
+          state.tried[ex.id] = true; logEvent("runs");
+          var passedAll = res.ok && res.tests.length && res.tests.every(function(t){ return t.pass; });
+          if (passedAll && !state.ex[ex.id]){ state.ex[ex.id] = true; logEvent("passed"); st.textContent += " Marked as passed."; }
+          save(); paintNav(currentRoute().id);
+        }
+        renderResult(host, res, true);
+      }, function(err){ st.textContent = "Could not start Python: " + String(err.message || err).replace(/[.!?\s]+$/, "") + ". Check your internet connection and press Run again."; }).then(done);
+    }
+    function doRun(){ if (runBtn.disabled) return; runBtn.disabled = true; run(ta.value, status, result, true, function(){ runBtn.disabled = false; }); }
+    var solRun = box.querySelector('[data-pq="sol-run"]');
+    function doSol(){ if (solRun.disabled) return; solRun.disabled = true; run(sta.value, box.querySelector("[data-pq-solstatus]"), box.querySelector("[data-pq-solresult]"), false, function(){ solRun.disabled = false; }); }
+    wireEditor(ta, doRun, function(){ state.drafts[ex.id] = ta.value; save(); });
+    wireEditor(sta, doSol, function(){ state.drafts["sol:" + ex.id] = sta.value; save(); });
+    runBtn.addEventListener("click", doRun);
+    solRun.addEventListener("click", doSol);
+    function setSol(open){ panel.hidden = !open; solBtn.setAttribute("aria-expanded", String(open)); solBtn.textContent = open ? "Hide solution" : "Show solution"; }
+    solBtn.addEventListener("click", function(){ setSol(panel.hidden); });
+    box.querySelector('[data-pq="sol-hide"]').addEventListener("click", function(){ setSol(false); solBtn.focus(); });
+    box.querySelector('[data-pq="sol-reset"]').addEventListener("click", function(){ sta.value = ex.solution; delete state.drafts["sol:" + ex.id]; save(); sta.focus(); });
+    box.querySelector('[data-pq="reset"]').addEventListener("click", function(){
+      if (!confirm("Reset to the starting code? Your current code will be lost.")) return;
+      ta.value = ex.starter; delete state.drafts[ex.id]; save(); result.innerHTML = ""; status.textContent = ""; ta.dispatchEvent(new Event("code-replaced")); ta.focus();
+    });
   }
 
   /* ---------- publishing lessons and local projects ---------- */
@@ -41411,6 +41485,21 @@ if sys.platform == "emscripten":
   }
 
   /* ---------- runnable lesson code ---------- */
+  var autoOpening = false;
+  // Open every lesson editor once the line notes are in place (they count the lesson's own code blocks).
+  function openLessonEditors(){
+    autoOpening = true;
+    try { view.querySelectorAll('[data-act="snip-open"], [data-act="snip-edit"]').forEach(function(b){ if (b.getAttribute("aria-expanded") !== "true") b.click(); }); }
+    finally { autoOpening = false; }
+    // Put each "Line by line" panel under its editor, so the code comes first.
+    view.querySelectorAll("details.line-notes").forEach(function(d){
+      var pre = d.previousElementSibling; if (!pre || pre.tagName !== "PRE" || !pre.hidden) return;
+      var n = d.nextElementSibling, after = null;
+      if (n && n.classList.contains("snip-bar")) after = n.nextElementSibling && n.nextElementSibling.classList.contains("snip-panel") ? n.nextElementSibling : n;
+      else if (n && n.classList.contains("snip-edit-wrap")) after = n.nextElementSibling && n.nextElementSibling.classList.contains("snip-panel") ? n.nextElementSibling : n;
+      if (after) after.after(d);
+    });
+  }
   // Every lesson <pre> gets either an "Edit and run" editor or a one-line reason it cannot run here.
   function wireSnippets(l){
     view.querySelectorAll("pre").forEach(function(pre, i){
@@ -41422,7 +41511,7 @@ if sys.platform == "emscripten":
         '<span class="meta">' + lang + (state.drafts[dkey] != null ? " · your edits are saved" : "") + '</span></div>');
       var bar = pre.nextElementSibling, openBtn = bar.querySelector("button"), panel = null;
       openBtn.addEventListener("click", function(){
-        if (panel){ panel.remove(); panel = null; openBtn.setAttribute("aria-expanded", "false"); openBtn.textContent = "▶ Edit and run"; return; }
+        if (panel){ panel.remove(); panel = null; pre.hidden = false; openBtn.setAttribute("aria-expanded", "false"); openBtn.textContent = "▶ Edit and run"; return; }
         openBtn.setAttribute("aria-expanded", "true"); openBtn.textContent = "Close editor";
         var id = "snip-" + i;
         bar.insertAdjacentHTML("afterend", '<div class="snip-panel" id="' + id + '">' +
@@ -41456,7 +41545,8 @@ if sys.platform == "emscripten":
         panel.querySelector('[data-act="snip-reset"]').addEventListener("click", function(){
           ta.value = original; delete state.drafts[dkey]; save(); result.innerHTML = ""; status.textContent = "Back to the lesson code."; if (snippetHook) snippetHook(); ta.focus();
         });
-        ta.focus();
+        pre.hidden = true;
+        if (!autoOpening) ta.focus();
       });
     });
   }
@@ -41475,7 +41565,7 @@ if sys.platform == "emscripten":
       offerFile(key.replace("#", "-") + "-recorded.zip", makeZip(recordedFiles(key, RECORDED[key], original))).then(function(){ st.textContent = "Saved " + key.replace("#", "-") + "-recorded.zip."; }, function(e){ st.textContent = downloadErrorText(e); });
     });
     openBtn.addEventListener("click", function(){
-      if (panel){ panel.remove(); panel = null; openBtn.setAttribute("aria-expanded", "false"); openBtn.textContent = "✎ Edit"; return; }
+      if (panel){ panel.remove(); panel = null; pre.hidden = false; openBtn.setAttribute("aria-expanded", "false"); openBtn.textContent = "✎ Edit"; return; }
       var id = "snipe-" + key.replace(/[^a-z0-9]/gi, "-");
       openBtn.setAttribute("aria-expanded", "true"); openBtn.textContent = "Close editor"; openBtn.setAttribute("aria-controls", id);
       bar.insertAdjacentHTML("afterend", '<div class="snip-panel" id="' + id + '"><div class="editor-wrap"><div class="editor-head"><span>' + esc(fname) + '</span><span>Edit only: this does not run in the page</span></div>' +
@@ -41493,7 +41583,8 @@ if sys.platform == "emscripten":
       panel.querySelector('[data-act="snip-reset"]').addEventListener("click", function(){
         ta.value = original; delete state.drafts[dkey]; save(); status.textContent = "Back to the lesson code."; if (snippetHook) snippetHook(); ta.focus();
       });
-      ta.focus();
+      pre.hidden = true;
+      if (!autoOpening) ta.focus();
     });
   }
 
@@ -41700,7 +41791,7 @@ if sys.platform == "emscripten":
     var wex = pf ? null : workedExample(ex);
     var noWex = !wex && !pf && ex.lesson && LESSON_BY_ID[ex.lesson];
     view.innerHTML = head + (wex ? wexHTML(wex) + '<h2 class="yt-h">Your turn</h2>' : noWex ? '<p class="meta wex-none">No worked example here: ' + (/<pre/.test(noWex.html) ? 'the code in <a href="#/lesson/' + noWex.id + '">its lesson</a> does not run in a web page (it needs a server, a model download or your own computer, or it is not Python).' : '<a href="#/lesson/' + noWex.id + '">its lesson</a> has no code example.') + '</p>' : '') + '<div>' + ex.prompt + '</div>' +
-      (ex.given ? '<details class="given-code"><summary>Pre-written starter code (it has mistakes on purpose)</summary><p class="meta">Some hints and the explanation compare the solution with this code. Your editor below starts from just the function header, so you write it yourself.</p><pre><code>' + esc(ex.given) + '</code></pre><div class="btn-row"><button class="btn" type="button" data-act="use-given">Put this code in my editor</button></div></details>' : '') +
+      (ex.given ? '<details class="given-code"><summary>Pre-written starter code (it has mistakes on purpose)</summary><p class="meta">Some hints and the explanation compare the solution with this code. Your editor below starts from just the function header, so you write it yourself.</p>' + editorHTML("given-code", ex.lang === "js" ? "starter.js" : "starter.py") + '<div class="btn-row"><button class="btn" type="button" data-act="given-run">▶ Run it</button><button class="btn" type="button" data-act="use-given">Put this code in my editor</button><button class="btn" type="button" data-act="given-reset">Reset</button></div><p class="status" data-given-status role="status" aria-live="polite"></p><div data-given-result></div></details>' : '') +
       ((isProject || pf) ? readinessHTML(ex.id) : '') +
       (state.ex[ex.id] ? '<p><span class="done-badge">✓ Passed</span></p>' : '') +
       editorHTML("code", ex.lang === "js" ? "main.js" : "main.py") +
@@ -41710,8 +41801,8 @@ if sys.platform == "emscripten":
       '<button class="btn" type="button" data-act="reset">Reset code</button></div>' +
       '<div class="hint-list" data-hints aria-live="polite"></div>' +
       '<p class="status" id="run-status" role="status" aria-live="polite"></p><div id="result"></div>' +
-      '<div class="sol-panel" id="sol-panel" hidden><h2>Solution</h2><p class="meta">One model solution. Yours can be different and still be right: the checks decide.</p><pre class="sol-code"><code>' + esc(ex.solution) + '</code></pre>' +
-      '<div class="btn-row"><button class="btn" type="button" data-act="sol-run">▶ Run the solution</button><button class="btn" type="button" data-act="sol-use">Put it in my editor</button><button class="btn" type="button" data-act="sol-hide">Hide solution</button></div>' +
+      '<div class="sol-panel" id="sol-panel" hidden><h2>Solution</h2><p class="meta">One model solution. Yours can be different and still be right: the checks decide.</p>' + editorHTML("sol-code", ex.lang === "js" ? "solution.js" : "solution.py") + '<p class="meta">You can change the solution and run it to see what happens. Your changes are saved here and never count as your pass.</p>' +
+      '<div class="btn-row"><button class="btn" type="button" data-act="sol-run">▶ Run the solution</button><button class="btn" type="button" data-act="sol-use">Put it in my editor</button><button class="btn" type="button" data-act="sol-reset">Reset solution</button><button class="btn" type="button" data-act="sol-hide">Hide solution</button></div>' +
       '<p class="status" data-sol-status role="status" aria-live="polite"></p><div data-sol-result></div>' + (ex.explain ? '<div data-explain></div>' : '') + '<div data-solution-lines></div></div>' +
       (isProject || pf ? '<h2>Definition of done</h2><ul><li>All ' + ex.tests.length + ' checks above pass.</li><li>You can explain every line without notes.</li></ul>' : '') +
       notesHTML("ex") + ((isProject || pf) ? publishHTML(ex) : "");
@@ -41758,6 +41849,29 @@ if sys.platform == "emscripten":
       solPanel.hidden = !open; solutionBtn.setAttribute("aria-expanded", String(open)); solutionBtn.textContent = open ? "Hide solution" : "Show solution";
     }
     if (wex) wireWex(wex, ex);
+    // The solution and the pre-written starter are editors too. Edits are kept per exercise and never mark it as passed.
+    function sideEditor(id, key, original){
+      var e = view.querySelector("#" + id); if (!e) return null;
+      e.value = state.drafts[key] != null ? state.drafts[key] : original;
+      e.rows = Math.min(Math.max(e.value.split("\n").length + 1, 4), 22);
+      return e;
+    }
+    var solTa = sideEditor("sol-code", "sol:" + ex.id, ex.solution);
+    var givenTa = ex.given ? sideEditor("given-code", "given:" + ex.id, ex.given) : null;
+    function runSide(btn, code, statusEl, resultEl, label){
+      if (btn.disabled) return; btn.disabled = true;
+      var js = ex.lang === "js";
+      statusEl.textContent = js || runner.ready ? "Running…" : "Loading Python (first run only, about 10 MB)…";
+      (js ? jsRunner : runner).run(ex, code, function(msg){ statusEl.textContent = msg; }).then(function(res){
+        statusEl.textContent = label; renderResult(resultEl, res, true);
+      }, function(err){ statusEl.textContent = "Could not start Python: " + String(err.message || err).replace(/[.!?\s]+$/, "") + ". Check your internet connection and press Run again."; }).then(function(){ btn.disabled = false; });
+    }
+    if (givenTa){
+      var gRun = view.querySelector('[data-act="given-run"]'), gSt = view.querySelector("[data-given-status]"), gRes = view.querySelector("[data-given-result]");
+      wireEditor(givenTa, function(){ runSide(gRun, givenTa.value, gSt, gRes, "This is the pre-written code's output. It does not count as your pass."); }, function(){ state.drafts["given:" + ex.id] = givenTa.value; save(); });
+      gRun.addEventListener("click", function(){ runSide(gRun, givenTa.value, gSt, gRes, "This is the pre-written code's output. It does not count as your pass."); });
+      view.querySelector('[data-act="given-reset"]').addEventListener("click", function(){ givenTa.value = ex.given; delete state.drafts["given:" + ex.id]; save(); gRes.innerHTML = ""; gSt.textContent = "Back to the pre-written code."; givenTa.focus(); });
+    }
     paintHints();
     wireNotes(r.id);
     var refreshPublish = (isProject || pf) ? wirePublish(ex, ta, isProject) : function(){};
@@ -41792,21 +41906,23 @@ if sys.platform == "emscripten":
     view.querySelector('[data-act="sol-hide"]').addEventListener("click", function(){ setSol(false); solutionBtn.focus(); });
     view.querySelector('[data-act="sol-use"]').addEventListener("click", function(){
       if (!confirm("Replace your code with the model solution? Your current code will be lost. Before you use it, make sure you can explain every line.")) return;
-      ta.value = ex.solution; state.drafts[ex.id] = ta.value; save(); ta.dispatchEvent(new Event("code-replaced")); ta.focus();
+      ta.value = solTa.value; state.drafts[ex.id] = ta.value; save(); ta.dispatchEvent(new Event("code-replaced")); ta.focus();
     });
     var useGiven = view.querySelector('[data-act="use-given"]');
     if (useGiven) useGiven.addEventListener("click", function(){
       if (!confirm("Replace your code with the pre-written starter code? Your current code will be lost.")) return;
-      ta.value = ex.given; state.drafts[ex.id] = ta.value; save(); ta.dispatchEvent(new Event("code-replaced")); ta.focus();
+      ta.value = givenTa.value; state.drafts[ex.id] = ta.value; save(); ta.dispatchEvent(new Event("code-replaced")); ta.focus();
     });
     var solRun = view.querySelector('[data-act="sol-run"]'), solStatus = view.querySelector("[data-sol-status]"), solResult = view.querySelector("[data-sol-result]");
+    wireEditor(solTa, function(){ solRun.click(); }, function(){ state.drafts["sol:" + ex.id] = solTa.value; save(); });
+    view.querySelector('[data-act="sol-reset"]').addEventListener("click", function(){ solTa.value = ex.solution; delete state.drafts["sol:" + ex.id]; save(); solResult.innerHTML = ""; solStatus.textContent = "Back to the model solution."; solTa.focus(); });
     solRun.addEventListener("click", function(){
       if (solRun.disabled) return; solRun.disabled = true;
       var js = ex.lang === "js";
       solStatus.textContent = js || runner.ready ? "Running the solution…" : "Loading Python (first run only, about 10 MB)…";
       // Runs the model solution only to show its output. It does not mark the exercise as passed.
-      (js ? jsRunner : runner).run(ex, ex.solution, function(msg){ solStatus.textContent = msg; }).then(function(res){
-        solStatus.textContent = "This is the model solution's output. It does not count as your pass."; renderResult(solResult, res, true);
+      (js ? jsRunner : runner).run(ex, solTa.value, function(msg){ solStatus.textContent = msg; }).then(function(res){
+        solStatus.textContent = "This is the solution's output. It does not count as your pass."; renderResult(solResult, res, true);
       }, function(err){ solStatus.textContent = "Could not start Python: " + String(err.message || err).replace(/[.!?\s]+$/, "") + ". Check your internet connection and press Run again."; }).then(function(){ solRun.disabled = false; });
     });
     view.querySelector('[data-act="reset"]').addEventListener("click", function(){
