@@ -61,6 +61,48 @@ code,pre,textarea.code{font-family:"JetBrains Mono",ui-monospace,Consolas,monosp
 .qbox-lang{margin-left:6px}
 .hero-sub{color:var(--muted);margin-top:-6px}
 .path-table td:first-child{white-space:nowrap;font-variant-numeric:tabular-nums}
+.hero{position:relative;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:28px;align-items:center;margin:0 0 22px;padding:34px 34px 30px;border-radius:16px;color:#e9ecff;overflow:hidden;
+  background:radial-gradient(120% 140% at 100% 0%,rgba(122,146,255,.35) 0%,rgba(122,146,255,0) 55%),radial-gradient(90% 120% at 0% 100%,rgba(45,190,160,.22) 0%,rgba(45,190,160,0) 60%),linear-gradient(135deg,#141a3a 0%,#1d2557 55%,#212a66 100%);
+  box-shadow:0 10px 30px rgba(20,26,58,.25)}
+.hero::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(180deg,#000 0%,transparent 85%);-webkit-mask-image:linear-gradient(180deg,#000 0%,transparent 85%);pointer-events:none}
+.hero>*{position:relative;z-index:1;min-width:0}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#b9c4ff;padding:4px 10px;border:1px solid rgba(185,196,255,.35);border-radius:99px;background:rgba(255,255,255,.06)}
+.view .hero h1{color:#fff;font-size:clamp(26px,3.4vw,38px);line-height:1.15;letter-spacing:-.02em;margin:14px 0 12px}
+.hero-lede{font-size:16px;line-height:1.6;color:#c9cfee;margin:0 0 20px;max-width:60ch}
+.hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.hero .hero-btn{background:#fff;color:#1d2557;border-color:#fff}
+.hero .hero-btn:hover{background:#e8edff}
+.hero .hero-btn-ghost{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.3)}
+.hero .hero-btn-ghost:hover{background:rgba(255,255,255,.14)}
+.hero a:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0;padding-top:18px;border-top:1px solid rgba(255,255,255,.14)}
+.hero-stats div{min-width:0}
+.hero-stats dd{margin:0;font-size:26px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1}
+.hero-stats dt{font-size:12px;color:#aab3e0;margin-bottom:2px;order:2}
+.hero-stats div{display:flex;flex-direction:column-reverse}
+.hero-term{background:rgba(8,11,28,.72);border:1px solid rgba(255,255,255,.12);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.35);overflow:hidden}
+.ht-bar{display:flex;align-items:center;gap:6px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.08);font-size:12px;color:#8e97c4}
+.ht-bar i{width:10px;height:10px;border-radius:50%;background:#3a4170;display:inline-block}
+.ht-bar i:first-child{background:#ff6b6b}.ht-bar i:nth-child(2){background:#f7c548}.ht-bar i:nth-child(3){background:#4ad295}
+.ht-bar span{margin-left:8px;font-family:"JetBrains Mono",ui-monospace,monospace}
+.view .hero-term pre{margin:0;padding:14px 16px;background:transparent;border:0;border-radius:0;box-shadow:none;color:#d7dcf5;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;line-height:1.75;white-space:pre-wrap;overflow-x:auto}
+.view .hero-term pre span{background:none}
+.ht-ok{color:#4ad295;font-weight:600}.ht-c{color:#8e97c4}.ht-sum{color:#4ad295;font-weight:600}
+.hero-sub2{color:var(--muted);margin-top:-2px}
+.pillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0 8px}
+.pillar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);min-width:0;border-top:3px solid var(--accent)}
+.pillar:nth-child(2){border-top-color:#7c5cff}.pillar:nth-child(3){border-top-color:var(--good)}
+.view .pillar h3{margin:0 0 4px;font-size:16px}
+.view .pillar p{margin:0 0 10px;font-size:14px;color:var(--muted)}
+.view .pillar p.meta{margin:10px 0 0;font-size:12.5px}
+.view .tags{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.view .tags li{margin:0;line-height:1.6;font-size:12px;font-weight:500;padding:2px 9px;border-radius:99px;background:var(--surface-2);border:1px solid var(--border);color:var(--text)}
+.phase-card{transition:border-color .15s,transform .15s,box-shadow .15s}
+.phase-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.phase-card.pc-feature{border-color:var(--accent);background:linear-gradient(0deg,var(--surface),var(--surface)) padding-box,linear-gradient(135deg,var(--accent),#7c5cff) border-box;border:1.5px solid transparent}
+@media (prefers-reduced-motion: reduce){.phase-card{transition:none}.phase-card:hover{transform:none}}
+@media (max-width:1180px){.hero{grid-template-columns:minmax(0,1fr)}.hero-term{max-width:560px}}
+@media (max-width:700px){.hero{padding:24px 18px 20px;border-radius:12px}.hero-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.pillars{grid-template-columns:minmax(0,1fr)}.view .hero-term pre{font-size:11.5px}}
 
 #view:focus{outline:none}
 
@@ -38544,31 +38586,38 @@ if sys.platform == "emscripten":
   var pager = document.querySelector("[data-pager]");
 
   function renderHome(){
-    var html = '<div class="eyebrow">Forward Deployed Engineer Study</div><h1>Become a forward deployed engineer, one phase at a time</h1>' +
-      '<p class="lede">A forward deployed engineer builds and ships AI systems inside a customer\'s company: on their data, in their systems, past their security review, and then turns what worked into reusable tools. Twelve phases take you from Python foundations through LLM apps, RAG and agents to the customer work itself. Every lesson, quiz and exercise runs in this page, and your progress is saved in this browser automatically.</p>';
-    if (state.last && routeIndex[state.last] != null && state.last !== "home"){
-      html += '<p><a class="btn primary" href="#/' + state.last + '">Continue: ' + esc(ROUTES[routeIndex[state.last]].title) + ' →</a></p>';
-    } else {
-      html += '<p><a class="btn primary" href="#/ph0">Start Phase 0 →</a></p>';
-    }
+    var nL = 0, nE = 0, nP = 0;
+    PHASES.forEach(function(ph){ nL += ph.lessons.length; nE += ph.exOrder.length; if (ph.project) nP++; });
+    nP += (PORTFOLIO && PORTFOLIO.length) || 0;
+    var cont = state.last && routeIndex[state.last] != null && state.last !== "home";
+    var html = '<section class="hero" aria-labelledby="hero-title"><div class="hero-main">' +
+      '<span class="hero-kicker">Forward Deployed Engineer Study</span>' +
+      '<h1 id="hero-title">Ship AI systems where the customer\'s problem lives.</h1>' +
+      '<p class="hero-lede">A forward deployed engineer builds LLM, RAG and agent systems inside a customer\'s company: on their data, in their systems, past their security review. Then they turn what worked into reusable tools. This path goes from Python foundations to that customer work, and every lesson, quiz and exercise runs in this page.</p>' +
+      '<div class="hero-cta">' + (cont
+        ? '<a class="btn hero-btn" href="#/' + state.last + '">Continue: ' + esc(ROUTES[routeIndex[state.last]].title) + ' →</a><a class="btn hero-btn-ghost" href="#/fde">The FDE course</a>'
+        : '<a class="btn hero-btn" href="#/ph0">Start Phase 0 →</a><a class="btn hero-btn-ghost" href="#/fde">Jump to the FDE course</a>') + '</div>' +
+      '<dl class="hero-stats"><div><dt>Lessons</dt><dd>' + nL + '</dd></div><div><dt>Auto-graded exercises</dt><dd>' + nE + '</dd></div><div><dt>Projects</dt><dd>' + nP + '</dd></div><div><dt>Installs needed</dt><dd>0</dd></div></dl>' +
+      '</div><div class="hero-term" aria-hidden="true"><div class="ht-bar"><i></i><i></i><i></i><span>verify_webhook.py · tests</span></div>' +
+      '<pre><span class="ht-c">$ run checks</span>\n<span class="ht-ok">✓</span> fresh signature accepted\n<span class="ht-ok">✓</span> tampered body rejected\n<span class="ht-ok">✓</span> stale timestamp rejected\n<span class="ht-ok">✓</span> malformed header rejected\n<span class="ht-ok">✓</span> constant-time compare\n\n<span class="ht-sum">5 passed</span> <span class="ht-c">in 0.0 s · Pyodide</span></pre></div></section>';
     var due = dueReviews().length, week = weekSummary(0);
     html += '<div class="grid home-stats">' +
       '<a class="stat stat-link" href="#/review"><div class="v">' + due + '</div><div class="l">' + (due === 1 ? "question" : "questions") + ' due for review</div></a>' +
       '<a class="stat stat-link" href="#/activity"><div class="v">' + week.days + ' / 7</div><div class="l">days studied this week</div></a>' +
       '<a class="stat stat-link" href="#/activity"><div class="v">' + week.total + '</div><div class="l">things done this week</div></a></div>';
-    html += '<div class="fde-box"><h2>What the job asks for</h2><p>Current FDE postings at AI labs and startups ask for three things. This site covers all three:</p><ul>' +
-      '<li><b>Engineering:</b> Python, SQL, APIs, Docker, a cloud, and often TypeScript (Phases 0 to 5, and Phase 9).</li>' +
-      '<li><b>AI systems:</b> LLM apps, evaluations, RAG, agents and MCP (Phases 6 to 8).</li>' +
-      '<li><b>Customer work:</b> discovery, scoping, integration, security reviews, rollout and stakeholders (Phase 9).</li></ul>' +
-      '<p class="meta">Every lesson is labelled <b>FDE core</b>, <b>FDE interviews</b> or <b>Optional for FDE</b>. Do the core lessons in order; come back to the optional ones for AI-engineer depth.</p></div>';
+    function pillar(t, d, tags, where){ return '<div class="pillar"><h3>' + t + '</h3><p>' + d + '</p><ul class="tags">' + tags.map(function(x){ return '<li>' + x + '</li>'; }).join("") + '</ul><p class="meta">' + where + '</p></div>'; }
+    html += '<h2>What the job asks for</h2><p class="hero-sub2">Current FDE postings at AI labs and startups ask for three things. Each lesson is labelled <b>FDE core</b>, <b>FDE interviews</b> or <b>Optional for FDE</b>: do the core lessons in order and come back to the optional ones for AI-engineer depth.</p><div class="pillars">' +
+      pillar("Engineering", "Clean, tested code that runs in someone else's systems.", ["Python", "SQL", "APIs", "Docker", "CI/CD", "TypeScript"], "Phases 0 to 5, and 9") +
+      pillar("AI systems", "LLM applications that are measured, not guessed.", ["Prompts", "Evals", "RAG", "Agents", "MCP", "Guardrails"], "Phases 6 to 8") +
+      pillar("Customer work", "The half of the job most courses skip.", ["Discovery", "Scoping", "Integration", "Security review", "Rollout", "Stakeholders"], "Phase 9") + '</div>';
     html += '<h2>Your path, in order</h2><div class="phase-cards">';
     PHASES.forEach(function(ph){
       var c = counts(ph), total = ph.lessons.length * 2 + ph.exOrder.length + (ph.project ? 1 : 0), got = c.l + c.q + c.e + c.p;
       var opt = ph.lessons.filter(function(l){ return fdeLabel(l.id) !== "core"; }).length;
-      html += '<a class="phase-card" href="#/' + ph.id + '"><div class="pc-top"><span><span class="pc-n">Phase ' + ph.n + '</span> <span class="pc-t">' + esc(ph.title) + '</span>' + (ph.id === "fde" ? '<span class="fde-chip core">New</span>' : '') + '</span>' +
+      html += '<a class="phase-card' + (ph.id === "fde" ? ' pc-feature' : '') + '" href="#/' + ph.id + '"><div class="pc-top"><span><span class="pc-n">Phase ' + ph.n + '</span> <span class="pc-t">' + esc(ph.title) + '</span>' + (ph.id === "fde" ? '<span class="fde-chip core">New</span>' : '') + '</span>' +
         '<span class="pc-s">' + (phaseDone(ph) ? "✓ Complete" : got + " / " + total + " done") + '</span></div>' +
         '<div class="pc-d">' + esc(ph.fde || ph.intro) + '</div>' +
-        '<div class="pc-d meta">' + (ph.lessons.length - opt) + ' of ' + ph.lessons.length + ' lessons are FDE core' + '</div>' + bar(got, total) + '</a>';
+        '<div class="pc-d meta">' + (ph.lessons.length - opt) + ' of ' + ph.lessons.length + ' lessons are FDE core · ' + ph.exOrder.length + ' exercises</div>' + bar(got, total) + '</a>';
     });
     html += '</div><div class="callout"><p><b>How each phase works:</b> read a lesson, take its quiz, then do the exercises. The project combines the phase. The checkpoint fills in by itself as you finish things. The first time you press Run, the page downloads Python (about 10 MB); later phases also download libraries such as pandas the first time you use them. JavaScript exercises run directly in the browser.</p></div>';
     view.innerHTML = html;

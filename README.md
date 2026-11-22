@@ -6,7 +6,7 @@
 ![No backend](https://img.shields.io/badge/backend-none-2d784c?style=flat-square)
 ![Tested with Playwright](https://img.shields.io/badge/tested%20with-Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white)
 
-**A study platform I built to train myself as a forward deployed engineer (FDE): 161 lessons, 234 auto-graded exercises in Python and JavaScript, and 12 projects. Everything runs in the browser, with no install, no backend and no sign-up.**
+**A study platform I built to train myself as a forward deployed engineer (FDE): 161 lessons, 234 auto-graded exercises in Python and JavaScript, and 18 projects (12 phase projects and 6 portfolio projects). Everything runs in the browser, with no install, no backend and no sign-up.**
 
 **Live site: [ahmed-fde-study.netlify.app](https://ahmed-fde-study.netlify.app)**
 
