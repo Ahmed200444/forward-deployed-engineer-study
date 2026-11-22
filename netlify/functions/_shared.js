@@ -7,10 +7,30 @@ const STATE_COOKIE = 'fde_gh_state';
 const API_VERSION = '2022-11-28';
 const SESSION_AGE = 60 * 60 * 24 * 180;
 
-function env(name){ const v = process.env[name]; if (!v) throw new Error(`Missing environment variable: ${name}`); return v; }
-function configured(){ return !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET && process.env.SESSION_SECRET); }
+// App settings come from Netlify environment variables if they are set, otherwise from the
+// site's Netlify Blobs store, where the one-time setup (github-setup.js) saves them. The browser never sees them.
+let CFG = null;
+function store(event){
+  try {
+    const { getStore, connectLambda } = require('@netlify/blobs');
+    if (event && event.blobs) connectLambda(event);
+    return getStore('github-publisher');
+  } catch (e) { return null; }
+}
+async function loadConfig(event){
+  const e = process.env;
+  if (e.GITHUB_CLIENT_ID && e.GITHUB_CLIENT_SECRET && e.SESSION_SECRET) return (CFG = { clientId: e.GITHUB_CLIENT_ID, clientSecret: e.GITHUB_CLIENT_SECRET, slug: e.GITHUB_APP_SLUG || '', sessionSecret: e.SESSION_SECRET });
+  if (CFG) return CFG;
+  const st = store(event); if (!st) return null;
+  const c = await st.get('config', { type: 'json' }).catch(() => null);
+  if (c && c.clientId && c.clientSecret && c.sessionSecret) CFG = c;
+  return CFG;
+}
+async function saveConfig(event, c){ const st = store(event); if (!st) throw new Error('Netlify Blobs is not available.'); await st.setJSON('config', c); CFG = c; }
+function cfg(){ if (!CFG) throw new Error('GitHub publishing is not set up.'); return CFG; }
+function configured(){ return !!CFG; }
 function siteUrl(){ return (process.env.SITE_URL || process.env.URL || '').replace(/\/$/, ''); }
-function key(){ return crypto.createHash('sha256').update(env('SESSION_SECRET')).digest(); }
+function key(){ return crypto.createHash('sha256').update(cfg().sessionSecret).digest(); }
 function b64url(buf){ return Buffer.from(buf).toString('base64url'); }
 function encrypt(obj){
   const iv = crypto.randomBytes(12), cipher = crypto.createCipheriv('aes-256-gcm', key(), iv);
@@ -55,7 +75,7 @@ async function gh(path, token, options = {}){
   return data;
 }
 async function tokenRequest(params){
-  const body = new URLSearchParams({ client_id: env('GITHUB_CLIENT_ID'), client_secret: env('GITHUB_CLIENT_SECRET'), ...params });
+  const body = new URLSearchParams({ client_id: cfg().clientId, client_secret: cfg().clientSecret, ...params });
   const r = await fetch('https://github.com/login/oauth/access_token', { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' }, body });
   const d = await r.json().catch(() => ({}));
   if (!r.ok || d.error) throw new Error(d.error_description || d.error || 'GitHub sign-in failed.');
@@ -88,4 +108,4 @@ function safePath(p){
   if (!p || p.length > 300 || p.split('/').some(x => !x || x === '.' || x === '..' || x === '.git' || !/^[A-Za-z0-9._ -]+$/.test(x))) { const e = new Error('Invalid file path: ' + p); e.status = 400; throw e; }
   return p;
 }
-module.exports = { COOKIE, STATE_COOKIE, SESSION_AGE, env, configured, siteUrl, encrypt, decrypt, cookies, cookie, json, redirect, header, csrfOk, gh, tokenRequest, sessionFrom, session, strongSecret, safePath };
+module.exports = { COOKIE, STATE_COOKIE, SESSION_AGE, loadConfig, saveConfig, cfg, configured, siteUrl, encrypt, decrypt, cookies, cookie, json, redirect, header, csrfOk, gh, tokenRequest, sessionFrom, session, strongSecret, safePath };

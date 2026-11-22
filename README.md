@@ -76,7 +76,7 @@ This course covers the customer half of the job, which most AI curricula skip:
 | Pyodide loaded on the first Run | Real CPython semantics and real libraries, with $0 hosting | The first run downloads about 10 MB; later runs are instant |
 | JavaScript graded in a Web Worker | Isolated from the page, and an endless loop can be stopped | Browser JavaScript, not Node: no `fs` or `require` in exercises |
 | `localStorage` for progress | Private and needs no account or server | Progress lives in one browser; backup and restore covers moving it |
-| Publishing through 6 small Netlify Functions and a GitHub App | One button, no tokens in the browser: the sign-in is an encrypted HttpOnly cookie, the app only gets Contents access to repositories you pick, and each publish is one atomic commit (Git Data API) | Needs a one-time GitHub App setup; publishing only works on the hosted site, not when `index.html` is opened from disk |
+| Publishing through 6 small Netlify Functions and a GitHub App | One button, no tokens in the browser: the sign-in is an encrypted HttpOnly cookie, the app only gets Contents access to repositories you pick, and each publish is one atomic commit (Git Data API) | Needs a one-time GitHub App setup (two clicks on GitHub); publishing only works on the hosted site, not when `index.html` is opened from disk |
 
 ## Quality checks
 
@@ -94,6 +94,7 @@ Before each release I run these checks in headless Chromium (Playwright):
 index.html                       the whole site: content, styles and app code in one file
 netlify.toml                     hosting config, API routes and security headers
 netlify/functions/               GitHub sign-in, status, publish, sign-out and one-time app setup
+package.json                     one dependency for the functions (@netlify/blobs, stores the app settings)
 github-setup.html                one-time GitHub App setup page (for the site owner)
 docs/FDE-RESEARCH-AND-GAPS.md    job-posting research, gap check and learning order
 docs/screenshots/                images used in this README

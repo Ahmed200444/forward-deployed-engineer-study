@@ -1,7 +1,8 @@
 // Tells the page whether publishing is set up, who is signed in, and which repositories the app can write to.
-const { configured, json, gh, session } = require('./_shared');
+const { loadConfig, configured, json, gh, session } = require('./_shared');
 exports.handler = async (event) => {
-  const slug = process.env.GITHUB_APP_SLUG || '';
+  const c = await loadConfig(event);
+  const slug = c && c.slug || '';
   const installUrl = slug ? `https://github.com/apps/${encodeURIComponent(slug)}/installations/new` : null;
   if (!configured()) return json(200, { configured: false });
   try {

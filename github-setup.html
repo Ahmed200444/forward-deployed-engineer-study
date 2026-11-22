@@ -21,20 +21,19 @@ a{color:var(--accent)}
 <body>
 <p><a href="/">← Back to the study site</a></p>
 <h1>Set up one-button GitHub publishing</h1>
-<p class="muted">You do this once, as the site owner. It takes about five minutes.</p>
+<p class="muted">You do this once, as the site owner. It takes two clicks on GitHub.</p>
 <div class="card">
 <ol>
-<li>Sign in to github.com in this browser.</li>
-<li>Press the button below. GitHub opens a page for a new GitHub App with every setting filled in. Choose <b>Create GitHub App</b>.</li>
-<li>GitHub sends you back to a page on this site that shows four values once. Paste them into Netlify's environment variables and redeploy.</li>
-<li>Install the app on your portfolio repository. Then <b>Publish to GitHub</b> works on every exercise, lesson and project.</li>
+<li>Press the button below (sign in to GitHub if it asks). GitHub shows a new GitHub App with every setting filled in. Press <b>Create GitHub App</b>.</li>
+<li>GitHub sends you straight to the install page. Choose <b>Only select repositories</b>, pick your portfolio repository and press <b>Install</b>.</li>
 </ol>
+<p>That's it. The first time you press <b>Publish to GitHub</b>, GitHub asks you to authorise the app once.</p>
 <form id="f" method="post" action="https://github.com/settings/apps/new">
 <input type="hidden" name="manifest" id="manifest">
 <button type="submit">Create the GitHub App</button>
 </form>
 </div>
-<p class="muted">The app asks for one repository permission, <b>Contents: read and write</b>, and only on the repositories you choose when you install it. It has no webhooks. Your sign-in is kept in an encrypted, HttpOnly cookie; the app's secret stays in Netlify and never reaches the browser.</p>
+<p class="muted">The app asks for one repository permission, <b>Contents: read and write</b>, and only on the repositories you choose when you install it. It has no webhooks. Your sign-in is kept in an encrypted, HttpOnly cookie. The app's secret is saved privately on Netlify by the setup step and never reaches the browser. Only an app created by the site owner's GitHub account is accepted.</p>
 <script>
 (function(){
   var o = location.origin, tag = Math.random().toString(36).slice(2, 7);

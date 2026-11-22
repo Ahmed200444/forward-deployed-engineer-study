@@ -1,0 +1,8 @@
+{
+  "name": "forward-deployed-engineer-study",
+  "private": true,
+  "description": "Static study site plus Netlify Functions for one-button GitHub publishing",
+  "dependencies": {
+    "@netlify/blobs": "8.2.0"
+  }
+}

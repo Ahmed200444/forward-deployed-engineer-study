@@ -1,7 +1,7 @@
 // Publishes one item (code, data, tests and the generated README) to a folder in one commit.
 // Uses the Git Data API so every file lands in a single atomic commit; an empty repository
 // (no branch yet) falls back to the Contents API, which creates the first commit.
-const { json, gh, session, csrfOk, strongSecret, safePath } = require('./_shared');
+const { loadConfig, json, gh, session, csrfOk, strongSecret, safePath } = require('./_shared');
 const MAX_FILES = 80, MAX_BYTES = 2000000;
 
 async function commitTree(o, r, branch, files, message, token){
@@ -31,6 +31,7 @@ exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method not allowed.' });
   let set = [];
   try {
+    if (!(await loadConfig(event))) return json(503, { error: 'GitHub publishing is not set up yet.' });
     const got = await session(event), s = got.session; set = got.cookie ? [got.cookie] : [];
     if (!s) return json(401, { error: 'Sign in to GitHub first.' }, set);
     if (!csrfOk(event, s)) return json(403, { error: 'Security check failed. Reload the page and try again.' }, set);
