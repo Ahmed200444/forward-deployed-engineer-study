@@ -62,7 +62,7 @@ This course covers the customer half of the job, which most AI curricula skip:
 - **Edit and run any lesson example.** Code blocks open in an editor next to the text. Examples that can't run in a browser, such as servers, say why and can be downloaded.
 - **Progress that stays.** Progress, notes and drafts are saved in the browser, with backup and restore to a file.
 - **Spaced review** of missed quiz questions, full-text search and a study log.
-- **One-button publish to GitHub.** Press **Publish to GitHub** on any phase project, the capstone or a portfolio project: the site signs you in with GitHub once, writes the README from your code, test results and notes, and commits the code, data, tests and README to your portfolio repository in a single commit. Every item can also be downloaded as a ready-to-push .zip (tests run with `pytest`, or `node --test` for JavaScript).
+- **One-button publish to GitHub.** Press **Publish to GitHub** on any phase project, the capstone or a portfolio project: the site signs you in with GitHub once, writes the README from your code, test results and notes, and commits the code, data, tests and README to your portfolio repository in a single commit. Every project can also be downloaded as a ready-to-push .zip (tests run with `pytest`, or `node --test` for JavaScript).
 - **Responsive and accessible.** Fixed navigation on desktop, a collapsible "Course contents" menu on mobile, light and dark themes, keyboard support and ARIA live regions for results.
 
 <p align="center"><img src="docs/screenshots/exercise.jpg" alt="An exercise with all tests passing" width="70%"> <img src="docs/screenshots/mobile-dark.jpg" alt="Mobile layout in dark mode" width="24%"></p>
