@@ -186,7 +186,7 @@ ax.set_ybound(-0.5, 2.5)
 ax.set_aspect("equal")
 ax.axhline(0, color="grey", lw=0.5)
 ax.axvline(0, color="grey", lw=0.5)
-ax.set_title("Cosine with a: same direction 0.71, right angle 0, opposite -1")
+ax.set_title("Cosine with a: 45 degrees 0.71, right angle 0, opposite -1")
 plt.show()
 '''},
 }
