@@ -1,0 +1,35 @@
+FDE Study: offline copy
+=======================
+
+This folder is the whole study site, including the Python runtime (folder py/) with
+numpy, pandas, matplotlib, scikit-learn, scipy, pytest and SQLite. It works without
+an internet connection.
+
+Start it (Windows)
+------------------
+1. Extract the whole zip first (right-click the zip > Extract All). Do not run it from
+   inside the zip.
+2. Open the extracted folder and double-click "Start FDE Study".
+   If Windows asks "Do you want to run this file?", choose Run.
+3. Your browser opens http://localhost:8765/ . Keep the black window open while you
+   study. Close it to stop.
+
+Start it (Mac or Linux)
+-----------------------
+Open a terminal in this folder and run:   sh start.sh
+Then open http://localhost:8765/ if it does not open by itself. Ctrl+C stops it.
+
+Why not just double-click index.html?
+-------------------------------------
+Browsers block the Python runtime on pages opened straight from a file. You can still
+read lessons that way, but Run will not work. The launcher serves the folder to your
+own computer only (localhost); nothing is sent anywhere.
+
+Your progress
+-------------
+Progress is saved in your browser for http://localhost:8765/ . It is separate from the
+online site. To move progress between them, use Backup and restore on the site: download
+a backup from one and restore it on the other. Always start with the launcher (same
+address and port) so the browser finds your saved progress again.
+
+Publish to GitHub works only on the online site.

@@ -130,6 +130,9 @@ GLOSS = {
     "sql:COALESCE": ("<code>COALESCE(a, b)</code> in SQL gives <code>a</code>, or <code>b</code> when <code>a</code> is NULL.", "", []),
 }
 
+from newhere_v31 import FILL, LESSON_LINKS, NOT_NEW  # noqa: E402
+GLOSS.update(FILL)
+
 DOCS = {"builtin": "https://docs.python.org/3/library/functions.html#{n}", "np": "https://numpy.org/doc/stable/reference/generated/numpy.{n}.html",
         "re": "https://docs.python.org/3/library/re.html#re.{n}", "math": "https://docs.python.org/3/library/math.html#math.{n}",
         "str": "https://docs.python.org/3/library/stdtypes.html#str.{n}", "pd": "https://pandas.pydata.org/docs/reference/api/pandas.{n}.html",
@@ -185,12 +188,27 @@ def evaluate():
     return {f: list(zip(GLOSS[f][2], v)) for f, v in zip(GLOSS, vals)}
 
 
+def _links(h):
+    # "(lesson Files and errors)" becomes a link to that lesson
+    for title, lid in LESSON_LINKS.items():
+        h = h.replace("(lesson " + title + ")", '(lesson <a href="#/lesson/' + lid + '">' + esc(title) + "</a>)")
+    return h
+
+
 def note_html(f, examples):
+    """A worked example: the code that sets it up (when there is any to show), then each expression and its real value."""
     if f in GLOSS:
-        h = GLOSS[f][0]
+        h = _links(GLOSS[f][0])
+        setup = GLOSS[f][1]
+        head, _, tail = setup.partition("#show\n")
+        imports = [ln for ln in head.split("\n") if ln.startswith(("import ", "from ")) and ln != "import sqlite3"]
+        shown = "\n".join(imports + ([tail.rstrip("\n")] if tail.strip() else []))
         ex = examples.get(f) or []
-        if ex:
-            h += "<br>" + "; ".join("<code>" + esc(e) + "</code> → <code>" + esc(v) + "</code>" for e, v in ex)
+        lines = [shown.rstrip("\n")] if shown.strip() else []
+        for e, v in ex:
+            lines.append(">>> " + e + "\n" + v)
+        if lines:
+            h += '<code class="pq-ex">' + esc("\n".join(lines)) + "</code>"
         return "<li>" + h + "</li>"
     return ('<li><code>' + esc(label(f)) + '</code> is not explained earlier in this course. '
             '<a href="' + doc_link(f) + '" target="_blank" rel="noopener">Read what it does</a> before you start.</li>')
@@ -206,7 +224,7 @@ def apply(iq, rows):
         if r["lesson"] in skip:
             continue
         done = seen.setdefault(r["lesson"], set())
-        feats = [f for f in r["missing"] if f != "UNPLACED" and f not in done]
+        feats = [f for f in r["missing"] if f != "UNPLACED" and f not in done and f not in NOT_NEW]
         if not feats:
             continue
         done.update(feats)

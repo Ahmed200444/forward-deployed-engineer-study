@@ -23,6 +23,12 @@ CSS = r"""
 table.trace caption,table.sql-rows caption{caption-side:top;text-align:left;font-size:13px;font-weight:600;color:var(--muted);padding:8px 12px 0}
 table.sql-rows td.null{color:var(--muted);font-style:italic}
 .lesson-out .table-wrap{margin:0;border:0;border-radius:0}
+/* v31: opened from a folder */
+.file-notice{display:none;margin:0 0 16px;padding:12px 14px;border:1px solid var(--warn);border-left-width:4px;border-radius:8px;background:var(--warn-soft);color:var(--text);font-size:14px;line-height:1.5}
+html[data-file] .file-notice{display:block}
+/* v31: worked examples in New here notes */
+.pq-before code.pq-ex{display:block;white-space:pre;overflow-x:auto;max-width:100%;margin:6px 0 4px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-size:13px;line-height:1.45}
+.pq-before li{margin:6px 0;min-width:0}
 """
 
 PATCHES = [
@@ -85,6 +91,40 @@ PATCHES = [
      "        plot = lambda v: (type(v).__module__ or \"\").startswith(\"matplotlib\")\\n"
      "        if value is not None and not plot(value) and not (isinstance(value, (list, tuple)) and value and any(plot(v) for v in value)):\\n"
      "            print(repr(value))\\n"),
+    # v31: Python loads from py/ next to index.html, so the downloaded bundle works from any folder (the hosted site is at the root, so this is still /py/)
+    ('<script>window.__PY_BASE__="/py/";</script>',
+     '<script>window.__PY_BASE__="py/";if(location.protocol==="file:")document.documentElement.setAttribute("data-file","");</script>'),
+    ('      <div class="view" id="view" tabindex="-1"></div>\n',
+     '      <div class="file-notice" role="note"><strong>Opened as a file, so Python cannot run.</strong> Browsers block the Python runtime on pages opened straight from a folder. '
+     'Close this tab and double-click <b>Start FDE Study</b> in the folder you extracted (on a Mac or Linux, run <code>start.sh</code>). '
+     'Lessons still read fine here. Steps are in <code>HOW-TO-START.txt</code>.</div>\n'
+     '      <div class="view" id="view" tabindex="-1"></div>\n'),
+    ('  function checkPyAssets(){\n    if (pyAssetsChecked) return pyAssetsChecked;\n',
+     '  function checkPyAssets(){\n    if (pyAssetsChecked) return pyAssetsChecked;\n'
+     '    if (location.protocol === "file:"){\n'
+     '      var fe = new Error("This page was opened straight from a file, and browsers do not let Python run that way. Close this tab and double-click Start FDE Study in the folder you extracted (on a Mac or Linux, run start.sh). Your code is still saved here");\n'
+     '      fe.deploy = true; return Promise.reject(fe);\n'
+     '    }\n'),
+    # v31: two tabs creating the same day's Study Log entry (or its lessonIds map) for the first time: merge key by key
+    # instead of letting the later save replace the whole record. Counters stay additions even when the parent is new.
+    ("      if (depth > 0 && plain(x) && plain(y)){\n",
+     "      if (depth > 0 && path[0] === \"log\" && x === undefined && plain(y)) x = {};\n"
+     "      if (depth > 0 && plain(x) && plain(y)){\n"),
+    # v31: the sidebar's Practice group is split: real projects under Projects, interview prep and the checkpoint under Review
+    ('    if (ph.project) ROUTES.push({ id: rid(ph, "project"), phase: P, kind: "project", group: "Practice", title: "Project: " + ph.projectTitle, n: "", ref: ph.project });\n    LOCAL.forEach(function(lp){ if (lp.phase === P) ROUTES.push({ id: "local/" + lp.id, phase: P, kind: "local", group: "Practice",',
+     '    if (ph.project) ROUTES.push({ id: rid(ph, "project"), phase: P, kind: "project", group: "Projects", title: ph.projectTitle.charAt(0).toUpperCase() + ph.projectTitle.slice(1), n: "", ref: ph.project });\n    LOCAL.forEach(function(lp){ if (lp.phase === P) ROUTES.push({ id: "local/" + lp.id, phase: P, kind: "local", group: "Projects",'),
+    ('    if (P === "ph7") ROUTES.push({ id: "lab/real-model", phase: P, kind: "lab", group: "Practice",',
+     '    if (P === "ph7") ROUTES.push({ id: "lab/real-model", phase: P, kind: "lab", group: "Projects",'),
+    ('    ROUTES.push({ id: rid(ph, "interview"), phase: P, kind: "interview", group: "Practice", title: "Interview prep", n: "" });\n    ROUTES.push({ id: rid(ph, "checkpoint"), phase: P, kind: "checkpoint", group: "Practice",',
+     '    ROUTES.push({ id: rid(ph, "interview"), phase: P, kind: "interview", group: "Review", title: "Interview prep", n: "" });\n    ROUTES.push({ id: rid(ph, "checkpoint"), phase: P, kind: "checkpoint", group: "Review",'),
+    # v31: after GitHub sign-in the review could fail to open when the page re-rendered the card in between
+    # (the old card took the flag and then found itself gone). Take the flag only when this card opens the review.
+    ('      if (flag === ex.id && (j === "connected" || NET.connected)){\n        try { sessionStorage.removeItem("fde-gh-review"); } catch(e){}\n        if (NET.connected){ setTimeout(function(){ if (document.body.contains(card)) openReview("Signed in to GitHub as " + NET.user.login + "."); }, 0); return; }\n      }',
+     '      if (flag === ex.id && (j === "connected" || NET.connected)){\n        if (NET.connected){ setTimeout(function(){ var f2 = null; try { f2 = sessionStorage.getItem("fde-gh-review"); } catch(e){} if (f2 === ex.id && document.body.contains(card)){ try { sessionStorage.removeItem("fde-gh-review"); } catch(e){} openReview("Signed in to GitHub as " + NET.user.login + "."); } }, 0); return; }\n        try { sessionStorage.removeItem("fde-gh-review"); } catch(e){}\n      }'),
+    # v31: a save arriving from another tab (or from this page before the GitHub sign-in reload) re-rendered the
+    # page and closed an open publish review. Treat an open review like typing: refresh the sidebar only.
+    ('    var a = document.activeElement, typing = a && view.contains(a) && /^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName);\n    if (why === "restored") navPhase = null;',
+     '    var a = document.activeElement, typing = (a && view.contains(a) && /^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)) || !!view.querySelector("[data-gh-review]:not([hidden])");\n    if (why === "restored") navPhase = null;'),
 ]
 
 

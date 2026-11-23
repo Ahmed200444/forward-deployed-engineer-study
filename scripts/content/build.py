@@ -26,6 +26,8 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import lessons as LS  # noqa: E402
+import lessons_v31 as L31  # noqa: E402
+LS.LESSONS.update(L31.LESSONS)
 import questions as QS  # noqa: E402
 import newhere as NH  # noqa: E402
 import patches as PT  # noqa: E402
@@ -127,7 +129,9 @@ def rows_panel(res, caption):
     if res["error"]:
         raise SystemExit("SQL block failed: " + res["error"])
     r = res["rows"]
-    cell = lambda v: '<td class="null">NULL</td>' if v is None else "<td>" + esc(str(v)) + "</td>"
+    # same text the live SQL runner shows: JavaScript prints 12.0 as 12
+    fmt = lambda v: str(int(v)) if isinstance(v, float) and v.is_integer() and abs(v) < 1e21 else str(v)
+    cell = lambda v: '<td class="null">NULL</td>' if v is None else "<td>" + esc(fmt(v)) + "</td>"
     head = "".join("<th scope=\"col\">" + esc(c) + "</th>" for c in r["columns"])
     body = "".join("<tr>" + "".join(cell(v) for v in row) + "</tr>" for row in r["rows"])
     n = len(r["rows"])
@@ -191,7 +195,8 @@ def expand(lid, tpl, blocks, orig_pres, snip):
         REPORT["charts"] += len(res["figs"])
         if kind == "rows":
             REPORT["sql_tables"] += 1
-            return rows_panel(res, "Rows after this step" if k != "w0" else "The whole table")
+            cap = blocks.get(k, {}).get("caption") if k in blocks else None
+            return rows_panel(res, cap or ("Rows after this step" if k != "w0" else "The whole table"))
         if k in blocks and blocks[k].get("show_code") is False:
             return out_panel(res, "What Python prints").replace("from a real run of the block above", "from a real run")
         return out_panel(res)
@@ -213,6 +218,8 @@ def apply_lessons(s, snip):
                 spec = {"mode": blk["mode"], "setup": blk.get("setup", ""), "files": blk.get("files", [])}
                 if blk.get("note"):
                     spec["note"] = blk["note"]
+                if k.isdigit() and blk.get("code"):
+                    spec["code"] = blk["code"]   # a kept block that runs a fuller version of the code shown
                 snip["blocks"][lid + "#" + k] = spec
         s = s[:a] + "\n" + new + s[b:]
         REPORT["lessons"][lid] = {"blocks_kept": len(orig), "blocks_new": len([k for k in used if not k.isdigit()])}
