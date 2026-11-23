@@ -7,14 +7,17 @@ async function headOf(o, r, branch, token){
   try { const ref = await gh(`/repos/${o}/${r}/git/ref/heads/${encodeURIComponent(branch)}`, token); return ref.object.sha; }
   catch (e) { if (e.status === 404 || e.status === 409) return null; throw e; }
 }
-async function existing(o, r, head, folder, token){
-  // Files already in the folder on that branch, as path -> blob sha.
-  const out = {};
-  if (!head) return { files: out, truncated: false };
+async function existing(o, r, head, folder, extra, token){
+  // Files already in the folder on that branch (plus any requested root files), as path -> blob sha.
+  const out = {}, rootHave = {};
+  if (!head) return { files: out, root: rootHave, truncated: false };
   const commit = await gh(`/repos/${o}/${r}/git/commits/${head}`, token);
   const tree = await gh(`/repos/${o}/${r}/git/trees/${commit.tree.sha}?recursive=1`, token);
-  for (const t of tree.tree || []) if (t.type === 'blob' && t.path.startsWith(folder + '/')) out[t.path] = t.sha;
-  return { files: out, truncated: !!tree.truncated };
+  for (const t of tree.tree || []) if (t.type === 'blob'){
+    if (t.path.startsWith(folder + '/')) out[t.path] = t.sha;
+    else if (extra.includes(t.path)) rootHave[t.path] = t.sha;
+  }
+  return { files: out, root: rootHave, truncated: !!tree.truncated };
 }
 
 exports.handler = async (event) => {
@@ -36,9 +39,10 @@ exports.handler = async (event) => {
     const head = branch === defaultBranch ? defaultHead : await headOf(o, r, branch, s.accessToken);
     const empty = !defaultHead;
     if (empty && branch !== defaultBranch) return json(400, { error: `${info.full_name} is empty. Publish to ${defaultBranch} first, or add a README on github.com.` }, set);
-    const have = await existing(o, r, head, req.folder, s.accessToken);
-    const files = req.files.map(f => ({ path: f.path, name: f.name, bytes: Buffer.byteLength(f.content, 'utf8'),
-      action: !(f.path in have.files) ? 'add' : have.files[f.path] === gitBlobSha(f.content) ? 'unchanged' : 'replace' }));
+    const have = await existing(o, r, head, req.folder, req.files.filter(f => f.root).map(f => f.path), s.accessToken);
+    const all = Object.assign({}, have.files, have.root);
+    const files = req.files.map(f => ({ path: f.path, name: f.name, root: !!f.root, bytes: Buffer.byteLength(f.content, 'utf8'),
+      action: !(f.path in all) ? 'add' : all[f.path] === gitBlobSha(f.content) ? 'unchanged' : 'replace' }));
     const others = Object.keys(have.files).filter(p => !files.some(f => f.path === p)).sort();
     const review = { v: 1, login: user.login, repository: info.full_name, branch, head: head || null, base: head ? null : defaultHead || null,
       folder: req.folder, digest: filesDigest(req.files), exp: Date.now() + REVIEW_AGE_MS };

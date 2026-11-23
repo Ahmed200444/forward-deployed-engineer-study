@@ -46,7 +46,7 @@ a{color:var(--accent)}
     public: false,
     request_oauth_on_install: false,
     hook_attributes: { url: o, active: false },
-    default_permissions: { contents: "write", metadata: "read" },
+    default_permissions: { contents: "write", metadata: "read", workflows: "write" },
     default_events: []
   };
   document.getElementById("manifest").value = JSON.stringify(manifest);

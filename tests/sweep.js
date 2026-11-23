@@ -7,7 +7,7 @@ function classify(status, result){
   if (/Could not start Python|Python could not start|did not start within|worker startup/.test(s)) return 'startup';
   if (/libraries this code needs could not be loaded/.test(s)) return 'libload';
   const m=(result||'').match(/(\d+) of (\d+) tests? passed/); if (m) return +m[1]===+m[2]?'pass':'assert';
-  if (/All \d+ tests? passed|All \d+ checks? pass/.test(result||'')) return 'pass';
+  if (/All \d+ tests? passed|All \d+ checks? pass/.test(result||'') || /Marked as passed/.test(status||'')) return 'pass';
   if (/Traceback|Error|Stopped after/.test(result||'')) return 'error';
   return 'other';
 }
@@ -40,6 +40,7 @@ async function waitIdle(p, sel){
     if (!isLesson){
       // worked example
       if (await p.$('[data-act="wex-run"]')){
+        const sum=await p.$('.wex-box > summary'); if (sum && !(await p.$('.wex-box[open]'))) await sum.click();
         await p.click('[data-act="wex-run"]'); await p.waitForTimeout(100); await waitIdle(p,'[data-act="wex-run"]');
         const t=await p.evaluate(()=>{ const box=document.querySelector('[data-act="wex-run"]').closest('section,div.card,div'); return box? box.innerText.slice(-600):''; });
         console.log(JSON.stringify({route:r, kind:'example', cls: /Could not start Python|Python could not start/.test(t)?'startup':/Traceback|Error:/.test(t)?'error':'ran', tail:t.slice(-200)}));
@@ -65,6 +66,7 @@ async function waitIdle(p, sel){
           run.click(); const t0=Date.now();
           await new Promise(r=>setTimeout(r,80));
           while(run.disabled && Date.now()-t0<180000) await new Promise(r=>setTimeout(r,100));
+          await new Promise(r=>setTimeout(r,300));   // the pass mark is written just after the button is enabled again
           return { st:[...el.querySelectorAll('.status')].map(x=>x.textContent).join(' | '), res:[...el.querySelectorAll('.result, [class*="result"]')].map(x=>x.innerText).join('\n') };
         }, k);
         console.log(JSON.stringify({route:r, kind:'inline', q:+k, cls:classify(res.st,res.res), head:res.res.split('\n').slice(0,3).join(' / ').slice(0,300), st:res.st.slice(0,300)}));
@@ -76,6 +78,7 @@ async function waitIdle(p, sel){
           if (!run) return {none:true};
           run.click(); const t0=Date.now(); await new Promise(r=>setTimeout(r,80));
           while(run.disabled && Date.now()-t0<180000) await new Promise(r=>setTimeout(r,100));
+          await new Promise(r=>setTimeout(r,300));   // the pass mark is written just after the button is enabled again
           return { st:[...el.querySelectorAll('.status')].map(x=>x.textContent).join(' | '), res:[...el.querySelectorAll('[class*="result"]')].map(x=>x.innerText).join('\n') };
         }, id);
         if (res.none) continue;

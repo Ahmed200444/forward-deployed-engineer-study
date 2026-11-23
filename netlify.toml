@@ -22,6 +22,10 @@
   to = "/.netlify/functions/github-preview"
   status = 200
 [[redirects]]
+  from = "/api/github/verify"
+  to = "/.netlify/functions/github-verify"
+  status = 200
+[[redirects]]
   from = "/api/github/publish"
   to = "/.netlify/functions/github-publish"
   status = 200

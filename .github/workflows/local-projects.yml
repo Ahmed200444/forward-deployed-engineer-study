@@ -1,0 +1,39 @@
+# Tests the 10 local projects exactly as learners download them: each is written out from index.html (the same
+# files the "Download the project (.zip)" button packs), then installed from its shipped uv.lock and tested.
+name: local projects
+on:
+  push:
+    paths: [index.html, scripts/export-local-projects.js, .github/workflows/local-projects.yml]
+  pull_request:
+    paths: [index.html, scripts/export-local-projects.js, .github/workflows/local-projects.yml]
+  workflow_dispatch:
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        project: [ai-backend, torch-trainer, llm-client, doc-qa, agent-app, capstone, distributed-pipeline, multimodal-lab, ml-pipeline, agent-graph]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            index.html
+            scripts
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/export-local-projects.js index.html dist ${{ matrix.project }}
+      - uses: astral-sh/setup-uv@v6
+      - name: Install from the shipped lockfile
+        working-directory: dist/${{ matrix.project }}
+        run: uv sync --locked
+      - name: Sample PDF (doc-qa only)
+        if: matrix.project == 'doc-qa'
+        working-directory: dist/${{ matrix.project }}
+        run: uv run --locked python scripts/make_pdf.py
+      - name: Tests
+        working-directory: dist/${{ matrix.project }}
+        run: uv run --locked pytest -q

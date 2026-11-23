@@ -40,7 +40,11 @@ function ghApi(req, body, p, q){
     if (same) return send(201, { sha: same[0] });
     const t = sha('t'); r.trees[t] = base; return send(201, { sha: t }); }
   if (rest === '/git/commits' && req.method === 'POST'){ const c = sha('c'); r.commits[c] = { tree: body.tree, parents: body.parents, message: body.message }; G.log.push({ op: 'commit', repo: r.full_name, sha: c, message: body.message }); return send(201, { sha: c }); }
-  if ((m = rest.match(/^\/git\/refs\/heads\/(.+)$/)) && req.method === 'PATCH'){ const b = decodeURIComponent(m[1]); if (!r.commits[body.sha] || r.commits[body.sha].parents[0] !== r.branches[b]) return send(422, { message: 'Update is not a fast forward' }); r.branches[b] = body.sha; G.log.push({ op: 'update-ref', repo: r.full_name, branch: b, sha: body.sha }); return send(200, {}); }
+  if ((m = rest.match(/^\/contents\/(.+)$/)) && req.method === 'GET'){
+    const fp = m[1].split('/').map(decodeURIComponent).join('/'), c = r.commits[q.ref] || r.commits[r.branches[q.ref]];
+    if (!c) return send(404, { message: 'No commit found for the ref' });
+    const t = r.trees[c.tree]; return Object.keys(t).some(k => k === fp || k.startsWith(fp + '/')) ? send(200, [{ path: fp }]) : send(404, { message: 'Not Found' }); }
+  if ((m = rest.match(/^\/git\/refs\/heads\/(.+)$/)) && req.method === 'PATCH'){ const b = decodeURIComponent(m[1]); if (G.noWorkflow && Object.keys(r.trees[r.commits[body.sha].tree]).some(k => k.startsWith('.github/workflows/') && !(r.trees[r.commits[r.branches[b]].tree][k]))) return send(422, { message: 'refusing to allow a GitHub App to create or update workflow `.github/workflows/x.yml` without `workflows` permission' }); if (!r.commits[body.sha] || r.commits[body.sha].parents[0] !== r.branches[b]) return send(422, { message: 'Update is not a fast forward' }); r.branches[b] = body.sha; G.log.push({ op: 'update-ref', repo: r.full_name, branch: b, sha: body.sha }); return send(200, {}); }
   if (rest === '/git/refs' && req.method === 'POST'){ const b = body.ref.replace('refs/heads/', ''); if (r.branches[b]) return send(422, { message: 'Reference already exists' }); r.branches[b] = body.sha; G.log.push({ op: 'create-ref', repo: r.full_name, branch: b }); return send(201, {}); }
   if ((m = rest.match(/^\/contents\/(.+)$/)) && req.method === 'PUT'){
     const fp = m[1].split('/').map(decodeURIComponent).join('/'), b = body.branch, head = r.branches[b], tree = head ? { ...r.trees[r.commits[head].tree] } : {};
@@ -65,6 +69,12 @@ https.createServer({ key: fs.readFileSync(process.env.TLS_KEY || __dirname + '/k
     if (u.pathname === '/__test/hide'){ missing.add(u.query.path); return json(200, { ok: true }); }
     if (u.pathname === '/__test/unhide'){ missing.delete(u.query.path); return json(200, { ok: true }); }
     if (u.pathname === '/__test/move'){ const r = G.repos[u.query.repo.toLowerCase()]; const c = sha('c'); r.commits[c] = { tree: r.commits[r.branches.main].tree, parents: [r.branches.main], message: 'external' }; r.branches.main = c; return json(200, { sha: c }); }
+    if (u.pathname === '/__test/noworkflow'){ G.noWorkflow = u.query.on === '1'; return json(200, { ok: true }); }
+    if (u.pathname === '/__test/rmpath'){ const r = G.repos[u.query.repo.toLowerCase()], b = u.query.branch || 'main', t0 = r.trees[r.commits[r.branches[b]].tree];
+      const t = Object.fromEntries(Object.entries(t0).filter(([k]) => !(k === u.query.path || k.startsWith(u.query.path + '/')))); const tid = sha('t'); r.trees[tid] = t;
+      const c = sha('c'); r.commits[c] = { tree: tid, parents: [r.branches[b]], message: 'remove' }; r.branches[b] = c; return json(200, { sha: c }); }
+    if (u.pathname === '/__test/rename'){ const r = G.repos[u.query.repo.toLowerCase()]; r.branches[u.query.to] = r.branches[u.query.from]; delete r.branches[u.query.from]; return json(200, { ok: true }); }
+    if (u.pathname === '/__test/revoke'){ delete G.repos[u.query.repo.toLowerCase()]; return json(200, { ok: true }); }
     if (u.pathname.startsWith('/gh-web/login/oauth/authorize')){ res.writeHead(302, { Location: u.query.redirect_uri + '?code=code-1&state=' + u.query.state }); return res.end(); }
     if (u.pathname === '/gh-web/login/oauth/access_token') return json(200, { access_token: 'tok-1', expires_in: 28800, refresh_token: 'ref-1' });
     if (u.pathname.startsWith('/gh-api/')){ const r = ghApi(req, raw ? JSON.parse(raw) : {}, u.pathname.slice(7), u.query); return json(r.s, r.d); }

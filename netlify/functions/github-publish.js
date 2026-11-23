@@ -18,7 +18,7 @@ async function commitTree(o, r, branch, expectedHead, files, message, token){
   const commit = await gh(`/repos/${o}/${r}/git/commits`, token, { method: 'POST', body: JSON.stringify({ message, tree: tree.sha, parents: [parent] }) });
   try {
     await gh(`/repos/${o}/${r}/git/refs/heads/${encodeURIComponent(branch)}`, token, { method: 'PATCH', body: JSON.stringify({ sha: commit.sha, force: false }) });
-  } catch (e) { if (e.status === 422) throw new Changed(`${branch} changed on GitHub while publishing. Nothing was written. Review the publish again.`); throw e; }
+  } catch (e) { if (e.status === 422 && !/workflow/i.test(e.message || '')) throw new Changed(`${branch} changed on GitHub while publishing. Nothing was written. Review the publish again.`); throw e; }
   return { unchanged: false, sha: commit.sha };
 }
 async function contentsFallback(o, r, branch, files, message, token){
@@ -72,6 +72,9 @@ exports.handler = async (event) => {
       folderUrl: `${base}/tree/${encodeURIComponent(branch)}/${req.folder.split('/').map(encodeURIComponent).join('/')}`,
       commitUrl: res.sha ? `${base}/commit/${res.sha}` : null, repoUrl: base }, set);
   } catch (e) {
+    // GitHub refuses workflow files from an app without the Workflows permission; say so plainly.
+    if (!e.changed && /workflow/i.test(e.message || '') && (e.status === 403 || e.status === 404 || e.status === 422))
+      return json(403, { error: 'GitHub refused the CI workflow file: the publishing app needs the Workflows (read and write) permission. Nothing was written. Untick "Include the CI workflow" to publish without it, or give the app that permission.', workflowPermission: true }, set);
     const status = e.status === 404 ? 404 : e.status || 500;
     const msg = e.status === 404 ? 'Repository not found, or the publishing app has no access to it.' : e.message || 'Publishing failed.';
     return json(status, { error: msg, changed: !!e.changed }, set);

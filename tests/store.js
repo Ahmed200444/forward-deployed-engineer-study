@@ -28,7 +28,7 @@ const FIX = { lessons:{l1:true,l2:true,l3:false}, ex:{e1:true}, quiz:{l1:{best:3
     for (const [nm,p] of [['A',A],['B',Bt]]){
       const st=await p.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY), r=(await rec(p)).state.state;
       ok('S1 '+nm+': both lessons read after reload', r.lessons.l5===true && r.lessons.l6===true, JSON.stringify(r.lessons));
-      ok('S1 '+nm+': study log counts both lessons', r.log[today].lessons===2, JSON.stringify(r.log));
+      ok('S1 '+nm+': study log counts both lessons', Object.keys(r.log[today].lessonIds||{}).length===2, JSON.stringify(r.log));
       ok('S2 '+nm+': both drafts kept (A latest, B)', r.drafts.e1==='# draft A2\n' && r.drafts.e2==='# draft B1\n', JSON.stringify(r.drafts));
       ok('S3 '+nm+': both quiz results kept', !!(r.quiz.l1 && r.quiz.l2) && r.log[today].quizzes===2, JSON.stringify(r.quiz)+JSON.stringify(r.log[today]));
       ok('S1 '+nm+': localStorage mirror matches IndexedDB', JSON.stringify(st)===JSON.stringify(r));
@@ -80,7 +80,7 @@ const FIX = { lessons:{l1:true,l2:true,l3:false}, ex:{e1:true}, quiz:{l1:{best:3
     const Bt=await open(c,'backup');
     const R={ lessons:{'ph1-l1':true}, ex:{}, quiz:{}, drafts:{e3:'restored\n'}, tried:{}, check:{}, review:{}, notes:{}, log:{}, hints:{}, gh:{}, qpass:{}, theme:'light' };
     const file=require('os').tmpdir() + '/backup-v1.json'; fs.writeFileSync(file, JSON.stringify({app:'ai-engineer-study',version:1,key:KEY,exportedAt:'2026-11-01T10:00:00.000Z',state:R}));
-    await Bt.setInputFiles('#restore-file', file); await Bt.waitForTimeout(300); await settle(Bt);
+    await Bt.setInputFiles('#restore-file', file); await Bt.waitForSelector('[data-act="restore-go"]'); await Bt.click('[data-act="restore-go"]'); await Bt.waitForTimeout(300); await settle(Bt);
     // tab A, opened before the restore, now marks its lesson read
     await A.click('[data-act="read"]'); await settle(A); await A.waitForTimeout(200); await settle(A,Bt);
     await Bt.reload(); await ready(Bt); const r=(await rec(Bt)).state;

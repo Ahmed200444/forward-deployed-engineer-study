@@ -135,14 +135,25 @@ function readRequest(b){
   if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repository) || /\/\.+$/.test(repository)) { const e = new Error('Invalid repository name.'); e.status = 400; throw e; }
   const folder = safePath(b.folder);
   const names = Object.keys(b.files || {});
-  if (!names.length || names.length > 80) { const e = new Error('Nothing to publish, or too many files.'); e.status = 400; throw e; }
+  if (!names.length || names.length > 120) { const e = new Error('Nothing to publish, or too many files.'); e.status = 400; throw e; }
   let total = 0;
   const files = names.map(n => {
     const content = String(b.files[n] ?? ''); total += Buffer.byteLength(content, 'utf8');
     const found = strongSecret(content); if (found){ const e = new Error(`Remove the ${found} in ${n} before publishing.`); e.status = 400; throw e; }
     return { name: n, path: safePath(folder + '/' + safePath(n)), content };
   });
-  if (total > 2000000) { const e = new Error('These files are too large to publish from the browser.'); e.status = 413; throw e; }
+  // Repository-root files the learner approved on the review screen: only GitHub Actions workflows, because GitHub
+  // reads workflows from .github/workflows/ at the root and ignores copies inside a project folder.
+  const rootNames = Object.keys(b.rootFiles || {});
+  if (rootNames.length > 5) { const e = new Error('Too many workflow files.'); e.status = 400; throw e; }
+  for (const n of rootNames){
+    if (!/^\.github\/workflows\/[A-Za-z0-9_.-]+\.ya?ml$/.test(n)) { const e = new Error('Only workflow files can be published outside the project folder: ' + n); e.status = 400; throw e; }
+    const content = String(b.rootFiles[n] ?? ''); total += Buffer.byteLength(content, 'utf8');
+    const found = strongSecret(content); if (found){ const e = new Error(`Remove the ${found} in ${n} before publishing.`); e.status = 400; throw e; }
+    if (files.some(f => f.path === n)) { const e = new Error('Duplicate file: ' + n); e.status = 400; throw e; }
+    files.push({ name: n, path: safePath(n), content, root: true });
+  }
+  if (total > 4000000) { const e = new Error('These files are too large to publish from the browser.'); e.status = 413; throw e; }
   if (!files.some(f => /\/README\.md$/.test(f.path))) { const e = new Error('The README is missing.'); e.status = 400; throw e; }
   return { repository, folder, files, branch: safeBranch(b.branch) };
 }

@@ -9,11 +9,21 @@ openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 30
 node server.js .. 8820 &          # serves the site at https://localhost:8820
 node rt.js                         # Python + SQL in worker and compatibility mode, startup failure handling
 node store.js                      # two-tab saves, migration, interrupted migration, restore with a stale tab
-node pub.js                        # GitHub review screen, cancel, publish, update, moved branch, test branch
+node pub.js                        # GitHub review screen, cancel, publish, update, moved branch, test branch, root CI
+                                   #   workflow, missing Workflows permission, recheck: folder removed, branch renamed, access lost
 node smoke.js                      # one model solution per phase + every phase project (compatibility mode)
-node lay.js                        # no page overflow / review panel fits, 7 widths, both themes, duplicate ids
+node lay.js                        # 13 screens x 7 widths x 2 themes: no page overflow, sidebar beside content on desktop,
+                                   #   Course contents on mobile, theme switch on screen, review panel fits, duplicate ids
+node v29.js                        # quiz shuffle/grading, Review, Study log, Playground undo, search paging and Back,
+                                   #   backup preview/errors/restore/undo, .ps1 download, project counts, local ZIP = export,
+                                   #   breadcrumb, phase navigation, Continue card, theme kept across pages, checker messages
 for i in 0 1 2 3; do node sweep.js $i 4 > sweep-$i.jsonl & done   # every exercise, inline question, project, example, snippet
 ```
 
 Test switches the page understands (they do nothing unless a test sets them):
 `window.__PY_MODE__` = "main" or "worker", `window.__STORE_TEST__` = { abortMigration, abortNextWrite, onOps }.
+
+The mock GitHub (server.js) also has test endpoints: `/__test/rmpath`, `/__test/rename`, `/__test/revoke` and
+`/__test/noworkflow?on=1` (refuses new workflow files the way GitHub does without the Workflows permission).
+
+`node ../scripts/export-local-projects.js ../index.html OUT [ids...]` writes the 10 local projects exactly as their ZIPs contain them.
