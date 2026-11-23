@@ -104,7 +104,18 @@ def run_block(spec, code, files):
         p = subprocess.run([sys.executable, "-I", rp, sp], capture_output=True, text=True, timeout=120)
         if p.returncode != 0:
             raise SystemExit("runner failed for block:\n" + code + "\n" + p.stderr)
-        return json.loads(p.stdout.strip().splitlines()[-1])
+        res = json.loads(p.stdout.strip().splitlines()[-1])
+        if res["figs"]:
+            # draw charts with the bundled Pyodide runtime (Matplotlib 3.5.2), the same one the site runs
+            q = subprocess.run(["node", os.path.join(HERE, "pyodide_run.js"), rp, sp], capture_output=True, text=True, timeout=300)
+            if q.returncode != 0:
+                raise SystemExit("Pyodide runner failed for block:\n" + code + "\n" + q.stderr)
+            pres = json.loads(q.stdout.strip().splitlines()[-1])
+            if pres["stdout"] != res["stdout"] or pres["error"] != res["error"] or len(pres["figs"]) != len(res["figs"]):
+                raise SystemExit("Pyodide and CPython disagree on block:\n" + code + "\n" + json.dumps([pres["stdout"], res["stdout"], pres["error"], res["error"]]))
+            res["figs"] = pres["figs"]
+            REPORT["charts_pyodide"] = REPORT.get("charts_pyodide", 0) + len(pres["figs"])
+        return res
 
 
 def out_panel(res, label="Output"):

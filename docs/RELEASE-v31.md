@@ -52,8 +52,12 @@ open, and the sign-in flag is used only by the card that actually opens the revi
 
 ## Build
 `cd scripts/content && python build.py BASE OUT [REPORT]` with Python 3.12, numpy 1.26.4, pandas 2.2.0,
-scikit-learn 1.4.2, matplotlib 3.8.4 and scipy 1.12.0 (matching Pyodide 0.26.4's output). New sources:
-`lessons_v31.py`, `newhere_v31.py`, `scripts/bundle/`, `scripts/make-bundle.py`.
+scikit-learn 1.4.2 and scipy 1.12.0, the same versions as the bundled Pyodide 0.26.4 runtime, so printed output
+matches the site. The bundled runtime has Matplotlib 3.5.2, which has no Python 3.12 wheel for a normal
+computer, so CPython uses Matplotlib 3.8.4 only to check a chart block's printed output. Every chart shown in a
+lesson is then drawn again by `scripts/content/pyodide_run.js` in the bundled runtime (Matplotlib 3.5.2), and the
+build stops if that run's printed output or number of charts differs from the CPython run. Needs Node.js.
+New sources: `lessons_v31.py`, `newhere_v31.py`, `pyodide_run.js`, `scripts/bundle/`, `scripts/make-bundle.py`.
 
 ## Tests
 New: `tests/studylog.js` (two tabs from an empty day), `tests/bundle.js` (a freshly extracted zip served by its
