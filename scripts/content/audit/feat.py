@@ -130,6 +130,22 @@ def teach_feats(h):
                 if g: pf|=g
             pf|=sql_feats(code) if re.search(r'\bSELECT\b',code,re.I) else set()
         f|=pf
+    # v31: worked examples in notes: the shown code and every ">>> expression" are code
+    for c in re.findall(r'<code class="pq-ex">(.*?)</code>', h, re.S):
+        text=H.unescape(c); code=[]; skip=False
+        for line in text.split('\n'):
+            if line.startswith('>>> '): code.append(line[4:]); skip=True
+            elif not skip: code.append(line)
+        src='\n'.join(code)
+        pf=py_feats(src)
+        if pf is None:
+            pf=set()
+            for line in code:
+                g=py_feats(line.strip())
+                if g: pf|=g
+        f|=pf
+        f|=sql_feats(src) if re.search(r'\bSELECT\b|\bUPDATE\b',src) else set()
     prose=re.sub(r'<pre.*?</pre>','',h,flags=re.S)
+    prose=re.sub(r'<code class="pq-ex">.*?</code>','',prose,flags=re.S)
     f|=prose_mentions(prose)
     return f

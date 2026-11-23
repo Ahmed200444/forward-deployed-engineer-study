@@ -299,3 +299,105 @@ print(predict_all([0, 10], 2.0, 5.0))
     ("q:ph3-l1-3", dict(after="Many inputs", level="independent",
                         before="<p>Raising <code>ValueError</code> is covered in <a href=\"#/lesson/l5\">Files and errors</a>; the lengths check comes first, then the sum. The reference solution wraps the result in <code>round(total, 10)</code>, because decimal sums leave tiny errors: <code>0.1 + 0.2</code> is <code>0.30000000000000004</code>.</p>")),
 ]
+
+# ---------------------------------------------------------------- ph2-l7 (v31)
+def _db_q(fn, body_starter, body_solution, call):
+    return (MAKE_DB + "\n\n" + fn + "\n" + body_starter + "\n\n" + call + "\n",
+            MAKE_DB + "\n\n" + fn + "\n" + body_solution + "\n\n" + call + "\n")
+
+
+_s, _sol = _db_q("def agency_names(conn):",
+    '    sql = """SELECT r.id, a.name FROM requests AS r\n             JOIN agencies AS a ON a.code = r.agency\n             ORDER BY r.id"""   # keep every request: change the kind of join\n    return conn.execute(sql).fetchall()',
+    '    sql = """SELECT r.id, a.name FROM requests AS r\n             LEFT JOIN agencies AS a ON a.code = r.agency\n             ORDER BY r.id"""\n    return conn.execute(sql).fetchall()',
+    "print(agency_names(conn))")
+_s2, _sol2 = _db_q("def days_open(conn):",
+    '    sql = """SELECT id, ROUND(julianday(closed) - julianday(created), 1) AS days\n             FROM requests\n             ORDER BY id"""   # add the WHERE that keeps closed requests only\n    return conn.execute(sql).fetchall()',
+    '    sql = """SELECT id, ROUND(julianday(closed) - julianday(created), 1) AS days\n             FROM requests\n             WHERE closed IS NOT NULL\n             ORDER BY id"""\n    return conn.execute(sql).fetchall()',
+    "print(days_open(conn))")
+_s3, _sol3 = _db_q("def avg_hours(conn):",
+    '    sql = """WITH durations AS (\n               SELECT agency, (julianday(closed) - julianday(created)) * 24 AS hours\n               FROM requests WHERE closed IS NOT NULL\n             )\n             SELECT agency, ROUND(AVG(hours), 1) FROM durations\n             ORDER BY agency"""   # one row per agency: add the GROUP BY\n    return conn.execute(sql).fetchall()',
+    '    sql = """WITH durations AS (\n               SELECT agency, (julianday(closed) - julianday(created)) * 24 AS hours\n               FROM requests WHERE closed IS NOT NULL\n             )\n             SELECT agency, ROUND(AVG(hours), 1) FROM durations\n             GROUP BY agency\n             ORDER BY agency"""\n    return conn.execute(sql).fetchall()',
+    "print(avg_hours(conn))")
+_s4, _sol4 = _db_q("def number_in_agency(conn):",
+    '    sql = """SELECT agency, id,\n                    ROW_NUMBER() OVER (ORDER BY created) AS n\n             FROM requests\n             ORDER BY agency, n"""   # restart the numbering for each agency\n    return conn.execute(sql).fetchall()',
+    '    sql = """SELECT agency, id,\n                    ROW_NUMBER() OVER (PARTITION BY agency ORDER BY created) AS n\n             FROM requests\n             ORDER BY agency, n"""\n    return conn.execute(sql).fetchall()',
+    "print(number_in_agency(conn))")
+
+ORDER["ph2-l7"] = [
+    (new("q:ph2-l7-5", "Keep every request (guided)",
+         "Write a function <code>agency_names(conn)</code> that returns <code>(id, name)</code> for every request, ordered by id, with the agency's full name from <code>agencies</code>. "
+         "The query below uses an inner join, so request 4 (NYPD) is missing. Change one word so it comes back with <code>None</code> as its name.",
+         "def agency_names(conn):", _s, _sol,
+         [("All six requests", "rows = agency_names(conn)\nassert len(rows) == 6\n"),
+          ("NYPD has no name", "assert agency_names(conn)[3] == (4, None)\n"),
+          ("Names match", "assert agency_names(conn)[0] == (1, 'Transportation') and agency_names(conn)[1] == (2, 'Environment')\n")],
+         hint="<code>LEFT JOIN</code> keeps every row of the table on the left (requests)."),
+     dict(after="JOIN", level="guided")),
+    ("q:ph2-l7-1", dict(after="JOIN", level="independent")),
+    (new("q:ph2-l7-6", "Days open (guided)",
+         "Write a function <code>days_open(conn)</code> that returns <code>(id, days)</code> for closed requests only, ordered by id, with days rounded to 1 decimal. "
+         "The subtraction is done for you. Request 3 is still open, so its <code>closed</code> is <code>NULL</code> and its days come out as <code>None</code>: filter it out.",
+         "def days_open(conn):", _s2, _sol2,
+         [("Five closed requests", "assert [r[0] for r in days_open(conn)] == [1, 2, 4, 5, 6]\n"),
+          ("Request 1 by hand", "assert days_open(conn)[0] == (1, 0.5)\n"),
+          ("No None values", "assert all(d is not None for _, d in days_open(conn))\n")],
+         hint="<code>WHERE closed IS NOT NULL</code> goes after <code>FROM requests</code>. <code>= NULL</code> never matches."),
+     dict(after="Durations in SQLite", level="guided")),
+    ("q:ph2-l7-2", dict(after="Durations in SQLite", level="independent")),
+    (new("q:ph2-l7-7", "Average from a CTE (guided)",
+         "Write a function <code>avg_hours(conn)</code> that returns <code>(agency, avg_hours)</code> per agency, ordered by agency, average rounded to 1 decimal. "
+         "The <code>durations</code> CTE is written for you. The final <code>SELECT</code> averages over all rows at once; make it one row per agency.",
+         "def avg_hours(conn):", _s3, _sol3,
+         [("One row per agency", "assert avg_hours(conn) == [('DEP', 13.0), ('DOT', 30.0), ('NYPD', 1.0)]\n")],
+         hint="Add <code>GROUP BY agency</code> before <code>ORDER BY</code>, the same as lesson 6."),
+     dict(after="CTEs: name each step", level="guided")),
+    ("q:ph2-l7-3", dict(after="CTEs: name each step", level="independent")),
+    (new("q:ph2-l7-8", "Number inside each agency (guided)",
+         "Write a function <code>number_in_agency(conn)</code> that returns <code>(agency, id, n)</code> where <code>n</code> counts each agency's requests in the order they were created, starting again at 1 for every agency. "
+         "The window below numbers all six rows in one run; make it restart per agency.",
+         "def number_in_agency(conn):", _s4, _sol4,
+         [("Restarts per agency", "assert number_in_agency(conn) == [('DEP', 2, 1), ('DEP', 5, 2), ('DOT', 1, 1), ('DOT', 3, 2), ('DOT', 6, 3), ('NYPD', 4, 1)]\n")],
+         hint="<code>PARTITION BY agency</code> goes inside <code>OVER (...)</code>, before <code>ORDER BY created</code>."),
+     dict(after="Window functions", level="guided")),
+    ("q:ph2-l7-4", dict(after="Window functions", level="independent")),
+]
+
+# ---------------------------------------------------------------- ph3-l2 (v31)
+ORDER["ph3-l2"] = [
+    (new("q:ph3-l2-5", "Dot product with a loop (guided)",
+         "Write a function <code>dot_loop(a, b)</code> that returns the dot product of two lists of the same length. "
+         "The loop walks both lists together; fill in the line that adds one product to the total. Check it by hand first: 3 × 0.5 + 1 × 2 + 2 × (−1) = 1.5.",
+         "def dot_loop(a, b):",
+         "def dot_loop(a, b):\n    total = 0\n    for x, y in zip(a, b):\n        pass   # replace pass: add x times y to total\n    return total\n\n\nprint(dot_loop([3.0, 1.0, 2.0], [0.5, 2.0, -1.0]))\n",
+         "def dot_loop(a, b):\n    total = 0\n    for x, y in zip(a, b):\n        total = total + x * y\n    return total\n\n\nprint(dot_loop([3.0, 1.0, 2.0], [0.5, 2.0, -1.0]))\n",
+         [("The lesson's vectors", "assert dot_loop([3.0, 1.0, 2.0], [0.5, 2.0, -1.0]) == 1.5\n"),
+          ("Small whole numbers", "assert dot_loop([1, 2], [3, 4]) == 11\n"),
+          ("Opposite signs cancel", "assert dot_loop([1, -1], [1, 1]) == 0\n")],
+         hint="<code>total = total + x * y</code> inside the loop."),
+     dict(after="Dot product", level="guided")),
+    ("q:ph3-l2-1", dict(after="Dot product", level="independent")),
+    ("q:ph3-l2-2", dict(after="A whole dataset at once", level="independent")),
+    (new("q:ph3-l2-6", "Length of a vector (guided)",
+         "Write a function <code>length(v)</code> that returns the length of a list of numbers: the square root of the sum of the squares. "
+         "The squares are summed for you. By hand for [3, 4]: 9 + 16 = 25, and the square root of 25 is 5.",
+         "def length(v):",
+         "import math\n\n\ndef length(v):\n    total = sum(x * x for x in v)\n    return total   # take the square root with math.sqrt\n\n\nprint(length([3, 4]))\n",
+         "import math\n\n\ndef length(v):\n    total = sum(x * x for x in v)\n    return math.sqrt(total)\n\n\nprint(length([3, 4]))\n",
+         [("3, 4, 5", "assert length([3, 4]) == 5.0\n"), ("Three numbers", "assert length([1, 2, 2]) == 3.0\n"),
+          ("Matches NumPy", "import numpy as np\nassert abs(length([0.3, -1.2, 2.5]) - np.linalg.norm([0.3, -1.2, 2.5])) < 1e-12\n")],
+         hint="<code>math.sqrt(total)</code> is the square root."),
+     dict(after="Length and direction", level="guided")),
+    ("q:ph3-l2-3", dict(after="Length and direction", level="independent")),
+    (new("q:ph3-l2-7", "Cosine of two vectors (guided)",
+         "Write a function <code>cosine(a, b)</code> that returns the cosine similarity of two NumPy vectors: their dot product divided by the product of their lengths. "
+         "The dot product is done for you. By hand for [1, 0] and [1, 1]: the dot product is 1, the lengths are 1 and 1.414, so the cosine is about 0.707.",
+         "def cosine(a, b):",
+         "import numpy as np\n\n\ndef cosine(a, b):\n    top = a @ b\n    return top   # divide by np.linalg.norm(a) * np.linalg.norm(b)\n\n\nprint(round(cosine(np.array([1.0, 0.0]), np.array([1.0, 1.0])), 3))\n",
+         "import numpy as np\n\n\ndef cosine(a, b):\n    top = a @ b\n    return top / (np.linalg.norm(a) * np.linalg.norm(b))\n\n\nprint(round(cosine(np.array([1.0, 0.0]), np.array([1.0, 1.0])), 3))\n",
+         [("45 degrees", "assert abs(cosine(np.array([1.0, 0.0]), np.array([1.0, 1.0])) - 0.70710678) < 1e-6\n"),
+          ("Same direction, different length", "assert abs(cosine(np.array([1.0, 2.0]), np.array([3.0, 6.0])) - 1.0) < 1e-12\n"),
+          ("Opposite", "assert abs(cosine(np.array([1.0, 0.0]), np.array([-2.0, 0.0])) + 1.0) < 1e-12\n")],
+         hint="Put the product of the two lengths in brackets: <code>top / (np.linalg.norm(a) * np.linalg.norm(b))</code>."),
+     dict(after="Cosine similarity", level="guided")),
+    ("q:ph3-l2-4", dict(after="Cosine similarity", level="independent")),
+]

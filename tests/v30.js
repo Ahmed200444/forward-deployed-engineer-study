@@ -11,7 +11,7 @@ const B = 'https://localhost:8820/', KEY = 'ai-study-phase0-v1';
 const out = []; const ok = (n, c, i) => out.push((c ? 'PASS ' : 'FAIL ') + n + (i !== undefined && !c ? ' — ' + String(i).slice(0, 400) : ''));
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const IQ = (() => { const i = html.indexOf('var INLINE_Q = ') + 15; let d = 0, j = i, s = false, e = false; for (; j < html.length; j++) { const c = html[j]; if (s) { if (e) e = false; else if (c === '\\') e = true; else if (c === '"') s = false; continue; } if (c === '"') s = true; else if (c === '{') d++; else if (c === '}') { d--; if (!d) break; } } return JSON.parse(html.slice(i, j + 1)); })();
-const LESSONS = ['l1', 'l2', 'l4', 'l5', 'ph2-l6', 'ph3-l1'];
+const LESSONS = ['l1', 'l2', 'l4', 'l5', 'ph2-l6', 'ph3-l1', 'ph2-l7', 'ph3-l2'];
 function emptyState(extra) { return Object.assign({ lessons: {}, ex: {}, quiz: {}, drafts: {}, tried: {}, check: {}, review: {}, notes: {}, log: {}, hints: {}, gh: {}, qpass: {} }, extra || {}); }
 async function ready(p) { await p.waitForFunction(() => window.__FDE_STORE__ && window.__FDE_STORE__.store.mode !== 'starting'); await p.evaluate(() => window.__FDE_STORE__.store.ready); }
 async function ctx(b, fixture) { const c = await b.newContext({ ignoreHTTPSErrors: true });

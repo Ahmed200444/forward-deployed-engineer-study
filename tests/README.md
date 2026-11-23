@@ -17,6 +17,8 @@ node lay.js                        # 18 screens x 7 widths x 2 themes: no page o
 node v29.js                        # quiz shuffle/grading, Review, Study log, Playground undo, search paging and Back,
                                    #   backup preview/errors/restore/undo, .ps1 download, project counts, local ZIP = export,
                                    #   breadcrumb, phase navigation, Continue card, theme kept across pages, checker messages
+node studylog.js                   # two tabs finish different lessons from an empty day: both completions and log entries survive
+node v31.js ../path/to/v30/index.html  # sidebar Projects/Review, same destinations as v30
 node v30.js                        # rewritten lessons: live output equals the shown panel, SQL row tables, chart, question
                                    #   levels and Optional practice, old drafts kept, every question in the 6 lessons via the buttons,
                                    #   new-here notes, Playground bare expression, ax.hist without its tuple
@@ -30,3 +32,7 @@ The mock GitHub (server.js) also has test endpoints: `/__test/rmpath`, `/__test/
 `/__test/noworkflow?on=1` (refuses new workflow files the way GitHub does without the Workflows permission).
 
 `node ../scripts/export-local-projects.js ../index.html OUT [ids...]` writes the 10 local projects exactly as their ZIPs contain them.
+
+Offline copy: `python ../scripts/make-bundle.py OUT`, unzip `OUT/fde-study-offline.zip` into an empty folder, run
+`sh start.sh` inside it, then `node bundle.js http://localhost:8765/ /path/to/fde-study-offline` (blocks every
+request that leaves localhost, and checks the file:// behaviour).
