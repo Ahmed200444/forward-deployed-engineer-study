@@ -9,7 +9,7 @@ const out=[]; const ok=(n,c,i)=>out.push((c?'PASS ':'FAIL ')+n+(!c&&i!==undefine
   const p=await c.newPage(); p.on('dialog',d=>d.accept());
   for (const w of W){
    await p.setViewportSize({width:w,height:800});
-   for (const r of ['home','ph0','ex/e1','lesson/l5','quiz/l1','playground','projects','search','activity','review','local/ai-backend','ph3/project','backup']){
+   for (const r of ['home','ph0','ex/e1','lesson/l2','lesson/l4','lesson/l5','lesson/ph2-l6','lesson/ph3-l1','lesson/ph3-l7','quiz/l1','playground','projects','search','activity','review','local/ai-backend','ph3/project','backup']){
      await p.goto(B+'#/'+r); await p.waitForTimeout(200);
      if (r==='local/ai-backend' || r==='ph3/project'){
        await p.click('[data-act="gh-publish"]'); await p.waitForSelector('[data-gh-review]:not([hidden])');
