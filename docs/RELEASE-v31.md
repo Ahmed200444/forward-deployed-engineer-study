@@ -56,6 +56,16 @@ scikit-learn 1.4.2 and scipy 1.12.0, the same versions as the bundled Pyodide 0.
 matches the site. Charts use the bundled runtime's Matplotlib 3.5.2: every chart shown in a lesson is drawn by
 `scripts/content/pyodide_run.js` in the bundled runtime, and the build stops if that run's printed output differs
 from the desktop Python check. Needs Node.js.
+
+| Library | Bundled runtime (what the site runs) | Build machine (checks printed output) |
+|---|---|---|
+| Python | 3.12 (Pyodide 0.26.4) | 3.12 |
+| numpy | 1.26.4 | 1.26.4 |
+| pandas | 2.2.0 | 2.2.0 |
+| scikit-learn | 1.4.2 | 1.4.2 |
+| scipy | 1.12.0 | 1.12.0 |
+| Matplotlib | 3.5.2 (draws every lesson chart) | not used for charts |
+
 New sources: `lessons_v31.py`, `newhere_v31.py`, `pyodide_run.js`, `scripts/bundle/`, `scripts/make-bundle.py`.
 
 ## Tests
