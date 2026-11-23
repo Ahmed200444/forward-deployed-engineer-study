@@ -1,0 +1,189 @@
+ph9-l6#2 a: A retry may re-run work that already succeeded
+ph9-l6#2 w0: To make them faster when the queue is long
+ph9-l6#2 w2: Queues require it technically for every message
+ph9-l6#2 w3: So they can run in parallel on several workers
+ph9-l7#1 w2: Request count per minute on the API dashboard
+ph9-l7#2 a: A prompt change can double the bill with no error and no latency change
+ph9-l7#2 w0: It is required by providers for any account that spends more than a set amount
+ph9-l7#2 w2: It replaces error monitoring, since a failing request costs nothing to send
+ph9-l8#0 a: Three to ten times: each step re-sends the transcript
+ph9-l8#0 w0: About the same, since tools are free to call
+ph9-l8#0 w2: A hundred times, because every step is a new model
+ph9-l8#0 w3: Less, because it uses tools instead of long answers
+ph9-l8#2 w0: Nothing; outages are rare, so the team can decide during one, when the details are known and everyone is already looking at the problem together
+ph9-l9#0 a: A normal result with isError true and a message
+ph9-l9#0 w0: A JSON-RPC error -32601, which means method not found
+ph9-l9#0 w2: Close the connection so the client retries the call
+ph9-l9#1 a: The client reads it as a protocol message and fails
+ph9-l9#1 w0: Nothing; clients ignore any line that is not JSON
+ph9-l9#1 w2: It appears in the model's answer as plain text
+ph9-l9#1 w3: It is logged by the client as a server warning
+ph9-l10#0 w1: url.startswith('https://api.github.com'), which checks the scheme and host together
+ph9-l10#1 w2: Lowercase it so the comparison ignores case
+ph9-l10#1 w3: Check the file size before reading anything
+ph9-l10#2 a: Remove one of the three, e.g. the email tool, or require approval
+ph9-l10#2 w0: A better system prompt that forbids sending private data by email
+ph9-l10#2 w2: A larger model that is better at spotting malicious pages
+ph9-l10#2 w3: More logging, so every email can be reviewed after it is sent
+ph9-l11#1 w2: SQLite requires it for any value that is a string or a number
+ph9-l11#2 a: Storing data with no rules for access, deletion and retention
+ph9-l11#2 w2: SQLite cannot store it once it grows past one table
+ph9-l11#2 w3: The model forgets it after the conversation ends anyway
+ph9-l12#1 a: One timed operation, like a model or tool call
+ph9-l12#1 w0: A log file that covers one whole request from start to end
+ph9-l12#1 w2: A token in the model's output, with its timing and cost
+ph9-l12#1 w3: A test that checks one request end to end in staging
+ph9-l13#0 w0: A ReAct loop with no step limit, so the model can choose freely
+ph9-l13#1 a: Reject the plan before running anything
+ph9-l13#1 w2: Remove the reference silently and run the rest of the plan
+ph9-l13#1 w3: Run 'order' twice, once before and once after 'reply'
+ph9-l14#1 w2: By sending random messages and reading the error replies that come back
+ph9-l14#2 a: Untrusted input that may hold an injection
+ph9-l14#2 w0: An instruction to follow, since the remote agent is a partner we chose
+ph9-l14#2 w2: A protocol error that the A2A client should reject
+ph9-l15#0 w0: A node in the graph
+ph9-l15#0 w2: A handoff between agents
+ph9-l15#0 w3: A guardrail on the output
+ph9-l15#2 w0: The prompt templates only, since the framework handles everything else for you
+ph9-l16#0 a: The step runs again from its start, so the e-mail is sent twice
+ph9-l16#0 w2: LangGraph skips the e-mail automatically, because the step already ran once
+ph9-l16#0 w3: The resume fails with an error, since the step was interrupted midway
+ph9-l16#1 a: A ledger limit: total refunds cannot exceed what was paid
+ph9-l16#1 w0: The idempotency key, because both chats send the same thread id
+ph9-l16#1 w1: The checkpoint, which records that the refund already happened
+ph9-l16#1 w3: durability="sync", which writes each step before the next one starts
+ph9-l16#3 w0: It makes model calls synchronous, so each step waits for the model before the checkpoint is written to disk at the very end
+fde-l1#0 a: A working deployment at a customer, plus reusable tools and feedback
+fde-l1#0 w1: Sales demos before a contract is signed, tailored to each customer's data and workflow
+fde-l1#0 w3: Written recommendations without code, for the customer's own engineers to follow later
+fde-l1#1 a: Scope: agree what is built and how it is tested
+fde-l1#1 w1: Build the integration with the customer's systems
+fde-l1#1 w2: Roll out to every user so feedback comes in early
+fde-l1#1 w3: Codify the work into a reusable product feature
+fde-l2#0 w3: Say vector databases are unnecessary and propose a fine-tuned model for the support team instead
+fde-l2#1 a: Without today's numbers you can't show the deployment improved anything
+fde-l2#1 w1: Baselines are required by law for any AI system used with customers
+fde-l2#1 w2: It makes the model more accurate, because it learns from the baseline
+fde-l2#2 a: When the rules are known, stable and easy to code
+fde-l2#2 w1: When inputs are long, messy documents with no fixed layout
+fde-l2#2 w2: When a person checks a draft before it is used
+fde-l2#2 w3: When there are too many rules to write by hand
+fde-l3#1 w1: Safety limits make the model faster, because it can skip the risky cases
+fde-l4#0 a: Cache it and refresh shortly before it expires
+fde-l4#0 w1: Request a new token for every call, so it is never stale
+fde-l4#0 w2: Hard-code a token in the source, since it never changes
+fde-l4#2 a: It could be a captured request replayed by an attacker
+fde-l4#2 w1: Old webhooks are always duplicates of ones already received
+fde-l4#2 w2: HMAC stops working after 5 minutes, so the signature is invalid
+fde-l4#2 w3: It saves memory, because old events never need processing
+fde-l5#1 w3: Stop the whole load and wait until the customer has fixed every row in the source system
+fde-l5#2 a: Confirm the format with the customer before mapping
+fde-l5#2 w1: Assume the US format, since most software uses it
+fde-l5#2 w2: Assume the European format, since the customer is in Europe
+fde-l6#1 a: In the first week, alongside discovery
+fde-l6#1 w1: After the pilot passes, when the design is settled
+fde-l6#1 w2: After the full rollout, once usage is known
+fde-l6#1 w3: Only if the customer asks for one twice
+fde-l7#1 w1: Azure Blob Storage with static hosting
+fde-l7#2 a: Their team can review it and repeat the deployment exactly
+fde-l7#2 w1: It makes the model more accurate, since settings are versioned with it
+fde-l7#2 w2: It removes the need for permissions in the customer's cloud account
+fde-l8#0 a: It resolves; you must check response.ok
+fde-l8#0 w1: It throws an exception you catch with try/catch
+fde-l8#0 w2: It retries automatically up to three times
+fde-l8#0 w3: It returns null instead of a Response
+fde-l8#2 w3: It is not needed; TypeScript types guarantee the data at run time, including data from other services
+fde-l9#0 a: It runs on real traffic, but its output is only recorded and compared
+fde-l9#0 w1: The system runs at night only, when real users are unlikely to see mistakes
+fde-l9#0 w2: A dark colour theme for the dashboard, used in the customer's control room
+fde-l9#2 a: A named customer-side owner who agreed to it
+fde-l9#2 w1: The FDE, forever, since they know the system best
+fde-l9#2 w2: Nobody; it runs itself once the tests pass
+fde-l9#2 w3: The model provider, who supports the model it uses
+fde-l10#1 w2: Customers prefer seeing broken software, since it proves the demo is not staged
+fde-l11#0 a: Usually once you have seen the pattern about three times
+fde-l11#0 w1: Always on the first customer, so the second is faster
+fde-l11#0 w2: Never; each customer is unique, so code is never shared
+fde-l11#1 a: 4 of 6 deployments built their own date filter, 2 to 4 days each; here is a shared one
+fde-l11#1 w1: Customers want better search, according to most of the people we talked to this quarter
+fde-l11#1 w2: Search is bad, and several customers have complained about it in their weekly calls
+fde-l11#1 w3: Please improve the product: our deployments keep running into the same rough edges
+fde-l12#0 w2: Draw the database schema, since the data shapes everything else after it
+fde-l12#1 a: Ask what the constraint is and offer options, like running in their cloud or redacted samples
+fde-l12#1 w1: Insist the project needs the data, and explain that results will be poor without it
+fde-l12#1 w3: Promise to use fake data in production so their real data never leaves their systems
+fde-l12#2 a: The smallest version that delivers value, with what is left out stated
+fde-l12#2 w1: The full system, built first, so nothing is missing when the customer looks
+fde-l12#2 w2: The database layer only, since every other part depends on it being right
+fde-l12#2 w3: A slide deck that shows the customer the full plan before any code is written
+ph6-l1#2 w3: It avoids overfitting, because the gradient averages over many examples at once
+ph6-l2#0 a: It equals a single linear layer
+ph6-l2#0 w0: It gets more powerful with each layer added
+ph6-l2#0 w3: It overfits faster than a single layer would
+ph6-l2#1 a: To stop exp() overflowing, without changing the result
+ph6-l2#1 w0: It changes the probabilities for the better on rare classes
+ph6-l2#1 w2: To make the rows sum to 1 after the exponent is taken
+ph6-l2#1 w3: It is faster, because exp() of small numbers is cheaper
+ph6-l3#0 w2: It matches the batch size, with one value per example in the batch
+ph6-l3#1 a: Compare it with a numerical gradient on a tiny example
+ph6-l3#1 w0: Run it longer and check that the loss keeps going down
+ph6-l3#1 w2: Check that the loss is positive after every single step
+ph6-l3#2 a: Only where the input was positive
+ph6-l3#2 w0: Everywhere, scaled by the input value
+ph6-l3#2 w3: Nowhere; ReLU has no gradient at all
+ph6-l4#1 w2: The model trains faster, since gradients from earlier steps keep pushing in the same direction
+ph6-l4#2 a: It adapts the step size per weight, so it needs less tuning
+ph6-l4#2 w0: It is always more accurate than SGD on every kind of model
+ph6-l4#2 w2: It uses no extra memory beyond the weights and gradients
+ph6-l5#1 a: So the average activation matches no dropout
+ph6-l5#1 w0: To make training faster by using larger values
+ph6-l5#1 w2: To avoid negative values after units are dropped
+ph6-l5#1 w3: It is arbitrary; any constant scale would work
+ph6-l6#0 w3: Embeddings need no training, since they come ready-made for every vocabulary of any size
+ph6-l6#1 a: A lookup table of vectors, one row per token, trained like other weights
+ph6-l6#1 w0: A matrix multiplication of one-hot vectors that is recomputed every time
+ph6-l6#1 w2: A clustering algorithm that groups the tokens by how often they appear
+ph6-l6#2 a: Short sentences get pulled toward the padding vector
+ph6-l6#2 w0: Nothing, because padding vectors are always zero
+ph6-l6#2 w2: It crashes, because padding has no embedding
+ph6-l6#2 w3: It improves accuracy by giving every sentence the same length
+ph6-l7#1 w0: To normalise the output so every row of attention sums to exactly one, as a probability should
+ph6-l7#2 a: Attention cost grows with the square of the length
+ph6-l7#2 w0: Memory for the weights grows with the context length
+ph6-l7#2 w2: Tokenization is slow for long texts on every request
+ph6-l8#0 a: Retrieve them and put them in the prompt
+ph6-l8#0 w0: Fine-tune on them so the model memorises every document
+ph6-l8#0 w2: Train a new model from scratch on them
+ph6-l8#0 w3: Nothing can be done until the provider adds them
+ph6-l9#0 w0: The latest gradient only, since backward() overwrites
+ph6-l9#1 a: CrossEntropyLoss already applies log-softmax, so softmax is applied twice
+ph6-l9#1 w2: Softmax needs a GPU to work correctly inside a training loop with batches
+ph6-l9#1 w3: CrossEntropyLoss needs one-hot labels, not class indices, so the loss is wrong
+ph6-l10#1 w0: Only the model object, saved with torch.save, which keeps everything needed
+ph6-l11#0 a: Which positions are real tokens and which are padding
+ph6-l11#0 w0: The important words the model should focus on most
+ph6-l11#0 w3: The layers to train and the layers to keep frozen
+ph6-l11#1 a: Rare words split into smaller known pieces, down to bytes
+ph6-l11#1 w0: They have every word in the language in their vocabulary
+ph6-l11#1 w2: They skip rare words, so no token is ever produced for them
+ph6-l11#1 w3: They use a dictionary lookup that guesses the closest known word
+ph6-l12#1 w3: To make training faster on a GPU, since zero matrices need no multiplication at all
+ph6-l12#2 a: Folds W + (alpha/r)BA into one matrix, so inference costs the same as the base
+ph6-l12#2 w0: Deletes the base model and keeps only the adapter matrices for inference
+ph6-l12#2 w3: Converts it to 4 bits so the merged model fits in the memory of a small GPU
+ph6-l14#1 w2: 512 Hz, one bin per sample
+ph6-l14#2 w0: Accuracy per file, as a share of files that were correct
+ph6-l14#2 w3: Mean squared error between the audio waveforms
+ph6-l15#2 a: An image can cost many tokens; size drives cost and latency
+ph6-l15#2 w0: Models refuse large images and return an error for any above 1 MB
+ph6-l15#2 w2: It improves accuracy in every case, since the model sees less noise
+ph6-l15#2 w3: It removes personal data such as faces and plates from the picture
+ph6-l16#1 w2: The model needs more epochs of training on the app's real traffic before it adapts
+ph6-l16#2 a: The same base model with a good prompt and a few solved examples
+ph6-l16#2 w0: The base model with no instruction, given the raw input text only
+ph6-l16#2 w2: A random guesser only, since anything else is not a fair baseline at all
+ph6-l17#0 a: Batch 8 with gradient accumulation over 4 steps
+ph6-l17#0 w0: A higher learning rate with a batch size of 8
+ph6-l17#0 w2: More epochs at batch size 8 to make up for it
+ph6-l17#0 w3: float64 weights, which pack the batch more tightly
+ph6-l17#2 w3: A shorter dataset that fits in one session, so training always finishes before the time limit

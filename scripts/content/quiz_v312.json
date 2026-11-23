@@ -1,0 +1,2919 @@
+{
+ "l3": {
+  "0": {
+   "check": "None",
+   "o": [
+    "3",
+    "\"3\"",
+    "None",
+    "f itself"
+   ]
+  },
+  "2": {
+   "check": "It runs only when the file is run direct",
+   "o": [
+    "It makes the code run faster, because Python compiles that block only once",
+    "It runs only when the file is run directly, not when imported by a test",
+    "It is required for every Python file that has functions, or imports will fail",
+    "It hides the code from Git"
+   ]
+  }
+ },
+ "l6": {
+  "2": {
+   "check": "Reproduce it with the smallest input tha",
+   "o": [
+    "Rewrite the function",
+    "Reproduce it reliably",
+    "Add try/except around it",
+    "Ask an AI to fix it"
+   ]
+  }
+ },
+ "l8": {
+  "0": {
+   "check": "Stages changes for the next commit",
+   "o": [
+    "Uploads your files to GitHub right away",
+    "Stages changes for the next commit",
+    "Creates a new branch",
+    "Deletes untracked files"
+   ]
+  },
+  "1": {
+   "check": "No, list it in .gitignore; uv sync rebui",
+   "o": [
+    "Yes, so others get exactly the same installed packages",
+    "No, list it in .gitignore; uv sync rebuilds it",
+    "Only on Windows",
+    "Only the Scripts folder, so the commands still work"
+   ]
+  }
+ },
+ "ph1-l1": {
+  "2": {
+   "check": "When there is no data that must live bet",
+   "o": [
+    "Never",
+    "When there is no data that must live between calls",
+    "When the code is longer than about 10 lines in total",
+    "When you use type hints"
+   ]
+  }
+ },
+ "ph1-l2": {
+  "0": {
+   "check": "__init__, __repr__ and __eq__",
+   "o": [
+    "__init__, __repr__ and __eq__",
+    "__init__ only",
+    "__str__, __hash__ and __lt__ for sorting",
+    "Every dunder method, including __add__"
+   ]
+  },
+  "1": {
+   "check": "Each object gets its own new list",
+   "o": [
+    "It is faster",
+    "Each object gets its own list",
+    "It allows None as the default value",
+    "It makes the field frozen after creation"
+   ]
+  }
+ },
+ "ph1-l3": {
+  "2": {
+   "check": "The function may return None, so check b",
+   "o": [
+    "The dict may be empty, so loop over it carefully before use",
+    "The function may return None, so check before indexing",
+    "The keys may be ints instead of str, so convert them first",
+    "Nothing"
+   ]
+  }
+ },
+ "ph1-l4": {
+  "0": {
+   "check": "It stores the original error as the caus",
+   "o": [
+    "It hides the original error so users see a clean message",
+    "It keeps the original error as the cause",
+    "It retries the operation",
+    "It converts the error into a warning and keeps going"
+   ]
+  },
+  "2": {
+   "check": "\"age must be 0 to 150, got 200\"",
+   "o": [
+    "\"invalid\"",
+    "\"error\"",
+    "\"age must be 0 to 150, got 200\"",
+    "\"something went wrong, please try again\""
+   ]
+  }
+ },
+ "ph1-l5": {
+  "0": {
+   "check": "WARNING and above",
+   "o": [
+    "All of them, from DEBUG up",
+    "DEBUG and INFO, but not ERROR",
+    "WARNING and above",
+    "Only ERROR"
+   ]
+  },
+  "1": {
+   "check": "Once, at the program's entry point",
+   "o": [
+    "At the top of every module",
+    "Once, at the entry point",
+    "Inside each function that logs",
+    "Never"
+   ]
+  }
+ },
+ "ph1-l6": {
+  "1": {
+   "check": "Tests then import the installed package,",
+   "o": [
+    "It runs faster, because Python searches src/ before any other folder",
+    "Tests import the installed package, catching packaging mistakes",
+    "GitHub requires it",
+    "It hides the code"
+   ]
+  },
+  "2": {
+   "check": "Formats code and flags likely bugs",
+   "o": [
+    "Runs your tests and reports coverage",
+    "Formats code and flags likely bugs",
+    "Deploys the app",
+    "Manages Python versions and virtual environments"
+   ]
+  }
+ },
+ "ph1-l7": {
+  "0": {
+   "check": "Shared setup that pytest passes to tests",
+   "o": [
+    "A broken test",
+    "Shared setup that pytest passes in",
+    "A kind of assertion that compares two values",
+    "A test that always passes, used as a placeholder"
+   ]
+  },
+  "2": {
+   "check": "Tests can pass a fake client, so no real",
+   "o": [
+    "It is required by Python for any function that calls an API",
+    "Tests can pass a fake client, so no real API calls",
+    "It uses less memory",
+    "It makes the function async"
+   ]
+  }
+ },
+ "ph1-l9": {
+  "1": {
+   "check": "Lists are mutable, so they are not hasha",
+   "o": [
+    "Lists are too large",
+    "Lists are mutable, so they are not hashable",
+    "Dict keys must be strings or numbers in Python",
+    "It works, it is just slow for large dictionaries"
+   ]
+  },
+  "2": {
+   "check": "It can be O(n²) because each += creates ",
+   "o": [
+    "Nothing",
+    "Each += can copy the whole string: O(n²)",
+    "It raises an error once the string gets long",
+    "It changes the original pieces as it goes along"
+   ]
+  }
+ },
+ "ph1-l10": {
+  "2": {
+   "check": "When numbers can be negative",
+   "o": [
+    "When numbers can be negative",
+    "When k is even",
+    "When the list is sorted in ascending order",
+    "Never"
+   ]
+  }
+ },
+ "ph1-l11": {
+  "2": {
+   "check": "Push the negated numbers",
+   "o": [
+    "Use heapq.reverse() on the heap",
+    "Push the negated numbers",
+    "Sort the heap list after each push",
+    "It is not possible"
+   ]
+  }
+ },
+ "ph1-l12": {
+  "2": {
+   "check": "O(n), the tree is a chain",
+   "o": [
+    "O(log n), as for any BST",
+    "O(n): a chain",
+    "O(1)",
+    "O(n log n), like sorting"
+   ]
+  }
+ },
+ "ph1-l13": {
+  "2": {
+   "check": "The remaining nodes are in a cycle (or d",
+   "o": [
+    "The graph is disconnected, so Kahn's needs a second start node",
+    "The remaining nodes are in a cycle (or depend on one)",
+    "The graph is undirected",
+    "Nothing; that is normal"
+   ]
+  }
+ },
+ "ph1-l14": {
+  "0": {
+   "check": "A base case that stops it",
+   "o": [
+    "A loop",
+    "A base case that stops it",
+    "A global variable to count the depth",
+    "A cache of earlier results"
+   ]
+  },
+  "1": {
+   "check": "So the next choice starts from the same ",
+   "o": [
+    "To save memory",
+    "So the next choice starts clean",
+    "Python requires it in recursive functions",
+    "To sort the results before they are returned"
+   ]
+  }
+ },
+ "ph2-l1": {
+  "1": {
+   "check": "Only the values greater than 24",
+   "o": [
+    "True or False",
+    "The positions (indexes) of the big values",
+    "Only the values greater than 24",
+    "The count of values over 24"
+   ]
+  },
+  "2": {
+   "check": "It runs in compiled code and says what i",
+   "o": [
+    "It uses less memory in every case, even for small arrays",
+    "It runs in compiled code and says what it means",
+    "Loops are not allowed over NumPy arrays in any form",
+    "It rounds the results"
+   ]
+  }
+ },
+ "ph2-l2": {
+  "0": {
+   "check": "It sorts as text and cannot be subtracte",
+   "o": [
+    "Nothing",
+    "It sorts as text and cannot be subtracted",
+    "pandas refuses to load the file and stops with an error",
+    "It becomes a number counting days since 1970"
+   ]
+  },
+  "2": {
+   "check": "Durations (timedeltas)",
+   "o": [
+    "Text",
+    "Durations (timedeltas)",
+    "An error, because you cannot subtract dates",
+    "Dates"
+   ]
+  }
+ },
+ "ph2-l3": {
+  "0": {
+   "check": "So it does not change the caller's DataF",
+   "o": [
+    "It is faster",
+    "So it does not change the caller's DataFrame",
+    "pandas requires it before any change to a column",
+    "To remove duplicate rows before cleaning starts"
+   ]
+  },
+  "2": {
+   "check": "How many rows it changed and why",
+   "o": [
+    "Nothing",
+    "Rows changed, and why",
+    "Only the final row count",
+    "The time it took to run"
+   ]
+  }
+ },
+ "ph2-l4": {
+  "1": {
+   "check": "The right table has duplicate keys",
+   "o": [
+    "Nothing",
+    "The right table has duplicate keys",
+    "Some rows were dropped from the left table",
+    "The join was inner"
+   ]
+  },
+  "2": {
+   "check": "A Series with one median per agency",
+   "o": [
+    "One number",
+    "A Series with one median per agency",
+    "A DataFrame of all rows, sorted by agency",
+    "The hours column sorted within each agency"
+   ]
+  }
+ },
+ "ph2-l5": {
+  "0": {
+   "check": "Median (3)",
+   "o": [
+    "Mean (45.0)",
+    "Median (3)",
+    "Max (300 h)",
+    "Sum (315 h)"
+   ]
+  },
+  "2": {
+   "check": "The spread within each group",
+   "o": [
+    "The ranking of the groups by size",
+    "The spread within each group",
+    "The group names",
+    "Nothing"
+   ]
+  }
+ },
+ "ph2-l6": {
+  "1": {
+   "check": "WHERE closed IS NULL",
+   "o": [
+    "WHERE closed = NULL",
+    "WHERE closed IS NULL",
+    "WHERE closed = '' OR closed = 0",
+    "WHERE closed IS NOT NULL"
+   ]
+  },
+  "2": {
+   "check": "FROM, WHERE, GROUP BY, HAVING, SELECT, O",
+   "o": [
+    "SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY",
+    "FROM, WHERE, GROUP BY, HAVING, SELECT, ORDER BY",
+    "FROM, SELECT, WHERE, GROUP BY, ORDER BY, HAVING",
+    "ORDER BY first, then FROM, WHERE and SELECT"
+   ]
+  }
+ },
+ "ph2-l7": {
+  "2": {
+   "check": "ROW_NUMBER gives 1 and 2; RANK gives bot",
+   "o": [
+    "ROW_NUMBER gives 1 and 2; RANK gives both 1",
+    "Both give 1 and 2, in the order the rows were read",
+    "Both give 1",
+    "An error"
+   ]
+  }
+ },
+ "ph2-l8": {
+  "0": {
+   "check": "The value is sent as data, so it can nev",
+   "o": [
+    "It is shorter",
+    "The value is sent as data, never as SQL",
+    "f-strings do not work inside SQLite queries",
+    "It is faster to type and easier to read later"
+   ]
+  },
+  "1": {
+   "check": "Different handling of missing values (NU",
+   "o": [
+    "Missing values (NULL vs NaN)",
+    "SQL is always wrong when it disagrees",
+    "pandas is always wrong with dates",
+    "Computers are random"
+   ]
+  }
+ },
+ "ph3-l1": {
+  "0": {
+   "check": "Makes the line twice as steep",
+   "o": [
+    "Moves the whole line up by w units",
+    "Makes the line twice as steep",
+    "Nothing",
+    "Flips the line"
+   ]
+  },
+  "1": {
+   "check": "Choosing the weights that make its predi",
+   "o": [
+    "Writing the function that makes the predictions",
+    "Choosing weights that make predictions good",
+    "Collecting and labelling the data the model uses",
+    "Plotting results"
+   ]
+  },
+  "2": {
+   "check": "A weighted sum of the features plus a bi",
+   "o": [
+    "The largest of the three features",
+    "A weighted sum plus a bias",
+    "The average of the three features",
+    "A random number near the mean"
+   ]
+  }
+ },
+ "ph3-l3": {
+  "2": {
+   "check": "The one with smaller variance",
+   "o": [
+    "The one with the larger variance",
+    "The one with smaller variance",
+    "They are identical",
+    "Neither"
+   ]
+  }
+ },
+ "ph3-l4": {
+  "1": {
+   "check": "95% of requests took 800 ms or less",
+   "o": [
+    "The average is 800 ms",
+    "95% of requests took 800 ms or less",
+    "Only 5% of requests took 800 ms or less",
+    "The slowest request of all took 800 ms"
+   ]
+  },
+  "2": {
+   "check": "Look at the distribution, for example a ",
+   "o": [
+    "Nothing",
+    "Look at the distribution first",
+    "Always use the mean, it is standard",
+    "Remove all the large values first"
+   ]
+  }
+ },
+ "ph3-l5": {
+  "1": {
+   "check": "Ignoring the base rate",
+   "o": [
+    "Overfitting to the test set",
+    "Ignoring the base rate",
+    "Data leakage",
+    "Regularization"
+   ]
+  }
+ },
+ "ph3-l6": {
+  "0": {
+   "check": "Your own data, with replacement",
+   "o": [
+    "New data drawn fresh from the world",
+    "Your own data, with replacement",
+    "Only the outliers, with replacement",
+    "The test set"
+   ]
+  },
+  "1": {
+   "check": "Bootstrap the difference B − A on the sa",
+   "o": [
+    "Conclude neither is better, because overlapping intervals mean no real difference",
+    "Bootstrap the paired difference B − A and check if its interval excludes zero",
+    "Pick the model with the narrower interval, since its score is more certain",
+    "Collect a new test set for each model"
+   ]
+  },
+  "3": {
+   "check": "So the luck of which examples were drawn",
+   "o": [
+    "It is faster",
+    "So the luck of which examples were drawn cancels out of the difference",
+    "Because numpy requires it",
+    "It makes the interval wider, so the comparison stays on the cautious side"
+   ]
+  }
+ },
+ "ph3-l8": {
+  "1": {
+   "check": "So one learning rate suits every weight",
+   "o": [
+    "It changes which answer the model converges to",
+    "So one learning rate suits every weight",
+    "It removes the outliers from every feature",
+    "It is only cosmetic, for nicer plots"
+   ]
+  }
+ },
+ "ph4-l1": {
+  "0": {
+   "check": "The metric should reflect what errors co",
+   "o": [
+    "It is a legal requirement for every model that is used on real people's data",
+    "The metric should reflect what errors cost the people using the model",
+    "It makes training faster",
+    "It does not matter"
+   ]
+  },
+  "1": {
+   "check": "Predict the training median for everyone",
+   "o": [
+    "A neural network trained on the same columns",
+    "Predict the training median for everyone",
+    "Predict zero",
+    "There is no baseline for regression, only for classification"
+   ]
+  },
+  "2": {
+   "check": "It is not yet useful, however complex",
+   "o": [
+    "It needs more layers",
+    "Not useful yet",
+    "The baseline is wrong",
+    "The test set is too small"
+   ]
+  }
+ },
+ "ph4-l2": {
+  "1": {
+   "check": "note_words (written at closing)",
+   "o": [
+    "agency",
+    "borough",
+    "note_words (written at closing)",
+    "distance_km (computed from the address)"
+   ]
+  },
+  "3": {
+   "check": "Copies of test reviews are also in train",
+   "o": [
+    "The model is excellent",
+    "Copies of test reviews are in training, so the test is not new text",
+    "The test set is too large, so the small errors average out to almost nothing",
+    "TF-IDF needs more n-grams to tell the near-copies apart from each other"
+   ]
+  }
+ },
+ "ph4-l3": {
+  "0": {
+   "check": "So it learns only from training data and",
+   "o": [
+    "It looks neater",
+    "So it learns from training data only",
+    "It is required by Python for any scaler",
+    "It makes the model larger and so more accurate"
+   ]
+  },
+  "2": {
+   "check": "Histogram gradient boosting",
+   "o": [
+    "k-means",
+    "Histogram gradient boosting",
+    "Linear regression with many features",
+    "PCA"
+   ]
+  }
+ },
+ "ph4-l4": {
+  "2": {
+   "check": "The share of positives",
+   "o": [
+    "0.5, the same as for ROC-AUC",
+    "The share of positives",
+    "1.0, since every point is ranked",
+    "0, the score of an empty model"
+   ]
+  }
+ },
+ "ph4-l5": {
+  "1": {
+   "check": "The C setting of the pipeline step named",
+   "o": [
+    "A column named C in the training data's table",
+    "The C setting of the pipeline step named clf",
+    "A class weight",
+    "The number of folds"
+   ]
+  }
+ },
+ "ph4-l6": {
+  "0": {
+   "check": "How much the score drops when that colum",
+   "o": [
+    "Its correlation with the label across all the rows",
+    "How much the score drops when that column is shuffled",
+    "The size of its coefficient",
+    "How many missing values it has in the training data"
+   ]
+  },
+  "1": {
+   "check": "An overall score can hide a group where ",
+   "o": [
+    "To make charts that are easier to present to a client",
+    "A good overall score can hide a group that fails",
+    "It improves accuracy automatically for every agency",
+    "It is faster"
+   ]
+  }
+ },
+ "ph4-l7": {
+  "1": {
+   "check": "It still returns 4 groups",
+   "o": [
+    "It reports that there are no clusters to find",
+    "It still returns 4 groups",
+    "It crashes",
+    "It finds the true k"
+   ]
+  },
+  "2": {
+   "check": "You can describe and name it, and it hel",
+   "o": [
+    "A high silhouette score alone, whatever the groups mean",
+    "You can describe and name it, and it helps a decision",
+    "It is the largest group in the data set",
+    "It has round edges"
+   ]
+  }
+ },
+ "ph4-l8": {
+  "0": {
+   "check": "The whole pipeline, with preprocessing",
+   "o": [
+    "Only the model coefficients, as a CSV file",
+    "The whole pipeline",
+    "The training data only, to retrain later",
+    "Nothing"
+   ]
+  },
+  "2": {
+   "check": "A significant shift worth investigating",
+   "o": [
+    "Stable",
+    "A significant shift worth investigating",
+    "The model is perfect and needs no changes now",
+    "A bug in PSI"
+   ]
+  }
+ },
+ "ph4-l9": {
+  "0": {
+   "check": "GroupKFold with the customer id as the g",
+   "o": [
+    "Random KFold over all the rows, shuffled first",
+    "GroupKFold with the customer id as the group",
+    "TimeSeriesSplit ordered by the customer's first row",
+    "Leave-one-out"
+   ]
+  },
+  "1": {
+   "check": "0.91 is probably a bit optimistic becaus",
+   "o": [
+    "0.91 is an unbiased estimate of the final model's score on new data",
+    "It is probably optimistic: the best of 50 noisy scores",
+    "0.91 is a lower bound",
+    "Cross-validation removes all of the selection bias, so 0.91 holds"
+   ]
+  }
+ },
+ "ph4-l10": {
+  "0": {
+   "check": "The model ranks well but is not calibrat",
+   "o": [
+    "Nothing, AUC is high",
+    "The model ranks well but is not calibrated",
+    "The model is underfitting",
+    "The test set is too small for AUC to mean anything here"
+   ]
+  },
+  "1": {
+   "check": "Data the base model was not fitted on, s",
+   "o": [
+    "The test set",
+    "Data the base model was not fitted on, such as CV folds",
+    "The same rows the model was trained on, so nothing is wasted",
+    "Any data at all; calibration does not depend on which rows"
+   ]
+  }
+ },
+ "ph4-l11": {
+  "0": {
+   "check": "Data version, code commit, settings with",
+   "o": [
+    "The final accuracy, the model's name and the date it was trained on",
+    "Data version, code commit, seeded settings, lock file and model hash",
+    "The model file only, saved with joblib and kept in the same folder",
+    "A screenshot of the notebook after every cell has run once"
+   ]
+  },
+  "2": {
+   "check": "Small float differences across hardware ",
+   "o": [
+    "The original run was faked",
+    "Small float differences across hardware are normal; compare within a stated tolerance",
+    "The data must have changed between the two runs, so redo the split",
+    "Seeds do not work on GPUs at all, so the result cannot be trusted and must be rerun on a CPU"
+   ]
+  }
+ },
+ "ph4-l12": {
+  "0": {
+   "check": "After the batch is fully processed, writ",
+   "o": [
+    "Before processing the batch",
+    "After the batch is fully processed, written atomically",
+    "Only at the end of the whole run, once every batch is done and checked",
+    "Never; recompute it every time from the newest row in the target table"
+   ]
+  },
+  "1": {
+   "check": "Re-reading a short look-back window each",
+   "o": [
+    "A bigger server",
+    "Re-read a short look-back window and upsert by id",
+    "Deleting the watermark daily so every run starts from the beginning",
+    "Sorting each batch by timestamp before it is written"
+   ]
+  }
+ },
+ "ph4-l13": {
+  "0": {
+   "check": "So predictions still waiting for a label",
+   "o": [
+    "It is faster",
+    "So predictions still waiting for a label stay in the table and coverage can be measured",
+    "Inner joins do not work in pandas when one table has missing values in the key column, so the merge would fail",
+    "To remove duplicates"
+   ]
+  },
+  "1": {
+   "check": "Too early: few labels, and the early one",
+   "o": [
+    "The model improved, since 97% is above last month's score",
+    "Too early: few labels, maybe a biased subset",
+    "The model is broken, because 12% coverage is far too low",
+    "Labels are not needed"
+   ]
+  },
+  "2": {
+   "check": "Keep the champion and investigate that r",
+   "o": [
+    "Promote it, because the overall score went up",
+    "Keep the champion; investigate that region",
+    "Average the two models so every region is covered",
+    "Delete the region from the test data and compare again"
+   ]
+  }
+ },
+ "ph4-l15": {
+  "0": {
+   "check": "A gradient-boosted tree ensemble",
+   "o": [
+    "A deep neural network with several hidden layers",
+    "A gradient-boosted tree ensemble",
+    "k-nearest neighbours",
+    "A single decision tree"
+   ]
+  },
+  "1": {
+   "check": "Trees cannot predict beyond the range of",
+   "o": [
+    "Nothing",
+    "Trees can't predict past the training targets, so they underestimate",
+    "It trains too slowly once there are many years of data to learn from",
+    "It needs scaling first, or the trees split on the year column wrongly"
+   ]
+  },
+  "2": {
+   "check": "Stops adding trees when the score on a v",
+   "o": [
+    "Stops when training accuracy reaches 100% on the training rows",
+    "Stops adding trees when validation stops improving",
+    "Limits the depth of each tree so it cannot overfit",
+    "Removes the weakest features after each new tree is added"
+   ]
+  }
+ },
+ "ph4-l16": {
+  "2": {
+   "check": "The MAE of a seasonal naive forecast on ",
+   "o": [
+    "Training MAE",
+    "The MAE of a seasonal naive forecast on the same backtest",
+    "The number of features and the training time of the model",
+    "R squared only"
+   ]
+  }
+ },
+ "ph4-l17": {
+  "0": {
+   "check": "The same user sees both versions, so the",
+   "o": [
+    "There are too many page views, so the test takes too long to run",
+    "The same user sees both versions, so the views are not independent",
+    "Page views cannot be counted reliably when caching is on for the site",
+    "Nothing"
+   ]
+  },
+  "1": {
+   "check": "Repeated looks inflate the false positiv",
+   "o": [
+    "None; p is below 0.05, so the result is significant and final",
+    "Repeated looks inflate the false positive rate",
+    "The test was too long, so seasonal effects crept in",
+    "The lift is too large to be believable for any test"
+   ]
+  }
+ },
+ "ph4-l18": {
+  "0": {
+   "check": "PCA follows variance, so a column in lar",
+   "o": [
+    "PCA only works with values between 0 and 1, so unscaled columns make it fail with an error message",
+    "PCA follows variance, so a column in larger units would dominate the first component whatever its importance",
+    "Standardising makes the components correlated",
+    "It removes the need to centre the data"
+   ]
+  },
+  "1": {
+   "check": "Inside each training fold, for example i",
+   "o": [
+    "On all the data before splitting, so every fold uses the same components",
+    "On the test set only",
+    "Inside each training fold, e.g. in a pipeline",
+    "It does not matter, because PCA ignores the labels entirely"
+   ]
+  },
+  "2": {
+   "check": "The direction that separates the classes",
+   "o": [
+    "PCA failed to converge on the data and returned a random direction",
+    "The class-separating direction has little variance; PCA ignores labels",
+    "98% is too low; the classifier needs at least 99.9% of the variance",
+    "The classifier needs many more rows to learn from one single feature"
+   ]
+  }
+ },
+ "ph5-l1": {
+  "1": {
+   "check": "Something went wrong on the server's sid",
+   "o": [
+    "The caller made a mistake in the request body or URL",
+    "Something went wrong on the server's side",
+    "The request succeeded but returned no content",
+    "The page moved"
+   ]
+  }
+ },
+ "ph5-l2": {
+  "0": {
+   "check": "A number between 0 and 100 inclusive",
+   "o": [
+    "A string length of 0 to 100 characters",
+    "A number from 0 to 100",
+    "A list size between 0 and 100 items",
+    "Nothing at runtime; it is only a hint for docs"
+   ]
+  },
+  "2": {
+   "check": "An automatic 422 response listing the pr",
+   "o": [
+    "A 500 error",
+    "An automatic 422 response listing the problems",
+    "The request is retried",
+    "The default values are used for the fields that failed validation"
+   ]
+  }
+ },
+ "ph5-l3": {
+  "0": {
+   "check": "It takes the same time however much of t",
+   "o": [
+    "It is shorter",
+    "It takes the same time however much matches, so timing can't leak the key",
+    "It encrypts the key before comparing, so the plain key never sits in memory",
+    "It is required by HTTP for every header that carries a secret value"
+   ]
+  }
+ },
+ "ph5-l4": {
+  "0": {
+   "check": "In the platform's environment settings",
+   "o": [
+    "In the code",
+    "In a committed config file that only the team can read",
+    "In the platform's environment settings",
+    "In the README"
+   ]
+  },
+  "1": {
+   "check": "At start-up, with a message naming the s",
+   "o": [
+    "On the first user request that needs the setting",
+    "At start-up, naming the setting",
+    "Never",
+    "Only when an admin checks the health page"
+   ]
+  },
+  "2": {
+   "check": "Revoke the key and create a new one",
+   "o": [
+    "Nothing; the deleted commit is gone from GitHub",
+    "Revoke it and make a new one",
+    "Make the repo private so nobody else can see it",
+    "Rename the file that held the key"
+   ]
+  }
+ },
+ "ph5-l5": {
+  "1": {
+   "check": "The disk is wiped on restart",
+   "o": [
+    "SQLite is too slow",
+    "The disk is wiped on restart",
+    "SQLite cannot store JSON columns, so logs lose their fields",
+    "It is illegal"
+   ]
+  },
+  "2": {
+   "check": "Redact or hash what you do not need",
+   "o": [
+    "Log everything, so the audit trail is complete",
+    "Redact or hash what you do not need",
+    "Email it to yourself and delete it from the log",
+    "Nothing"
+   ]
+  }
+ },
+ "ph5-l6": {
+  "0": {
+   "check": "Loading the model on every request",
+   "o": [
+    "Python is slow at maths compared with C",
+    "Loading the model per request",
+    "JSON parsing of the request body",
+    "Too many routes registered in the app"
+   ]
+  },
+  "2": {
+   "check": "It avoids hammering a struggling service",
+   "o": [
+    "It looks professional",
+    "It avoids hammering a struggling service",
+    "It makes each request faster once the service recovers",
+    "It is required by HTTP"
+   ]
+  }
+ },
+ "ph5-l7": {
+  "0": {
+   "check": "The install layer stays cached when only",
+   "o": [
+    "Docker requires lock files to be copied before any source file",
+    "The install layer stays cached when only code changes",
+    "It makes the image smaller, because the lock file is compressed",
+    "It hides the code"
+   ]
+  },
+  "1": {
+   "check": "The secret is baked into the image for a",
+   "o": [
+    "Nothing",
+    "The secret is baked into the image for anyone to read",
+    "ENV is deprecated in Dockerfiles and ignored at run time",
+    "It slows the build, because every layer re-reads the variable"
+   ]
+  }
+ },
+ "ph5-l8": {
+  "0": {
+   "check": "Automatically runs checks such as lint, ",
+   "o": [
+    "Deploys the app to production on every commit, without any checks first",
+    "Automatically runs checks such as lint, type-check and tests on every push",
+    "Writes code",
+    "Monitors users"
+   ]
+  },
+  "1": {
+   "check": "Free services sleep when idle and must s",
+   "o": [
+    "A bug in the start-up code that loops for a while",
+    "Free services sleep when idle and must start",
+    "The model is wrong and has to be reloaded every time",
+    "GitHub is slow"
+   ]
+  },
+  "2": {
+   "check": "Read the build log from the bottom, then",
+   "o": [
+    "Rewrite the app with a simpler framework",
+    "Read the build log from the bottom",
+    "Delete the repo and push it again",
+    "Disable CI so the deploy goes through"
+   ]
+  }
+ },
+ "ph5-l9": {
+  "2": {
+   "check": "Every other request on that worker waits",
+   "o": [
+    "Nothing; async runs it in parallel with the other requests on a thread",
+    "Every other request on that worker waits about 2 seconds",
+    "It raises an error",
+    "FastAPI moves it to the GPU"
+   ]
+  }
+ },
+ "ph5-l10": {
+  "1": {
+   "check": "app.dependency_overrides or a create_app",
+   "o": [
+    "Edit the source before each test and restore it afterwards",
+    "dependency_overrides or a create_app(model=...) factory",
+    "Start a second server that runs a smaller copy of the model",
+    "Mock the network so the model's requests never leave the test"
+   ]
+  }
+ },
+ "ph5-l11": {
+  "1": {
+   "check": "Each user consistently gets the same ver",
+   "o": [
+    "It is more random",
+    "Each user consistently gets the same version, with no stored state",
+    "Hashing is required by HTTP for any request that has a user id in it",
+    "It encrypts the request"
+   ]
+  },
+  "2": {
+   "check": "Wait for the minimum sample size before ",
+   "o": [
+    "Roll back immediately, since any error is a failure",
+    "Wait for the minimum sample before judging",
+    "Promote it",
+    "Restart the server and count the requests again"
+   ]
+  }
+ },
+ "ph5-l12": {
+  "0": {
+   "check": "One part needs very different scaling or",
+   "o": [
+    "Microservices are the modern standard for any production team",
+    "One part needs very different scaling or hardware",
+    "It makes local development simpler for both people on the team",
+    "Each function should be its own service so it can be deployed alone"
+   ]
+  }
+ },
+ "ph5-l13": {
+  "1": {
+   "check": "In the same transaction as the effect it",
+   "o": [
+    "In a Python set in the worker, which is fast to check on every message",
+    "In the same transaction as the effect it guards",
+    "In the log file",
+    "In the queue message itself"
+   ]
+  },
+  "2": {
+   "check": "Losing or inventing events when a crash ",
+   "o": [
+    "Slow consumers that fall behind and let the queue grow without bound",
+    "Losing or inventing events in a crash between a DB write and a publish",
+    "Poison messages",
+    "Out-of-order delivery when several consumers read the same queue partition"
+   ]
+  }
+ },
+ "ph5-l14": {
+  "0": {
+   "check": "Least outstanding requests",
+   "o": [
+    "Round robin over the replicas",
+    "Least outstanding requests",
+    "Random choice of replica each time",
+    "Always the first healthy replica"
+   ]
+  },
+  "2": {
+   "check": "Reject it quickly with 429 or 503 and Re",
+   "o": [
+    "Queue it without a limit",
+    "Reject it quickly with 429 or 503 and Retry-After",
+    "Accept it and process it slowly, after the requests already running",
+    "Drop the connection silently"
+   ]
+  }
+ },
+ "ph5-l15": {
+  "2": {
+   "check": "The system passed its capacity, so reque",
+   "o": [
+    "The test is broken and must be rerun from scratch",
+    "It passed its capacity; requests queue",
+    "The network got faster, so the server is waiting on it",
+    "Nothing important; latency always grows like this"
+   ]
+  }
+ },
+ "ph5-l17": {
+  "0": {
+   "check": "Scoring every customer's churn risk each",
+   "o": [
+    "Blocking a card payment at checkout when a fraud score from last night is above the limit",
+    "Scoring every customer's churn risk each night for tomorrow's campaign",
+    "Answering a user's chat message",
+    "Autocomplete in a search box"
+   ]
+  },
+  "1": {
+   "check": "Write each chunk as its own part file an",
+   "o": [
+    "Retry the entire job from the start with a longer timeout",
+    "Write each chunk as its own part file; skip existing parts",
+    "Increase the chunk size",
+    "Run the job twice and compare the two outputs row by row"
+   ]
+  },
+  "2": {
+   "check": "A crash can never leave a half-written f",
+   "o": [
+    "Renaming compresses the file and checks that it is valid Parquet",
+    "A crash can never leave a half-written file that looks done",
+    "It makes the model faster, because it can read the file while it is written",
+    "It hides the file from other users until the whole job has finished running"
+   ]
+  }
+ },
+ "ph7-l1": {
+  "0": {
+   "check": "Durable rules: the role, the output form",
+   "o": [
+    "The ticket text to classify, so the model treats it as a rule it must follow",
+    "Durable rules: the role, the output format, what not to do",
+    "The temperature",
+    "Nothing; the two are identical"
+   ]
+  },
+  "1": {
+   "check": "It picks the most likely tokens, so resu",
+   "o": [
+    "It is cheaper per token, because the provider skips sampling",
+    "It picks the likeliest tokens, so results are nearly repeatable",
+    "It makes the model more accurate on every task",
+    "It disables the safety filters that change the answers"
+   ]
+  },
+  "2": {
+   "check": "No: batching and hardware still change r",
+   "o": [
+    "Yes, 0 means fully deterministic on every provider",
+    "No: batching and hardware still change results",
+    "Only with a local model running on your own machine",
+    "Only when you also set a seed in the request body"
+   ]
+  }
+ },
+ "ph7-l2": {
+  "1": {
+   "check": "Validate the output against an allow-lis",
+   "o": [
+    "Ask more politely and add 'please' so the model takes the categories more seriously",
+    "Make the prompt much longer",
+    "Validate the output against an allow-list in code and retry with the error",
+    "Raise the temperature"
+   ]
+  },
+  "2": {
+   "check": "It marks where the data starts and ends,",
+   "o": [
+    "It makes the model answer faster, because it can skip the quoted part",
+    "It marks where the data starts and ends, apart from the instructions",
+    "It is required by the JSON format whenever text contains line breaks",
+    "It encrypts the data"
+   ]
+  }
+ },
+ "ph7-l3": {
+  "0": {
+   "check": "It tells the model what was wrong, so th",
+   "o": [
+    "It is required by the API whenever a request is sent for a second time",
+    "It says what was wrong, so the retry is a correction, not a repeat",
+    "It reduces the cost of the retry, because the error replaces the prompt",
+    "It makes the output deterministic, so the second answer is always valid"
+   ]
+  },
+  "2": {
+   "check": "The code fence is not JSON, so it raises",
+   "o": [
+    "json.loads cannot read objects",
+    "The code fence is not JSON, so it raises; you have to find the object inside the text first",
+    "It would work fine",
+    "Because the keys are not quoted in the way Python's json module expects, so it would decode the wrong value"
+   ]
+  }
+ },
+ "ph7-l4": {
+  "1": {
+   "check": "Output tokens usually cost several times",
+   "o": [
+    "Output tokens usually cost more, and generation time grows with them",
+    "Input tokens are free",
+    "Output is counted twice by every provider, once to generate and once to bill",
+    "It does not; input and output are priced and timed the same way"
+   ]
+  },
+  "2": {
+   "check": "No: it shows tokens as they arrive, whic",
+   "o": [
+    "Yes, roughly twice as fast for long answers",
+    "No: it only makes the wait feel shorter",
+    "Yes, because it skips the provider's request queue",
+    "Only at temperature 0, when sampling is skipped"
+   ]
+  }
+ },
+ "ph7-l5": {
+  "1": {
+   "check": "So many clients do not all retry at the ",
+   "o": [
+    "To make the wait shorter on average",
+    "So many clients do not all retry at the same moment",
+    "Because providers reject retries that arrive with identical wait times between them",
+    "To randomise the model's output"
+   ]
+  },
+  "2": {
+   "check": "400 bad request or 401 bad key",
+   "o": [
+    "429 rate limited",
+    "503 from the provider during an outage",
+    "400 bad request or 401 bad key",
+    "A request that timed out before any reply"
+   ]
+  }
+ },
+ "ph7-l6": {
+  "0": {
+   "check": "Otherwise 'it seems better' is the only ",
+   "o": [
+    "It is cheaper that way, since the eval runs only once",
+    "Otherwise 'it seems better' is your only evidence",
+    "Providers require it before they allow prompt changes",
+    "It makes the model deterministic for the tuned prompt"
+   ]
+  },
+  "2": {
+   "check": "Accuracy next to cost and latency, so th",
+   "o": [
+    "That v3 is better, full stop",
+    "Accuracy next to cost and latency, so the trade-off is visible",
+    "Only the cost",
+    "Nothing until accuracy improves by ten points over v2, since one point is noise"
+   ]
+  }
+ },
+ "ph7-l7": {
+  "0": {
+   "check": "They prefer longer answers, their own st",
+   "o": [
+    "They prefer shorter answers",
+    "They prefer longer answers, their own style, and the first option",
+    "They are biased only against JSON and other structured answers",
+    "They have no measurable biases once the temperature is set to 0"
+   ]
+  },
+  "1": {
+   "check": "Because if 90% of items carry one label,",
+   "o": [
+    "90% is always poor for a judge that grades free text",
+    "If 90% of items share one label, always saying it scores 90%",
+    "Because raw agreement cannot be computed on text labels at all",
+    "Because kappa is always higher, so 90% means the judge is weak"
+   ]
+  }
+ },
+ "ph7-l8": {
+  "0": {
+   "check": "Giving the model no dangerous capability",
+   "o": [
+    "Telling the model, in a firm system message, to ignore any instructions found in the data",
+    "Putting the data in triple quotes",
+    "Giving the model no dangerous capability and requiring approval for outward actions",
+    "Asking the model to confirm it will behave"
+   ]
+  },
+  "1": {
+   "check": "It misses names and addresses and catche",
+   "o": [
+    "It is perfect once the patterns are right and tested on a few sample messages",
+    "It misses names and catches harmless strings: it reduces risk, not removes it",
+    "It only works on emails, because other personal data has no fixed format at all",
+    "It breaks the JSON schema"
+   ]
+  },
+  "2": {
+   "check": "Process it as data, flag it for logging ",
+   "o": [
+    "Delete the ticket at once so the model never sees the injected text",
+    "Treat it as data, flag it for review, and rely on validation and limited capability",
+    "Forward it to the model with extra authority so it can decide what the sender meant",
+    "Reply to the resident with the system prompt so they can see which rules apply here"
+   ]
+  }
+ },
+ "ph7-l9": {
+  "1": {
+   "check": "Return a tool result with is_error and a",
+   "o": [
+    "Raise an exception and stop the whole request, so the user sees the bug at once",
+    "Return a tool result with is_error and a short message, so the model can retry",
+    "Run the tool anyway",
+    "Delete the tool"
+   ]
+  }
+ },
+ "ph7-l10": {
+  "0": {
+   "check": "Keep it in a buffer until the rest arriv",
+   "o": [
+    "Parse the partial line and fill in the rest later",
+    "Keep it in a buffer until the rest arrives",
+    "Drop it",
+    "Restart the request from the last full event"
+   ]
+  },
+  "1": {
+   "check": "Time to first token",
+   "o": [
+    "Total time to the last token",
+    "Time to first token",
+    "Tokens per dollar spent",
+    "Request size in bytes"
+   ]
+  }
+ },
+ "ph7-l11": {
+  "0": {
+   "check": "The system prompt and the latest user me",
+   "o": [
+    "The oldest user message, since it holds the original task and all of its context",
+    "The system prompt and the latest user message",
+    "Every tool result",
+    "The assistant's last reply"
+   ]
+  },
+  "1": {
+   "check": "A result without its call (or the revers",
+   "o": [
+    "To save more tokens than dropping a plain message would",
+    "A result without its call (or the reverse) is an invalid request",
+    "Tool results are private, so they must not stay in the history",
+    "It is faster"
+   ]
+  },
+  "2": {
+   "check": "At the start of the prompt",
+   "o": [
+    "At the end, after the question",
+    "At the start",
+    "In the middle of the prompt",
+    "In a separate request first"
+   ]
+  }
+ },
+ "ph7-l12": {
+  "1": {
+   "check": "Fails calls immediately until a cooldown",
+   "o": [
+    "Sends every call",
+    "Fails calls immediately until a cooldown passes",
+    "Doubles the timeout for every call until the service is healthy again",
+    "Retries forever"
+   ]
+  },
+  "2": {
+   "check": "It answers differently, so its quality a",
+   "o": [
+    "It is required by law whenever a model is swapped in",
+    "It answers differently; check its quality and format",
+    "It is always worse, so you must know by how much",
+    "It is cheaper"
+   ]
+  }
+ },
+ "ph7-l13": {
+  "0": {
+   "check": "Says the real model is unavailable there",
+   "o": [
+    "Shows a sample answer recorded earlier as if it were live",
+    "Says the real model is unavailable and makes no call",
+    "Uses a paid API key built into the downloaded copy",
+    "Calls Ollama automatically on the default local port"
+   ]
+  },
+  "2": {
+   "check": "Free and private, but slower and more li",
+   "o": [
+    "Always more accurate, because nothing is lost on the network between calls",
+    "Free and private, but slower and more likely to break formats",
+    "Needs an API key",
+    "Cannot use tools"
+   ]
+  }
+ },
+ "ph7-l14": {
+  "1": {
+   "check": "Less memory, usually some quality loss y",
+   "o": [
+    "Identical answers, just faster and smaller on disk",
+    "Less memory and some quality loss to measure",
+    "Better quality, because the 4-bit file was re-trained",
+    "It stops supporting tools and structured outputs"
+   ]
+  }
+ },
+ "ph7-l15": {
+  "0": {
+   "check": "The context cache and runtime memory do ",
+   "o": [
+    "Ollama decompresses the 4-bit file back to 8 bits when it loads the weights into memory",
+    "The context cache and runtime memory do not shrink with the weights",
+    "The measurement is wrong",
+    "4-bit files store extra copies"
+   ]
+  },
+  "1": {
+   "check": "A paired interval over the tasks, plus h",
+   "o": [
+    "Two separate confidence intervals, one per file, checked for overlap",
+    "A paired interval over the tasks, plus how often answers agree",
+    "Only the mean accuracy",
+    "File size per accuracy point, since the smaller file is the goal"
+   ]
+  }
+ },
+ "ph8-l1": {
+  "1": {
+   "check": "It produces confident answers backed by ",
+   "o": [
+    "It costs more tokens than the answer is worth to anyone",
+    "Confident answers backed by irrelevant text are harder to spot than a refusal",
+    "It breaks the embedding model, which then returns the same chunks",
+    "It is not worse; any context helps, even when it is off-topic"
+   ]
+  }
+ },
+ "ph8-l2": {
+  "0": {
+   "check": "An answer that straddles a chunk boundar",
+   "o": [
+    "Duplicate documents in the index being returned twice in the results list",
+    "An answer that straddles a chunk boundary becoming unfindable",
+    "Embedding drift over time",
+    "Rate limits"
+   ]
+  },
+  "1": {
+   "check": "So a chunk like 'within twenty-four hour",
+   "o": [
+    "To make the chunk longer, so the embedding has more words to average",
+    "So a chunk like 'within twenty-four hours' still has a subject to cite",
+    "Because vector stores require a title field on every chunk they hold",
+    "To speed up search"
+   ]
+  },
+  "2": {
+   "check": "On structure the document already has: h",
+   "o": [
+    "Every 1000 characters exactly, so all chunks cost the same",
+    "On the document's own structure: headings, paragraphs, rows",
+    "Mid-sentence, to keep the chunks exactly the same size",
+    "Only at the end of the document, keeping it whole"
+   ]
+  }
+ },
+ "ph8-l3": {
+  "1": {
+   "check": "Re-embed and re-index every chunk, becau",
+   "o": [
+    "Nothing; vectors from different embedding models are interchangeable as long as the dimension matches exactly",
+    "Re-embed and re-index every chunk, because queries and documents must use the same model",
+    "Only the query path changes",
+    "Lower the temperature"
+   ]
+  },
+  "2": {
+   "check": "It returns something topically similar b",
+   "o": [
+    "It cannot find paraphrases, only the exact words from the question",
+    "It returns something topically similar but about the wrong year or agency",
+    "It cannot handle more than 100 documents before the scores all collapse",
+    "It always returns exact matches only"
+   ]
+  }
+ },
+ "ph8-l4": {
+  "0": {
+   "check": "Saturation: the tenth occurrence of a wo",
+   "o": [
+    "Document length, so long documents do not win by size",
+    "Saturation: repeats of a word add less and less",
+    "Rare terms, which get a higher weight than common ones",
+    "The number of documents in the whole collection"
+   ]
+  },
+  "2": {
+   "check": "'permit number 2023/118'",
+   "o": [
+    "'bins were not emptied this week'",
+    "'my flat is freezing'",
+    "'permit number 2023/118'",
+    "'who do I complain to'"
+   ]
+  }
+ },
+ "ph8-l5": {
+  "0": {
+   "check": "A cosine of 0.82 and a BM25 score of 11.",
+   "o": [
+    "Ranks are more precise than raw scores for any retriever",
+    "A cosine of 0.82 and a BM25 score of 11.4 are not comparable",
+    "Scores are not available from most vector stores, only ranks",
+    "It makes the result deterministic"
+   ]
+  },
+  "1": {
+   "check": "The cheap retriever is recall-oriented; ",
+   "o": [
+    "To spend more tokens on context, since more chunks always mean better answers",
+    "The retriever favours recall; a reranker picks precisely from the wider list",
+    "Because 25 is the provider's minimum number of results for one vector query",
+    "To avoid caching the results, which would make repeat questions return stale chunks"
+   ]
+  }
+ },
+ "ph8-l6": {
+  "0": {
+   "check": "The ranking: the right chunk is found bu",
+   "o": [
+    "Retrieve more chunks",
+    "The ranking: the right chunk is found but buried, so add a reranker",
+    "The chunk size only",
+    "Nothing; recall is what matters, and the model reads all three chunks anyway"
+   ]
+  },
+  "1": {
+   "check": "Because a system that never refuses is a",
+   "o": [
+    "To inflate the scores, since refusals are easy to get right",
+    "A system that never refuses is a system that invents",
+    "To test the provider's rate limits under a realistic load",
+    "They are needed to compute MRR"
+   ]
+  },
+  "2": {
+   "check": "Otherwise you tune prompts to compensate",
+   "o": [
+    "It is cheaper to compute, because retrieval metrics need no model call at all",
+    "Otherwise you tune prompts to cover for a retriever that missed the chunk",
+    "Because answers cannot be measured, only the chunks that went into the prompt",
+    "To avoid using an LLM judge, which is always biased towards longer answers"
+   ]
+  }
+ },
+ "ph8-l7": {
+  "1": {
+   "check": "It saves the call and the tokens, and th",
+   "o": [
+    "It gives a better answer",
+    "It saves the call and the tokens, and the refusal is more reliable than hoping the model refuses",
+    "Providers charge for refusals at a higher rate than for answers, so refusing after the call costs more",
+    "There is no difference"
+   ]
+  },
+  "2": {
+   "check": "It costs money and latency on every requ",
+   "o": [
+    "The model would crash once the window is more than half full of retrieved text",
+    "It costs money and latency each time and buries the best chunk in the middle",
+    "Citations stop working",
+    "It is always better to fill it, because more context can only help the model answer"
+   ]
+  }
+ },
+ "ph8-l8": {
+  "0": {
+   "check": "Filtering after can leave you with fewer",
+   "o": [
+    "Ranking is slower than filtering, so filtering first saves time on every single query",
+    "Filtering after can leave fewer than k results, and in multi-tenant data it is security",
+    "Vector stores cannot rank results once a filter has been applied to the candidates",
+    "It improves the embeddings, since the filtered vectors are re-normalised first"
+   ]
+  },
+  "2": {
+   "check": "A NumPy array in memory, moving only whe",
+   "o": [
+    "A hosted vector database, always, because it scales automatically when needed",
+    "A NumPy array in memory, moving only when a number forces it",
+    "FAISS from the start",
+    "A new service per collection"
+   ]
+  }
+ },
+ "ph8-l9": {
+  "0": {
+   "check": "Drop lines that repeat at the top of mos",
+   "o": [
+    "Delete the first line of every page, whatever it says",
+    "Drop lines that repeat at the top of most pages",
+    "Ask the model to ignore it when it answers questions",
+    "Use a bigger chunk size so the header matters less"
+   ]
+  },
+  "1": {
+   "check": "Skip it: nothing changed",
+   "o": [
+    "Re-embed it to be safe",
+    "Skip it",
+    "Delete it and ingest it again",
+    "Double its weight in search"
+   ]
+  }
+ },
+ "ph8-l10": {
+  "0": {
+   "check": "So inner product equals cosine similarit",
+   "o": [
+    "FAISS crashes otherwise, because inner product needs vectors of length one",
+    "So inner product equals cosine similarity",
+    "To save memory",
+    "To make search approximate"
+   ]
+  },
+  "1": {
+   "check": "Remove its old chunk ids, then add the n",
+   "o": [
+    "Add the new chunks next to the old ones and let ranking choose",
+    "Remove its old chunk ids, then add new chunks",
+    "Rebuild the whole index every time anything is edited",
+    "Nothing"
+   ]
+  },
+  "2": {
+   "check": "Re-embed every chunk into a new index",
+   "o": [
+    "Nothing; the old vectors still work",
+    "Re-embed every chunk into a new index",
+    "Only re-embed the new documents from now on",
+    "Change k so more results come back"
+   ]
+  }
+ },
+ "ph8-l11": {
+  "1": {
+   "check": "After first-stage retrieval, on a shortl",
+   "o": [
+    "Before chunking",
+    "After first-stage retrieval, on a shortlist",
+    "After the answer",
+    "Inside the embedding model, as its last layer before the vector"
+   ]
+  },
+  "2": {
+   "check": "Correct paraphrases (false alarms) and w",
+   "o": [
+    "Invented citation numbers that point at chunks that were never retrieved",
+    "Correct paraphrases (false alarms) and wrong claims that reuse the words",
+    "Empty answers, which have no words to overlap with the sources at all",
+    "Everything"
+   ]
+  }
+ },
+ "ph8-l12": {
+  "0": {
+   "check": "Without them, a system that always answe",
+   "o": [
+    "To make the set longer, so the averages are more stable",
+    "Without them, an always-answering system looks perfect",
+    "They are easier to grade than ordinary questions",
+    "Models like them and answer them more accurately"
+   ]
+  },
+  "2": {
+   "check": "Blocks a change whose key metrics drop b",
+   "o": [
+    "Blocks a change whose key metrics drop beyond a tolerance",
+    "Speeds up evaluation by skipping the cases that passed last time",
+    "Picks the best model",
+    "Deletes old reports"
+   ]
+  }
+ },
+ "ph8-l13": {
+  "0": {
+   "check": "A semantic embedding model",
+   "o": [
+    "BM25",
+    "A semantic embedding model",
+    "Exact string match on the word 'refunds'",
+    "A hashed bag of words with stemming turned on"
+   ]
+  },
+  "1": {
+   "check": "Re-embed every document and rebuild the ",
+   "o": [
+    "Nothing; the old vectors keep working fine",
+    "Re-embed everything and rebuild the index",
+    "Only re-embed new documents from now on",
+    "Lower the refusal threshold to make up for it"
+   ]
+  }
+ },
+ "ph8-l14": {
+  "1": {
+   "check": "A row that is not a word (a block, parag",
+   "o": [
+    "A wrong word that Tesseract could not recognise at all on the page",
+    "A row that is not a word (a block, paragraph or line)",
+    "Perfect confidence",
+    "An error"
+   ]
+  },
+  "2": {
+   "check": "OCR gives the exact characters with conf",
+   "o": [
+    "OCR is always more accurate than any vision model on any kind of document",
+    "OCR gives exact characters with confidence; a VLM may invent text",
+    "VLMs cannot read numbers, only words, so the total would always be missing",
+    "OCR is faster on GPUs"
+   ]
+  }
+ },
+ "ph8-l15": {
+  "0": {
+   "check": "Otherwise you cannot measure whether the",
+   "o": [
+    "To make the set longer and the averages steadier",
+    "Otherwise you cannot measure correct refusals",
+    "Models need them for training on refusal behaviour",
+    "They are easier to grade, since the answer is always the same"
+   ]
+  },
+  "2": {
+   "check": "A new embedding model or reranker",
+   "o": [
+    "A new user interface that shows the sources differently",
+    "A new embedding model or reranker",
+    "More API keys",
+    "A new logo"
+   ]
+  }
+ },
+ "ph8-l16": {
+  "0": {
+   "check": "The reported score is optimistic, becaus",
+   "o": [
+    "Nothing, as long as the question set has more than a hundred questions",
+    "The score is optimistic: the setting was chosen on the same questions",
+    "MRR cannot compare settings",
+    "You should report recall instead"
+   ]
+  },
+  "1": {
+   "check": "On these questions BM25 adds mostly nois",
+   "o": [
+    "Hybrid search is always worse than a single good retriever, so drop it everywhere",
+    "Here BM25 adds noise; hybrid helps when exact terms matter, so test your own queries",
+    "RRF is implemented wrong, because hybrid must always score at least as high as its parts",
+    "Use BM25 alone, since it was the weaker part of the hybrid and the cause of the drop"
+   ]
+  }
+ },
+ "ph8-l17": {
+  "0": {
+   "check": "The user can get too few results, and th",
+   "o": [
+    "It is slower",
+    "The user can get too few results, and the gaps reveal that restricted documents matched",
+    "Embeddings stop working",
+    "Nothing, as long as the permission filter itself is correct, tested and fast enough to run on every query"
+   ]
+  },
+  "1": {
+   "check": "Your identity provider or session, resol",
+   "o": [
+    "The user's message, where they state which team they are in",
+    "The model's tool call arguments, which it fills in from the chat",
+    "Your identity provider or session, resolved at query time",
+    "The chunk metadata"
+   ]
+  },
+  "2": {
+   "check": "Recording the deletion and refusing to i",
+   "o": [
+    "Re-embedding everything so the deleted chunks get new ids",
+    "Record the deletion and never ingest those ids again",
+    "A bigger index that keeps old and new documents apart",
+    "Deleting the export and ingesting from the live system only"
+   ]
+  }
+ },
+ "ph9-l2": {
+  "0": {
+   "check": "An error the model can read is usually f",
+   "o": [
+    "Exceptions are slow",
+    "An error the model can read is usually fixed on the next step, while a traceback kills the loop",
+    "Because tools cannot raise exceptions inside an agent loop, so any error must be converted into a plain string first",
+    "To hide bugs"
+   ]
+  },
+  "1": {
+   "check": "An invented argument such as force=true ",
+   "o": [
+    "They slow the call down, because every extra argument is validated twice",
+    "An invented argument like force=true shows a misunderstanding; ignoring it hides that",
+    "The schema forbids optional values, so any extra field breaks the JSON",
+    "There is no reason to"
+   ]
+  },
+  "2": {
+   "check": "A few named read-only operations plus ex",
+   "o": [
+    "One run_sql tool that takes any query, so nothing is missing",
+    "A shell tool, because it is flexible and needs no schema at all",
+    "A few named read-only operations plus marked writes",
+    "One tool per database column"
+   ]
+  }
+ },
+ "ph9-l3": {
+  "1": {
+   "check": "The result does not contain what the mod",
+   "o": [
+    "The tool is broken",
+    "The result does not contain what the model expected, so the prompt or the tools are wrong",
+    "The model needs a higher temperature to try different searches, which usually fixes the repeated calls on its own",
+    "It is normal and should be allowed"
+   ]
+  },
+  "2": {
+   "check": "A distinct status with no answer and the",
+   "o": [
+    "The best guess it can make from the steps so far",
+    "A distinct status, no answer, and the trace so far",
+    "An exception that stops the whole program",
+    "An empty string"
+   ]
+  }
+ },
+ "ph9-l4": {
+  "0": {
+   "check": "\"Do not close cases without permission\" ",
+   "o": [
+    "Prompts are too long already, so the gate would push other rules out",
+    "A prompt is a request; a dispatcher that refuses is a rule",
+    "The model cannot read instructions about tools, only their schemas",
+    "It makes the prompt cheaper because fewer rules are sent each time"
+   ]
+  },
+  "2": {
+   "check": "You get a dry run, an approval gate and ",
+   "o": [
+    "It makes them faster",
+    "You get a dry run, an approval gate and a filterable audit log from one set",
+    "It is required by schemas",
+    "It stops the model from calling them at all unless the user asks for the write in the same message"
+   ]
+  }
+ },
+ "ph9-l5": {
+  "0": {
+   "check": "One run can be reassembled by request id",
+   "o": [
+    "They are shorter on disk than sentences, so logs are cheaper to keep",
+    "One run can be reassembled by request id, and the file feeds metrics",
+    "Prose cannot be stored",
+    "JSON is required by law for any log that contains a user's request"
+   ]
+  },
+  "1": {
+   "check": "The request id, a timestamp and duration",
+   "o": [
+    "The full prompt and the full model reply, for replay",
+    "The request id, time and duration, versions, and outcome",
+    "The API key, so each call can be traced to its account",
+    "Only the error message, to keep the logs short"
+   ]
+  }
+ },
+ "ph9-l6": {
+  "0": {
+   "check": "A thirty-second request gets killed by a",
+   "o": [
+    "It is cheaper per token, because background jobs are billed at a lower batch rate by every provider we use, so long requests cost less",
+    "A thirty-second request gets killed by a proxy and retried by the client, and queueing lets you cap concurrency",
+    "Because models cannot stream",
+    "To avoid logging"
+   ]
+  },
+  "1": {
+   "check": "A job that failed its last attempt, with",
+   "o": [
+    "Every failed attempt, so the queue can retry each of them forever in order",
+    "A job that failed its last attempt, with error and count: a cheap bug report",
+    "Successful jobs, for audit",
+    "Nothing; failures should be dropped so the queue never fills up with old work"
+   ]
+  },
+  "2": {
+   "check": "A retry after a timeout may re-run work ",
+   "o": [
+    "To make them faster when the queue is long",
+    "A retry may re-run work that already succeeded",
+    "Queues require it technically for every message",
+    "So they can run in parallel on several workers"
+   ]
+  }
+ },
+ "ph9-l7": {
+  "1": {
+   "check": "A rise in the refusal or ungrounded rate",
+   "o": [
+    "CPU usage",
+    "A rise in the refusal or ungrounded rate",
+    "Request count per minute on the API dashboard",
+    "Disk space"
+   ]
+  },
+  "2": {
+   "check": "A prompt change can double the bill with",
+   "o": [
+    "It is required by providers for any account that spends more than a set amount",
+    "A prompt change can double the bill with no error and no latency change",
+    "It replaces error monitoring, since a failing request costs nothing to send",
+    "To bill users"
+   ]
+  }
+ },
+ "ph9-l8": {
+  "0": {
+   "check": "Three to ten times, because every step r",
+   "o": [
+    "About the same, since tools are free to call",
+    "Three to ten times: each step re-sends the transcript",
+    "A hundred times, because every step is a new model",
+    "Less, because it uses tools instead of long answers"
+   ]
+  },
+  "2": {
+   "check": "The fallback (cached answer, cheaper mod",
+   "o": [
+    "Nothing; outages are rare, so the team can decide during one, when the details are known and everyone is already looking at the problem together",
+    "The fallback (cached answer, cheaper model, keyword-only, or an honest error) and how to roll back prompt and image",
+    "Which model to fine-tune",
+    "How to raise the temperature"
+   ]
+  }
+ },
+ "ph9-l9": {
+  "0": {
+   "check": "A normal result with isError true and a ",
+   "o": [
+    "A JSON-RPC error -32601, which means method not found",
+    "A normal result with isError true and a message",
+    "Close the connection so the client retries the call",
+    "Return an empty result"
+   ]
+  },
+  "1": {
+   "check": "The client tries to read it as a protoco",
+   "o": [
+    "Nothing; clients ignore any line that is not JSON",
+    "The client reads it as a protocol message and fails",
+    "It appears in the model's answer as plain text",
+    "It is logged by the client as a server warning"
+   ]
+  }
+ },
+ "ph9-l10": {
+  "0": {
+   "check": "Parse the URL and compare the hostname e",
+   "o": [
+    "'api.github.com' in url",
+    "url.startswith('https://api.github.com'), which checks the scheme and host together",
+    "Parse the URL and compare the hostname exactly",
+    "Ask the model"
+   ]
+  },
+  "1": {
+   "check": "Normalise the path so '..' is resolved",
+   "o": [
+    "Nothing",
+    "Normalise the path so '..' is resolved",
+    "Lowercase it so the comparison ignores case",
+    "Check the file size before reading anything"
+   ]
+  },
+  "2": {
+   "check": "Remove one of the three, for example the",
+   "o": [
+    "A better system prompt that forbids sending private data by email",
+    "Remove one of the three, e.g. the email tool, or require approval",
+    "A larger model that is better at spotting malicious pages",
+    "More logging, so every email can be reviewed after it is sent"
+   ]
+  }
+ },
+ "ph9-l11": {
+  "1": {
+   "check": "User and tool text could otherwise chang",
+   "o": [
+    "Speed only",
+    "User and tool text could otherwise change the SQL",
+    "SQLite requires it for any value that is a string or a number",
+    "To compress the data"
+   ]
+  },
+  "2": {
+   "check": "Storing data without rules for access, d",
+   "o": [
+    "It is slow",
+    "Storing data with no rules for access, deletion and retention",
+    "SQLite cannot store it once it grows past one table",
+    "The model forgets it after the conversation ends anyway"
+   ]
+  }
+ },
+ "ph9-l12": {
+  "1": {
+   "check": "One timed operation, such as a model or ",
+   "o": [
+    "A log file that covers one whole request from start to end",
+    "One timed operation, like a model or tool call",
+    "A token in the model's output, with its timing and cost",
+    "A test that checks one request end to end in staging"
+   ]
+  }
+ },
+ "ph9-l13": {
+  "0": {
+   "check": "Plan and execute, with the plan checked ",
+   "o": [
+    "A ReAct loop with no step limit, so the model can choose freely",
+    "Plan and execute, with the plan checked in code",
+    "A multi-agent crew",
+    "No tools at all"
+   ]
+  },
+  "1": {
+   "check": "Reject the plan before running anything",
+   "o": [
+    "Run it and hope",
+    "Reject the plan before running anything",
+    "Remove the reference silently and run the rest of the plan",
+    "Run 'order' twice, once before and once after 'reply'"
+   ]
+  }
+ },
+ "ph9-l14": {
+  "1": {
+   "check": "Its agent card at /.well-known/agent-car",
+   "o": [
+    "Its README",
+    "Its agent card at /.well-known/agent-card.json",
+    "By sending random messages and reading the error replies that come back",
+    "In the HTTP headers"
+   ]
+  },
+  "2": {
+   "check": "Untrusted input that may contain an inje",
+   "o": [
+    "An instruction to follow, since the remote agent is a partner we chose",
+    "Untrusted input that may hold an injection",
+    "A protocol error that the A2A client should reject",
+    "A completed task"
+   ]
+  }
+ },
+ "ph9-l15": {
+  "0": {
+   "check": "A checkpointer",
+   "o": [
+    "A node in the graph",
+    "A checkpointer",
+    "A handoff between agents",
+    "A guardrail on the output"
+   ]
+  },
+  "2": {
+   "check": "Tools, permission policies and evaluatio",
+   "o": [
+    "The prompt templates only, since the framework handles everything else for you",
+    "Tools, permission policies and evaluation",
+    "Nothing",
+    "The UI"
+   ]
+  }
+ },
+ "ph9-l16": {
+  "0": {
+   "check": "The step runs again from its start, so t",
+   "o": [
+    "Nothing special",
+    "The step runs again from its start, so the e-mail is sent twice",
+    "LangGraph skips the e-mail automatically, because the step already ran once",
+    "The resume fails with an error, since the step was interrupted midway"
+   ]
+  },
+  "1": {
+   "check": "A limit enforced by the payments ledger ",
+   "o": [
+    "The idempotency key, because both chats send the same thread id",
+    "The checkpoint, which records that the refund already happened",
+    "A ledger limit: total refunds cannot exceed what was paid",
+    "durability=\"sync\", which writes each step before the next one starts"
+   ]
+  },
+  "3": {
+   "check": "Each step's checkpoint is written before",
+   "o": [
+    "It makes model calls synchronous, so each step waits for the model before the checkpoint is written to disk at the very end",
+    "Each step's checkpoint is written before the next step starts, so a crash cannot lose finished steps",
+    "It disables checkpoints",
+    "It runs steps in parallel"
+   ]
+  }
+ },
+ "fde-l1": {
+  "0": {
+   "check": "A working deployment at a customer, plus",
+   "o": [
+    "A working deployment at a customer, plus reusable tools and feedback",
+    "Sales demos before a contract is signed, tailored to each customer's data and workflow",
+    "Research on new model architectures",
+    "Written recommendations without code, for the customer's own engineers to follow later"
+   ]
+  },
+  "1": {
+   "check": "Scope: agree what will be built and how ",
+   "o": [
+    "Scope: agree what is built and how it is tested",
+    "Build the integration with the customer's systems",
+    "Roll out to every user so feedback comes in early",
+    "Codify the work into a reusable product feature"
+   ]
+  }
+ },
+ "fde-l2": {
+  "0": {
+   "check": "Ask what slows the support team down tod",
+   "o": [
+    "Ask what slows the support team down today and how it is measured",
+    "Agree and choose a vector database",
+    "Explain how vector databases work",
+    "Say vector databases are unnecessary and propose a fine-tuned model for the support team instead"
+   ]
+  },
+  "1": {
+   "check": "Without today's numbers you cannot show ",
+   "o": [
+    "Without today's numbers you can't show the deployment improved anything",
+    "Baselines are required by law for any AI system used with customers",
+    "It makes the model more accurate, because it learns from the baseline",
+    "It reduces cloud costs"
+   ]
+  },
+  "2": {
+   "check": "When the rules are known, stable and eas",
+   "o": [
+    "When the rules are known, stable and easy to code",
+    "When inputs are long, messy documents with no fixed layout",
+    "When a person checks a draft before it is used",
+    "When there are too many rules to write by hand"
+   ]
+  }
+ },
+ "fde-l3": {
+  "1": {
+   "check": "A high average can still hide rare, cost",
+   "o": [
+    "A high average can still hide rare, costly mistakes",
+    "Safety limits make the model faster, because it can skip the risky cases",
+    "Customers only care about safety",
+    "It halves the evaluation work"
+   ]
+  }
+ },
+ "fde-l4": {
+  "0": {
+   "check": "Cache it and refresh shortly before it e",
+   "o": [
+    "Cache it and refresh shortly before it expires",
+    "Request a new token for every call, so it is never stale",
+    "Hard-code a token in the source, since it never changes",
+    "Ask the user to paste a token each morning"
+   ]
+  },
+  "2": {
+   "check": "It could be a captured request replayed ",
+   "o": [
+    "It could be a captured request replayed by an attacker",
+    "Old webhooks are always duplicates of ones already received",
+    "HMAC stops working after 5 minutes, so the signature is invalid",
+    "It saves memory, because old events never need processing"
+   ]
+  }
+ },
+ "fde-l5": {
+  "1": {
+   "check": "Reject them with a reason, report the co",
+   "o": [
+    "Reject them with a reason, report the count, and ask the customer",
+    "Drop them silently",
+    "Fill in a made-up id",
+    "Stop the whole load and wait until the customer has fixed every row in the source system"
+   ]
+  },
+  "2": {
+   "check": "Confirm the format with the customer bef",
+   "o": [
+    "Confirm the format with the customer before mapping",
+    "Assume the US format, since most software uses it",
+    "Assume the European format, since the customer is in Europe",
+    "Drop the column"
+   ]
+  }
+ },
+ "fde-l6": {
+  "1": {
+   "check": "In the first week, in parallel with disc",
+   "o": [
+    "In the first week, alongside discovery",
+    "After the pilot passes, when the design is settled",
+    "After the full rollout, once usage is known",
+    "Only if the customer asks for one twice"
+   ]
+  }
+ },
+ "fde-l7": {
+  "1": {
+   "check": "Azure Container Apps",
+   "o": [
+    "Azure Container Apps",
+    "Azure Blob Storage with static hosting",
+    "Azure Key Vault",
+    "Entra ID"
+   ]
+  },
+  "2": {
+   "check": "Their team can review it and repeat the ",
+   "o": [
+    "Their team can review it and repeat the deployment exactly",
+    "It makes the model more accurate, since settings are versioned with it",
+    "It removes the need for permissions in the customer's cloud account",
+    "Consoles are not allowed in the cloud"
+   ]
+  }
+ },
+ "fde-l8": {
+  "0": {
+   "check": "It resolves normally; you must check res",
+   "o": [
+    "It resolves; you must check response.ok",
+    "It throws an exception you catch with try/catch",
+    "It retries automatically up to three times",
+    "It returns null instead of a Response"
+   ]
+  },
+  "2": {
+   "check": "Types are erased at runtime, so they can",
+   "o": [
+    "Types are erased at runtime, so they cannot check data that arrives while the program runs",
+    "TypeScript has no types for JSON",
+    "Validation makes the code compile faster",
+    "It is not needed; TypeScript types guarantee the data at run time, including data from other services"
+   ]
+  }
+ },
+ "fde-l9": {
+  "0": {
+   "check": "The system runs on real traffic, but its",
+   "o": [
+    "It runs on real traffic, but its output is only recorded and compared",
+    "The system runs at night only, when real users are unlikely to see mistakes",
+    "A dark colour theme for the dashboard, used in the customer's control room",
+    "Running the model without logging"
+   ]
+  },
+  "2": {
+   "check": "A named person on the customer side who ",
+   "o": [
+    "A named customer-side owner who agreed to it",
+    "The FDE, forever, since they know the system best",
+    "Nobody; it runs itself once the tests pass",
+    "The model provider, who supports the model it uses"
+   ]
+  }
+ },
+ "fde-l10": {
+  "1": {
+   "check": "It shows how it behaves when unsure, whi",
+   "o": [
+    "It shows how it behaves when unsure, which builds trust",
+    "It makes the demo longer",
+    "Customers prefer seeing broken software, since it proves the demo is not staged",
+    "It hides the real failures"
+   ]
+  }
+ },
+ "fde-l11": {
+  "0": {
+   "check": "Usually once you have seen the pattern a",
+   "o": [
+    "Usually once you have seen the pattern about three times",
+    "Always on the first customer, so the second is faster",
+    "Never; each customer is unique, so code is never shared",
+    "Only when the customer asks"
+   ]
+  },
+  "1": {
+   "check": "4 of 6 deployments built their own date ",
+   "o": [
+    "4 of 6 deployments built their own date filter, 2 to 4 days each; here is a shared one",
+    "Customers want better search, according to most of the people we talked to this quarter",
+    "Search is bad, and several customers have complained about it in their weekly calls",
+    "Please improve the product: our deployments keep running into the same rough edges"
+   ]
+  }
+ },
+ "fde-l12": {
+  "0": {
+   "check": "Clarify the user, the goal and how succe",
+   "o": [
+    "Clarify the user, the goal and how success is measured",
+    "Choose the model",
+    "Draw the database schema, since the data shapes everything else after it",
+    "Estimate the cloud bill"
+   ]
+  },
+  "1": {
+   "check": "Ask what the constraint is and offer opt",
+   "o": [
+    "Ask what the constraint is and offer options, like running in their cloud or redacted samples",
+    "Insist the project needs the data, and explain that results will be poor without it",
+    "End the conversation",
+    "Promise to use fake data in production so their real data never leaves their systems"
+   ]
+  },
+  "2": {
+   "check": "The smallest version that delivers value",
+   "o": [
+    "The smallest version that delivers value, with what is left out stated",
+    "The full system, built first, so nothing is missing when the customer looks",
+    "The database layer only, since every other part depends on it being right",
+    "A slide deck that shows the customer the full plan before any code is written"
+   ]
+  }
+ },
+ "ph6-l1": {
+  "2": {
+   "check": "Matrix multiplication on a batch is much",
+   "o": [
+    "It uses less memory",
+    "Matrix multiplication on a batch is much faster than a Python loop",
+    "It is more accurate",
+    "It avoids overfitting, because the gradient averages over many examples at once"
+   ]
+  }
+ },
+ "ph6-l2": {
+  "0": {
+   "check": "It is equivalent to a single linear laye",
+   "o": [
+    "It gets more powerful with each layer added",
+    "It equals a single linear layer",
+    "It crashes",
+    "It overfits faster than a single layer would"
+   ]
+  },
+  "1": {
+   "check": "To prevent exp() from overflowing, witho",
+   "o": [
+    "It changes the probabilities for the better on rare classes",
+    "To stop exp() overflowing, without changing the result",
+    "To make the rows sum to 1 after the exponent is taken",
+    "It is faster, because exp() of small numbers is cheaper"
+   ]
+  }
+ },
+ "ph6-l3": {
+  "0": {
+   "check": "It matches the shape of the parameter it",
+   "o": [
+    "It is always 1-D",
+    "It matches the shape of the parameter it belongs to",
+    "It matches the batch size, with one value per example in the batch",
+    "It is a single number"
+   ]
+  },
+  "1": {
+   "check": "Compare it with a numerical gradient on ",
+   "o": [
+    "Run it longer and check that the loss keeps going down",
+    "Compare it with a numerical gradient on a tiny example",
+    "Check that the loss is positive after every single step",
+    "Print the weights"
+   ]
+  },
+  "2": {
+   "check": "Only where the input was positive",
+   "o": [
+    "Everywhere, scaled by the input value",
+    "Only where the input was positive",
+    "Only where the input was negative",
+    "Nowhere; ReLU has no gradient at all"
+   ]
+  }
+ },
+ "ph6-l4": {
+  "1": {
+   "check": "Gradients accumulate across steps and tr",
+   "o": [
+    "Nothing",
+    "Gradients accumulate across steps and training goes wrong",
+    "The model trains faster, since gradients from earlier steps keep pushing in the same direction",
+    "An exception"
+   ]
+  },
+  "2": {
+   "check": "It adapts the step size per weight, so i",
+   "o": [
+    "It is always more accurate than SGD on every kind of model",
+    "It adapts the step size per weight, so it needs less tuning",
+    "It uses no extra memory beyond the weights and gradients",
+    "It avoids overfitting"
+   ]
+  }
+ },
+ "ph6-l5": {
+  "1": {
+   "check": "So the average activation is the same as",
+   "o": [
+    "To make training faster by using larger values",
+    "So the average activation matches no dropout",
+    "To avoid negative values after units are dropped",
+    "It is arbitrary; any constant scale would work"
+   ]
+  }
+ },
+ "ph6-l6": {
+  "0": {
+   "check": "They are compact and similar meanings po",
+   "o": [
+    "Embeddings are exact",
+    "They are compact and similar meanings point in similar directions",
+    "One-hot is not supported",
+    "Embeddings need no training, since they come ready-made for every vocabulary of any size"
+   ]
+  },
+  "1": {
+   "check": "A lookup table of vectors, one row per t",
+   "o": [
+    "A matrix multiplication of one-hot vectors that is recomputed every time",
+    "A lookup table of vectors, one row per token, trained like other weights",
+    "A clustering algorithm that groups the tokens by how often they appear",
+    "A hash function"
+   ]
+  },
+  "2": {
+   "check": "Short sentences get pulled toward the pa",
+   "o": [
+    "Nothing, because padding vectors are always zero",
+    "Short sentences get pulled toward the padding vector",
+    "It crashes, because padding has no embedding",
+    "It improves accuracy by giving every sentence the same length"
+   ]
+  }
+ },
+ "ph6-l7": {
+  "1": {
+   "check": "To keep dot products in a range where so",
+   "o": [
+    "To normalise the output so every row of attention sums to exactly one, as a probability should",
+    "To keep dot products in a range where softmax has useful gradients",
+    "To save memory",
+    "To mask the future"
+   ]
+  },
+  "2": {
+   "check": "Attention cost grows with the square of ",
+   "o": [
+    "Memory for the weights grows with the context length",
+    "Attention cost grows with the square of the length",
+    "Tokenization is slow for long texts on every request",
+    "Longer prompts need bigger models"
+   ]
+  }
+ },
+ "ph6-l8": {
+  "0": {
+   "check": "Retrieve them and put them in the prompt",
+   "o": [
+    "Fine-tune on them so the model memorises every document",
+    "Retrieve them and put them in the prompt",
+    "Train a new model from scratch on them",
+    "Nothing can be done until the provider adds them"
+   ]
+  }
+ },
+ "ph6-l9": {
+  "0": {
+   "check": "The sum of both gradients",
+   "o": [
+    "The latest gradient only, since backward() overwrites",
+    "The sum of both gradients",
+    "Zero",
+    "An error"
+   ]
+  },
+  "1": {
+   "check": "CrossEntropyLoss already applies log-sof",
+   "o": [
+    "Nothing",
+    "CrossEntropyLoss already applies log-softmax, so softmax is applied twice",
+    "Softmax needs a GPU to work correctly inside a training loop with batches",
+    "CrossEntropyLoss needs one-hot labels, not class indices, so the loss is wrong"
+   ]
+  }
+ },
+ "ph6-l10": {
+  "1": {
+   "check": "The model and optimizer state_dicts, the",
+   "o": [
+    "Only the model object, saved with torch.save, which keeps everything needed",
+    "The model and optimizer state_dicts, the epoch and the model config",
+    "The training data",
+    "Only the loss"
+   ]
+  }
+ },
+ "ph6-l11": {
+  "0": {
+   "check": "Which positions are real tokens and whic",
+   "o": [
+    "The important words the model should focus on most",
+    "Which positions are real tokens and which are padding",
+    "The labels",
+    "The layers to train and the layers to keep frozen"
+   ]
+  },
+  "1": {
+   "check": "Rare words split into smaller known piec",
+   "o": [
+    "They have every word in the language in their vocabulary",
+    "Rare words split into smaller known pieces, down to bytes",
+    "They skip rare words, so no token is ever produced for them",
+    "They use a dictionary lookup that guesses the closest known word"
+   ]
+  }
+ },
+ "ph6-l12": {
+  "1": {
+   "check": "So the adapted model starts exactly equa",
+   "o": [
+    "To save memory",
+    "So the adapted model starts exactly equal to the pretrained one",
+    "Because A is random",
+    "To make training faster on a GPU, since zero matrices need no multiplication at all"
+   ]
+  },
+  "2": {
+   "check": "Folds W + (alpha/r)BA into one matrix so",
+   "o": [
+    "Deletes the base model and keeps only the adapter matrices for inference",
+    "Folds W + (alpha/r)BA into one matrix, so inference costs the same as the base",
+    "Trains it again",
+    "Converts it to 4 bits so the merged model fits in the memory of a small GPU"
+   ]
+  }
+ },
+ "ph6-l14": {
+  "1": {
+   "check": "1000 Hz",
+   "o": [
+    "32 Hz",
+    "1000 Hz",
+    "512 Hz, one bin per sample",
+    "500 Hz"
+   ]
+  },
+  "2": {
+   "check": "Word error rate from edit distance",
+   "o": [
+    "Accuracy per file, as a share of files that were correct",
+    "Word error rate from edit distance",
+    "BLEU",
+    "Mean squared error between the audio waveforms"
+   ]
+  }
+ },
+ "ph6-l15": {
+  "2": {
+   "check": "An image can cost many tokens, so size d",
+   "o": [
+    "Models refuse large images and return an error for any above 1 MB",
+    "An image can cost many tokens; size drives cost and latency",
+    "It improves accuracy in every case, since the model sees less noise",
+    "It removes personal data such as faces and plates from the picture"
+   ]
+  }
+ },
+ "ph6-l16": {
+  "1": {
+   "check": "The prompt format at inference differs f",
+   "o": [
+    "The LoRA rank is too low",
+    "The prompt format at inference differs from the training format",
+    "The model needs more epochs of training on the app's real traffic before it adapts",
+    "The tokenizer is broken"
+   ]
+  },
+  "2": {
+   "check": "The same base model with a good prompt a",
+   "o": [
+    "The base model with no instruction, given the raw input text only",
+    "The same base model with a good prompt and a few solved examples",
+    "A random guesser only, since anything else is not a fair baseline at all",
+    "The training loss"
+   ]
+  }
+ },
+ "ph6-l17": {
+  "0": {
+   "check": "Batch size 8 with gradient accumulation ",
+   "o": [
+    "A higher learning rate with a batch size of 8",
+    "Batch 8 with gradient accumulation over 4 steps",
+    "More epochs at batch size 8 to make up for it",
+    "float64 weights, which pack the batch more tightly"
+   ]
+  },
+  "2": {
+   "check": "Checkpoints and adapters saved regularly",
+   "o": [
+    "Nothing can be done",
+    "Checkpoints and adapters saved regularly to storage outside the session",
+    "A larger batch",
+    "A shorter dataset that fits in one session, so training always finishes before the time limit"
+   ]
+  }
+ },
+ "ph6-l18": {
+  "0": {
+   "check": "To get a smaller, cheaper model that kee",
+   "o": [
+    "To make a model more accurate than its teacher on every task it is given",
+    "A smaller, cheaper model that keeps most of a larger model's accuracy",
+    "To remove the labels from a dataset so that no human annotation is needed",
+    "To train without any data"
+   ]
+  },
+  "1": {
+   "check": "It flattens the distribution so the smal",
+   "o": [
+    "It makes the teacher more accurate on the hard examples in the training set",
+    "It flattens the distribution, so wrong-class probabilities carry information",
+    "It speeds up training, since flatter outputs give smaller gradients to compute",
+    "It prevents overfitting by dropping the classes with the lowest probability"
+   ]
+  },
+  "3": {
+   "check": "Because the gradients of the softened te",
+   "o": [
+    "To make the loss negative",
+    "Because the gradients of the softened term shrink like 1 over T squared, and the factor keeps its contribution comparable as T changes",
+    "To normalise the labels",
+    "Because KL divergence needs squaring to be a true distance between the two distributions, otherwise it can be negative and the loss would drop below zero during training"
+   ]
+  }
+ },
+ "ph10-l1": {
+  "0": {
+   "check": "The README, then whether the project run",
+   "o": [
+    "The commit history, to see how often you commit",
+    "The README, then whether the project runs",
+    "The test coverage percentage shown in the badge",
+    "The number of stars"
+   ]
+  },
+  "1": {
+   "check": "They show attendance, not that you can b",
+   "o": [
+    "They are usually fake or bought, so reviewers ignore them entirely",
+    "They show attendance, not that you can build something that works",
+    "Employers dislike online learning and prefer a degree for every AI role",
+    "They expire after a year, so they say nothing about current skills"
+   ]
+  }
+ },
+ "ph10-l2": {
+  "0": {
+   "check": "There are thousands of existing solution",
+   "o": [
+    "The data is too small to train a model that would be worth showing to an employer",
+    "There are thousands of existing solutions, so it shows nothing about your judgement",
+    "The licences forbid it",
+    "They are too hard"
+   ]
+  },
+  "1": {
+   "check": "Having no baseline to compare it against",
+   "o": [
+    "Reporting it to two decimals instead of four",
+    "No baseline to compare it against",
+    "Using scikit-learn instead of a deep learning framework",
+    "Writing it in bold"
+   ]
+  },
+  "2": {
+   "check": "Two finished, because finishing is rarer",
+   "o": [
+    "Eight started, because it shows range and ambition",
+    "Two finished: finishing is rarer and can be shown",
+    "It makes no difference to how reviewers see you",
+    "Neither; wait until everything is perfect"
+   ]
+  }
+ },
+ "ph10-l3": {
+  "2": {
+   "check": "It is both a security incident and an in",
+   "o": [
+    "Fine if the current file no longer has it, because GitHub only shows the latest version of each file to visitors, so the old commit is hidden from the public",
+    "It is both a security incident and an interview answer you do not want to give; rotate the key and keep secrets out with .gitignore",
+    "Only matters for paid APIs",
+    "Harmless in a private repo"
+   ]
+  }
+ },
+ "ph10-l4": {
+  "0": {
+   "check": "A comparison: the metric against a basel",
+   "o": [
+    "More decimal places, so the result looks measured precisely",
+    "A comparison: the metric against a baseline or a before-and-after",
+    "Naming the model architecture and the size of the training data",
+    "Nothing; numbers are decoration"
+   ]
+  },
+  "1": {
+   "check": "It is a thing you built that does not wo",
+   "o": [
+    "It is slower to load than a page of screenshots, so reviewers leave",
+    "It is something you built that does not work, seen by the reviewer",
+    "Recruiters never click links, so it only wastes space on the resume",
+    "It is not worse; any link shows that you tried to deploy the project"
+   ]
+  }
+ },
+ "ph10-l5": {
+  "1": {
+   "check": "Apply if you meet most of the listed req",
+   "o": [
+    "Skip it",
+    "Apply if you meet most of the listed requirements and can show work",
+    "Apply and claim the experience, since everyone stretches the truth on a resume a little",
+    "Wait three years"
+   ]
+  },
+  "2": {
+   "check": "A referral, even a weak one",
+   "o": [
+    "A longer resume that lists every course",
+    "A referral, even a weak one",
+    "A personal website with a custom domain",
+    "Applying at midnight"
+   ]
+  }
+ },
+ "ph10-l6": {
+  "1": {
+   "check": "The problem restated, one edge case, and",
+   "o": [
+    "Your preferred editor and language, so they can set up the shared screen",
+    "The problem restated, an edge case, and your approach and its cost",
+    "That you have seen the problem before, so they can give you a different one",
+    "Nothing; start typing at once, because time is short in a coding round"
+   ]
+  }
+ },
+ "ph10-l7": {
+  "0": {
+   "check": "Who uses it, how often, what success mea",
+   "o": [
+    "The model architecture, since it decides the hardware and the cost of everything else",
+    "Who uses it, how often, what success means and what an error costs",
+    "The cloud provider",
+    "The training framework"
+   ]
+  },
+  "1": {
+   "check": "Without it there is no way to show the m",
+   "o": [
+    "It is faster to train, so the interviewer sees a result in the time slot",
+    "Without it you can't show the model helps, and it is often good enough",
+    "Interviewers require sklearn in every design round for junior roles",
+    "It replaces the test set"
+   ]
+  },
+  "2": {
+   "check": "A specific failure mode and the cheapest",
+   "o": [
+    "There are none that matter for the use case it was built for",
+    "A specific failure mode and the cheapest next step to fix it",
+    "Blaming the dataset, since the labels came from someone else",
+    "Listing every technique you did not use, from transformers to ensembles"
+   ]
+  }
+ },
+ "ph10-l8": {
+  "2": {
+   "check": "Mentorship, code review, and whether som",
+   "o": [
+    "The job title",
+    "Mentorship, code review, and whether someone senior will read your pull requests",
+    "The office location",
+    "The size of the company, since a larger one always offers more structure, training budget and room to move teams"
+   ]
+  }
+ },
+ "ph10-l9": {
+  "0": {
+   "check": "After the time is up and you have run th",
+   "o": [
+    "As soon as you are stuck on any part of it",
+    "After time is up and you have run the tests",
+    "Before reading the question, to see what it wants",
+    "Never"
+   ]
+  },
+  "1": {
+   "check": "A partial solution with clear reasoning ",
+   "o": [
+    "A complete solution written in silence, with every test passing at the end",
+    "A partial solution with clear reasoning about what is missing",
+    "Asking for the answer early, so no time is lost on a dead end",
+    "Copying a known solution"
+   ]
+  }
+ },
+ "ph10-l10": {
+  "0": {
+   "check": "So the evaluation is not shaped, even un",
+   "o": [
+    "It is faster",
+    "So the evaluation is not shaped, even unconsciously, by what the model already does well",
+    "Reviewers require a date on the evaluation set, and a later date looks like the set was changed after training, which would make the scores look made up",
+    "To use less data"
+   ]
+  },
+  "1": {
+   "check": "Drop it: it is filled in when the reques",
+   "o": [
+    "Keep it: it is the best feature, and the model should use every signal it has",
+    "Drop it: it is filled in at closing, so it is unknown at prediction time",
+    "Scale it to between 0 and 1 so it does not dominate the other features",
+    "Use it only in the test set, so training stays clean and the score stays honest"
+   ]
+  },
+  "2": {
+   "check": "Some fields are ambiguous; no model can ",
+   "o": [
+    "Your model is bad, because it was trained on these same abstracts last week",
+    "Some fields are ambiguous; tighten the guide, since labels cap what you can measure",
+    "You should label fewer items, more slowly, and stop when you feel tired",
+    "Nothing useful, because twenty abstracts are far too few to learn anything"
+   ]
+  }
+ }
+}

@@ -2,7 +2,7 @@
 // It only writes what the learner confirmed on the review screen: the request must carry the token from
 // github-preview for the same account, repository, branch, folder and files, and the branch must not have
 // moved since the review. Uses the Git Data API so every file lands in a single atomic commit; an empty
-// repository (no branch yet) falls back to the Contents API, which creates the first commit.
+// repository (no branch yet) gets its README through the Contents API first, then the rest in one commit.
 const { loadConfig, json, gh, session, csrfOk, readRequest, filesDigest, readReview } = require('./_shared');
 
 class Changed extends Error { constructor(m){ super(m); this.status = 409; this.changed = true; } }
@@ -19,17 +19,19 @@ async function commitTree(o, r, branch, expectedHead, files, message, token){
   try {
     await gh(`/repos/${o}/${r}/git/refs/heads/${encodeURIComponent(branch)}`, token, { method: 'PATCH', body: JSON.stringify({ sha: commit.sha, force: false }) });
   } catch (e) { if (e.status === 422 && !/workflow/i.test(e.message || '')) throw new Changed(`${branch} changed on GitHub while publishing. Nothing was written. Review the publish again.`); throw e; }
-  return { unchanged: false, sha: commit.sha };
+  return { unchanged: false, sha: commit.sha, commits: 1 };
 }
 async function contentsFallback(o, r, branch, files, message, token){
-  let sha = null;
-  for (const f of files){
-    const path = f.path.split('/').map(encodeURIComponent).join('/');
-    const body = { message, content: Buffer.from(f.content, 'utf8').toString('base64'), branch };
-    const saved = await gh(`/repos/${o}/${r}/contents/${path}`, token, { method: 'PUT', body: JSON.stringify(body) });
-    sha = saved.commit && saved.commit.sha;
-  }
-  return { unchanged: false, sha, multiple: files.length > 1 };
+  // v31.2: an empty repository has no commit for the Git Data API to build on, so the first file (the README)
+  // creates the branch through the Contents API and every other file follows in one more commit: two commits, not one per file.
+  const first = files.find(f => /(^|\/)README\.md$/.test(f.path)) || files[0];
+  const path = first.path.split('/').map(encodeURIComponent).join('/');
+  const saved = await gh(`/repos/${o}/${r}/contents/${path}`, token, { method: 'PUT', body: JSON.stringify({ message, content: Buffer.from(first.content, 'utf8').toString('base64'), branch }) });
+  const rest = files.filter(f => f !== first);
+  const sha = saved.commit && saved.commit.sha;
+  if (!rest.length) return { unchanged: false, sha, commits: 1 };
+  const res = await commitTree(o, r, branch, sha, rest, message, token);
+  return { unchanged: false, sha: res.sha, commits: res.unchanged ? 1 : 2 };
 }
 
 exports.handler = async (event) => {
@@ -62,13 +64,13 @@ exports.handler = async (event) => {
       catch (e) { if (e.status === 422) throw new Changed(`A branch called ${branch} appeared after you reviewed. Review again.`); throw e; }
       res = await commitTree(o, r, branch, rv.base, req.files, message, s.accessToken);
     } else {
-      // Empty repository: there is nothing to compare against, so the first commit is made file by file.
+      // Empty repository: the README creates the branch, then the other files land in one commit.
       let now = null; try { now = await gh(`/repos/${o}/${r}/git/ref/heads/${encodeURIComponent(branch)}`, s.accessToken); } catch (e) { if (e.status !== 404 && e.status !== 409) throw e; }
       if (now) throw new Changed(`${rv.repository} is no longer empty. Review the publish again.`);
       res = await contentsFallback(o, r, branch, req.files, message, s.accessToken);
     }
     const base = `https://github.com/${info.full_name}`;
-    return json(200, { ok: true, unchanged: res.unchanged, files: req.files.length, repository: info.full_name, branch, folder: req.folder, sha: res.sha || null,
+    return json(200, { ok: true, unchanged: res.unchanged, files: req.files.length, repository: info.full_name, branch, folder: req.folder, sha: res.sha || null, commits: res.unchanged ? 0 : res.commits || 1,
       folderUrl: `${base}/tree/${encodeURIComponent(branch)}/${req.folder.split('/').map(encodeURIComponent).join('/')}`,
       commitUrl: res.sha ? `${base}/commit/${res.sha}` : null, repoUrl: base }, set);
   } catch (e) {

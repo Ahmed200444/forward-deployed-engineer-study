@@ -123,7 +123,7 @@ const norm = t => t.replace(/\r/g, '').replace(/\s+$/g, '').split('\n').map(l =>
       await p.evaluate(() => { location.hash = '#/ex/ph1-e7'; }); await p.waitForTimeout(250);
       ok('exercise page ph1-e7 shows its New here note (re.sub)', await p.$eval('.ex-task', e => /New here/.test(e.textContent) && /re\.sub/.test(e.textContent)));
       await p.evaluate(() => { location.hash = '#/lesson/l3'; }); await p.waitForTimeout(250);
-      ok('an unchanged lesson (l3) still has no levels or optional group', await p.evaluate(() => !document.querySelector('#view .pq-optional') && !document.querySelector('#view .pq-level')));
+      ok('an unchanged lesson (l3) has no optional group, and (since v31.2) a level on every question', await p.evaluate(() => !document.querySelector('#view .pq-optional') && document.querySelectorAll('#view .pq').length === document.querySelectorAll('#view .pq .pq-level').length));
       await p.evaluate(() => { location.hash = '#/playground'; }); await p.waitForTimeout(300);
       await p.fill('textarea', 'import pandas as pd\ndf = pd.DataFrame({"a": [1, 2], "b": ["x", "y"]})\ndf\n');
       await p.click('[data-act="run"]'); await p.waitForSelector('#result .out', { timeout: 120000 });

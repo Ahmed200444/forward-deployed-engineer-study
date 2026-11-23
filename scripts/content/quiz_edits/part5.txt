@@ -1,0 +1,61 @@
+ph6-l18#0 a: A smaller, cheaper model that keeps most of a larger model's accuracy
+ph6-l18#0 w0: To make a model more accurate than its teacher on every task it is given
+ph6-l18#0 w2: To remove the labels from a dataset so that no human annotation is needed
+ph6-l18#1 a: It flattens the distribution, so wrong-class probabilities carry information
+ph6-l18#1 w0: It makes the teacher more accurate on the hard examples in the training set
+ph6-l18#1 w2: It speeds up training, since flatter outputs give smaller gradients to compute
+ph6-l18#1 w3: It prevents overfitting by dropping the classes with the lowest probability
+ph6-l18#3 w3: Because KL divergence needs squaring to be a true distance between the two distributions, otherwise it can be negative and the loss would drop below zero during training
+ph10-l1#0 w2: The test coverage percentage shown in the badge
+ph10-l1#0 w0: The commit history, to see how often you commit
+ph10-l1#1 a: They show attendance, not that you can build something that works
+ph10-l1#1 w0: They are usually fake or bought, so reviewers ignore them entirely
+ph10-l1#1 w2: Employers dislike online learning and prefer a degree for every AI role
+ph10-l1#1 w3: They expire after a year, so they say nothing about current skills
+ph10-l2#0 w0: The data is too small to train a model that would be worth showing to an employer
+ph10-l2#1 a: No baseline to compare it against
+ph10-l2#1 w0: Reporting it to two decimals instead of four
+ph10-l2#1 w2: Using scikit-learn instead of a deep learning framework
+ph10-l2#2 a: Two finished: finishing is rarer and can be shown
+ph10-l2#2 w0: Eight started, because it shows range and ambition
+ph10-l2#2 w2: It makes no difference to how reviewers see you
+ph10-l2#2 w3: Neither; wait until everything is perfect
+ph10-l3#2 w0: Fine if the current file no longer has it, because GitHub only shows the latest version of each file to visitors, so the old commit is hidden from the public
+ph10-l4#0 a: A comparison: the metric against a baseline or a before-and-after
+ph10-l4#0 w0: More decimal places, so the result looks measured precisely
+ph10-l4#0 w2: Naming the model architecture and the size of the training data
+ph10-l4#1 a: It is something you built that does not work, seen by the reviewer
+ph10-l4#1 w0: It is slower to load than a page of screenshots, so reviewers leave
+ph10-l4#1 w2: Recruiters never click links, so it only wastes space on the resume
+ph10-l4#1 w3: It is not worse; any link shows that you tried to deploy the project
+ph10-l5#1 w2: Apply and claim the experience, since everyone stretches the truth on a resume a little
+ph10-l5#2 w0: A longer resume that lists every course
+ph10-l5#2 w2: A personal website with a custom domain
+ph10-l6#1 a: The problem restated, an edge case, and your approach and its cost
+ph10-l6#1 w0: Your preferred editor and language, so they can set up the shared screen
+ph10-l6#1 w2: That you have seen the problem before, so they can give you a different one
+ph10-l6#1 w3: Nothing; start typing at once, because time is short in a coding round
+ph10-l7#0 w0: The model architecture, since it decides the hardware and the cost of everything else
+ph10-l7#1 a: Without it you can't show the model helps, and it is often good enough
+ph10-l7#1 w0: It is faster to train, so the interviewer sees a result in the time slot
+ph10-l7#1 w2: Interviewers require sklearn in every design round for junior roles
+ph10-l7#2 a: A specific failure mode and the cheapest next step to fix it
+ph10-l7#2 w0: There are none that matter for the use case it was built for
+ph10-l7#2 w2: Blaming the dataset, since the labels came from someone else
+ph10-l7#2 w3: Listing every technique you did not use, from transformers to ensembles
+ph10-l8#2 w3: The size of the company, since a larger one always offers more structure, training budget and room to move teams
+ph10-l9#0 a: After time is up and you have run the tests
+ph10-l9#0 w0: As soon as you are stuck on any part of it
+ph10-l9#0 w2: Before reading the question, to see what it wants
+ph10-l9#1 a: A partial solution with clear reasoning about what is missing
+ph10-l9#1 w0: A complete solution written in silence, with every test passing at the end
+ph10-l9#1 w2: Asking for the answer early, so no time is lost on a dead end
+ph10-l10#0 w2: Reviewers require a date on the evaluation set, and a later date looks like the set was changed after training, which would make the scores look made up
+ph10-l10#1 a: Drop it: it is filled in at closing, so it is unknown at prediction time
+ph10-l10#1 w0: Keep it: it is the best feature, and the model should use every signal it has
+ph10-l10#1 w2: Scale it to between 0 and 1 so it does not dominate the other features
+ph10-l10#1 w3: Use it only in the test set, so training stays clean and the score stays honest
+ph10-l10#2 a: Some fields are ambiguous; tighten the guide, since labels cap what you can measure
+ph10-l10#2 w0: Your model is bad, because it was trained on these same abstracts last week
+ph10-l10#2 w2: You should label fewer items, more slowly, and stop when you feel tired
+ph10-l10#2 w3: Nothing useful, because twenty abstracts are far too few to learn anything

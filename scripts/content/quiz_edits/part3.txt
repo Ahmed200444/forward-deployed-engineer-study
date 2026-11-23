@@ -1,0 +1,179 @@
+ph7-l5#2 w1: 503 from the provider during an outage
+ph7-l5#2 w3: A request that timed out before any reply
+ph7-l6#0 a: Otherwise 'it seems better' is your only evidence
+ph7-l6#0 w0: It is cheaper that way, since the eval runs only once
+ph7-l6#0 w2: Providers require it before they allow prompt changes
+ph7-l6#0 w3: It makes the model deterministic for the tuned prompt
+ph7-l6#2 w3: Nothing until accuracy improves by ten points over v2, since one point is noise
+ph7-l7#0 a: They prefer longer answers, their own style, and the first option
+ph7-l7#0 w2: They are biased only against JSON and other structured answers
+ph7-l7#0 w3: They have no measurable biases once the temperature is set to 0
+ph7-l7#1 a: If 90% of items share one label, always saying it scores 90%
+ph7-l7#1 w0: 90% is always poor for a judge that grades free text
+ph7-l7#1 w2: Because raw agreement cannot be computed on text labels at all
+ph7-l7#1 w3: Because kappa is always higher, so 90% means the judge is weak
+ph7-l8#0 w0: Telling the model, in a firm system message, to ignore any instructions found in the data
+ph7-l8#1 a: It misses names and catches harmless strings: it reduces risk, not removes it
+ph7-l8#1 w0: It is perfect once the patterns are right and tested on a few sample messages
+ph7-l8#1 w2: It only works on emails, because other personal data has no fixed format at all
+ph7-l8#2 a: Treat it as data, flag it for review, and rely on validation and limited capability
+ph7-l8#2 w0: Delete the ticket at once so the model never sees the injected text
+ph7-l8#2 w2: Forward it to the model with extra authority so it can decide what the sender meant
+ph7-l8#2 w3: Reply to the resident with the system prompt so they can see which rules apply here
+ph7-l9#1 w0: Raise an exception and stop the whole request, so the user sees the bug at once
+ph7-l10#0 w0: Parse the partial line and fill in the rest later
+ph7-l10#0 w3: Restart the request from the last full event
+ph7-l10#1 a: Time to first token
+ph7-l10#1 w0: Total time to the last token
+ph7-l10#1 w2: Tokens per dollar spent
+ph7-l10#1 w3: Request size in bytes
+ph7-l11#0 w0: The oldest user message, since it holds the original task and all of its context
+ph7-l11#1 a: A result without its call (or the reverse) is an invalid request
+ph7-l11#1 w0: To save more tokens than dropping a plain message would
+ph7-l11#1 w2: Tool results are private, so they must not stay in the history
+ph7-l11#2 a: At the start
+ph7-l11#2 w0: At the end, after the question
+ph7-l11#2 w2: In the middle of the prompt
+ph7-l11#2 w3: In a separate request first
+ph7-l12#1 w2: Doubles the timeout for every call until the service is healthy again
+ph7-l12#2 a: It answers differently; check its quality and format
+ph7-l12#2 w0: It is required by law whenever a model is swapped in
+ph7-l12#2 w2: It is always worse, so you must know by how much
+ph7-l13#0 a: Says the real model is unavailable and makes no call
+ph7-l13#0 w0: Shows a sample answer recorded earlier as if it were live
+ph7-l13#0 w2: Uses a paid API key built into the downloaded copy
+ph7-l13#0 w3: Calls Ollama automatically on the default local port
+ph7-l13#2 w0: Always more accurate, because nothing is lost on the network between calls
+ph7-l14#1 a: Less memory and some quality loss to measure
+ph7-l14#1 w0: Identical answers, just faster and smaller on disk
+ph7-l14#1 w2: Better quality, because the 4-bit file was re-trained
+ph7-l14#1 w3: It stops supporting tools and structured outputs
+ph7-l15#0 w0: Ollama decompresses the 4-bit file back to 8 bits when it loads the weights into memory
+ph7-l15#1 a: A paired interval over the tasks, plus how often answers agree
+ph7-l15#1 w0: Two separate confidence intervals, one per file, checked for overlap
+ph7-l15#1 w3: File size per accuracy point, since the smaller file is the goal
+ph8-l1#1 a: Confident answers backed by irrelevant text are harder to spot than a refusal
+ph8-l1#1 w0: It costs more tokens than the answer is worth to anyone
+ph8-l1#1 w2: It breaks the embedding model, which then returns the same chunks
+ph8-l1#1 w3: It is not worse; any context helps, even when it is off-topic
+ph8-l2#0 w0: Duplicate documents in the index being returned twice in the results list
+ph8-l2#1 a: So a chunk like 'within twenty-four hours' still has a subject to cite
+ph8-l2#1 w0: To make the chunk longer, so the embedding has more words to average
+ph8-l2#1 w2: Because vector stores require a title field on every chunk they hold
+ph8-l2#2 a: On the document's own structure: headings, paragraphs, rows
+ph8-l2#2 w0: Every 1000 characters exactly, so all chunks cost the same
+ph8-l2#2 w2: Mid-sentence, to keep the chunks exactly the same size
+ph8-l2#2 w3: Only at the end of the document, keeping it whole
+ph8-l3#1 w0: Nothing; vectors from different embedding models are interchangeable as long as the dimension matches exactly
+ph8-l3#2 a: It returns something topically similar but about the wrong year or agency
+ph8-l3#2 w0: It cannot find paraphrases, only the exact words from the question
+ph8-l3#2 w2: It cannot handle more than 100 documents before the scores all collapse
+ph8-l4#0 a: Saturation: repeats of a word add less and less
+ph8-l4#0 w0: Document length, so long documents do not win by size
+ph8-l4#0 w2: Rare terms, which get a higher weight than common ones
+ph8-l4#0 w3: The number of documents in the whole collection
+ph8-l4#2 w0: 'bins were not emptied this week'
+ph8-l5#0 a: A cosine of 0.82 and a BM25 score of 11.4 are not comparable
+ph8-l5#0 w0: Ranks are more precise than raw scores for any retriever
+ph8-l5#0 w2: Scores are not available from most vector stores, only ranks
+ph8-l5#1 a: The retriever favours recall; a reranker picks precisely from the wider list
+ph8-l5#1 w0: To spend more tokens on context, since more chunks always mean better answers
+ph8-l5#1 w2: Because 25 is the provider's minimum number of results for one vector query
+ph8-l5#1 w3: To avoid caching the results, which would make repeat questions return stale chunks
+ph8-l6#0 w3: Nothing; recall is what matters, and the model reads all three chunks anyway
+ph8-l6#1 a: A system that never refuses is a system that invents
+ph8-l6#1 w0: To inflate the scores, since refusals are easy to get right
+ph8-l6#1 w2: To test the provider's rate limits under a realistic load
+ph8-l6#2 a: Otherwise you tune prompts to cover for a retriever that missed the chunk
+ph8-l6#2 w0: It is cheaper to compute, because retrieval metrics need no model call at all
+ph8-l6#2 w2: Because answers cannot be measured, only the chunks that went into the prompt
+ph8-l6#2 w3: To avoid using an LLM judge, which is always biased towards longer answers
+ph8-l7#1 w2: Providers charge for refusals at a higher rate than for answers, so refusing after the call costs more
+ph8-l7#2 a: It costs money and latency each time and buries the best chunk in the middle
+ph8-l7#2 w0: The model would crash once the window is more than half full of retrieved text
+ph8-l7#2 w3: It is always better to fill it, because more context can only help the model answer
+ph8-l8#0 a: Filtering after can leave fewer than k results, and in multi-tenant data it is security
+ph8-l8#0 w0: Ranking is slower than filtering, so filtering first saves time on every single query
+ph8-l8#0 w2: Vector stores cannot rank results once a filter has been applied to the candidates
+ph8-l8#0 w3: It improves the embeddings, since the filtered vectors are re-normalised first
+ph8-l8#2 w0: A hosted vector database, always, because it scales automatically when needed
+ph8-l9#0 a: Drop lines that repeat at the top of most pages
+ph8-l9#0 w0: Delete the first line of every page, whatever it says
+ph8-l9#0 w2: Ask the model to ignore it when it answers questions
+ph8-l9#0 w3: Use a bigger chunk size so the header matters less
+ph8-l9#1 a: Skip it
+ph8-l9#1 w2: Delete it and ingest it again
+ph8-l9#1 w3: Double its weight in search
+ph8-l10#0 w0: FAISS crashes otherwise, because inner product needs vectors of length one
+ph8-l10#1 a: Remove its old chunk ids, then add new chunks
+ph8-l10#1 w0: Add the new chunks next to the old ones and let ranking choose
+ph8-l10#1 w2: Rebuild the whole index every time anything is edited
+ph8-l10#2 a: Re-embed every chunk into a new index
+ph8-l10#2 w0: Nothing; the old vectors still work
+ph8-l10#2 w2: Only re-embed the new documents from now on
+ph8-l10#2 w3: Change k so more results come back
+ph8-l11#1 w3: Inside the embedding model, as its last layer before the vector
+ph8-l11#2 a: Correct paraphrases (false alarms) and wrong claims that reuse the words
+ph8-l11#2 w0: Invented citation numbers that point at chunks that were never retrieved
+ph8-l11#2 w2: Empty answers, which have no words to overlap with the sources at all
+ph8-l12#0 a: Without them, an always-answering system looks perfect
+ph8-l12#0 w0: To make the set longer, so the averages are more stable
+ph8-l12#0 w2: They are easier to grade than ordinary questions
+ph8-l12#0 w3: Models like them and answer them more accurately
+ph8-l12#2 w1: Speeds up evaluation by skipping the cases that passed last time
+ph8-l13#0 w2: Exact string match on the word 'refunds'
+ph8-l13#0 w3: A hashed bag of words with stemming turned on
+ph8-l13#1 a: Re-embed everything and rebuild the index
+ph8-l13#1 w0: Nothing; the old vectors keep working fine
+ph8-l13#1 w2: Only re-embed new documents from now on
+ph8-l13#1 w3: Lower the refusal threshold to make up for it
+ph8-l14#1 w0: A wrong word that Tesseract could not recognise at all on the page
+ph8-l14#2 a: OCR gives exact characters with confidence; a VLM may invent text
+ph8-l14#2 w0: OCR is always more accurate than any vision model on any kind of document
+ph8-l14#2 w2: VLMs cannot read numbers, only words, so the total would always be missing
+ph8-l15#0 a: Otherwise you cannot measure correct refusals
+ph8-l15#0 w0: To make the set longer and the averages steadier
+ph8-l15#0 w2: Models need them for training on refusal behaviour
+ph8-l15#0 w3: They are easier to grade, since the answer is always the same
+ph8-l15#2 w0: A new user interface that shows the sources differently
+ph8-l16#0 a: The score is optimistic: the setting was chosen on the same questions
+ph8-l16#0 w0: Nothing, as long as the question set has more than a hundred questions
+ph8-l16#1 a: Here BM25 adds noise; hybrid helps when exact terms matter, so test your own queries
+ph8-l16#1 w0: Hybrid search is always worse than a single good retriever, so drop it everywhere
+ph8-l16#1 w2: RRF is implemented wrong, because hybrid must always score at least as high as its parts
+ph8-l16#1 w3: Use BM25 alone, since it was the weaker part of the hybrid and the cause of the drop
+ph8-l17#0 w3: Nothing, as long as the permission filter itself is correct, tested and fast enough to run on every query
+ph8-l17#1 a: Your identity provider or session, resolved at query time
+ph8-l17#1 w0: The user's message, where they state which team they are in
+ph8-l17#1 w1: The model's tool call arguments, which it fills in from the chat
+ph8-l17#2 a: Record the deletion and never ingest those ids again
+ph8-l17#2 w0: Re-embedding everything so the deleted chunks get new ids
+ph8-l17#2 w2: A bigger index that keeps old and new documents apart
+ph8-l17#2 w3: Deleting the export and ingesting from the live system only
+ph9-l2#0 w2: Because tools cannot raise exceptions inside an agent loop, so any error must be converted into a plain string first
+ph9-l2#1 a: An invented argument like force=true shows a misunderstanding; ignoring it hides that
+ph9-l2#1 w0: They slow the call down, because every extra argument is validated twice
+ph9-l2#1 w2: The schema forbids optional values, so any extra field breaks the JSON
+ph9-l2#2 a: A few named read-only operations plus marked writes
+ph9-l2#2 w0: One run_sql tool that takes any query, so nothing is missing
+ph9-l2#2 w1: A shell tool, because it is flexible and needs no schema at all
+ph9-l3#1 w2: The model needs a higher temperature to try different searches, which usually fixes the repeated calls on its own
+ph9-l3#2 a: A distinct status, no answer, and the trace so far
+ph9-l3#2 w0: The best guess it can make from the steps so far
+ph9-l3#2 w2: An exception that stops the whole program
+ph9-l4#0 a: A prompt is a request; a dispatcher that refuses is a rule
+ph9-l4#0 w0: Prompts are too long already, so the gate would push other rules out
+ph9-l4#0 w2: The model cannot read instructions about tools, only their schemas
+ph9-l4#0 w3: It makes the prompt cheaper because fewer rules are sent each time
+ph9-l4#2 w3: It stops the model from calling them at all unless the user asks for the write in the same message
+ph9-l5#0 a: One run can be reassembled by request id, and the file feeds metrics
+ph9-l5#0 w0: They are shorter on disk than sentences, so logs are cheaper to keep
+ph9-l5#0 w3: JSON is required by law for any log that contains a user's request
+ph9-l5#1 a: The request id, time and duration, versions, and outcome
+ph9-l5#1 w0: The full prompt and the full model reply, for replay
+ph9-l5#1 w2: The API key, so each call can be traced to its account
+ph9-l5#1 w3: Only the error message, to keep the logs short
+ph9-l6#0 w0: It is cheaper per token, because background jobs are billed at a lower batch rate by every provider we use, so long requests cost less
+ph9-l6#1 a: A job that failed its last attempt, with error and count: a cheap bug report
+ph9-l6#1 w0: Every failed attempt, so the queue can retry each of them forever in order
+ph9-l6#1 w3: Nothing; failures should be dropped so the queue never fills up with old work

@@ -1,0 +1,117 @@
+l3#0 w3: f itself
+l3#2 w0: It makes the code run faster, because Python compiles that block only once
+l3#2 w2: It is required for every Python file that has functions, or imports will fail
+l6#2 a: Reproduce it reliably
+l8#0 w0: Uploads your files to GitHub right away
+l8#1 w0: Yes, so others get exactly the same installed packages
+l8#1 w3: Only the Scripts folder, so the commands still work
+ph1-l1#2 w2: When the code is longer than about 10 lines in total
+ph1-l2#0 w2: __str__, __hash__ and __lt__ for sorting
+ph1-l2#0 w3: Every dunder method, including __add__
+ph1-l2#1 a: Each object gets its own list
+ph1-l2#1 w3: It makes the field frozen after creation
+ph1-l2#1 w2: It allows None as the default value
+ph1-l3#2 w0: The dict may be empty, so loop over it carefully before use
+ph1-l3#2 w2: The keys may be ints instead of str, so convert them first
+ph1-l4#0 a: It keeps the original error as the cause
+ph1-l4#0 w0: It hides the original error so users see a clean message
+ph1-l4#0 w3: It converts the error into a warning and keeps going
+ph1-l4#2 w3: "something went wrong, please try again"
+ph1-l5#0 w0: All of them, from DEBUG up
+ph1-l5#0 w1: DEBUG and INFO, but not ERROR
+ph1-l5#1 a: Once, at the entry point
+ph1-l5#1 w2: Inside each function that logs
+ph1-l6#1 a: Tests import the installed package, catching packaging mistakes
+ph1-l6#1 w0: It runs faster, because Python searches src/ before any other folder
+ph1-l6#2 w0: Runs your tests and reports coverage
+ph1-l6#2 w3: Manages Python versions and virtual environments
+ph1-l7#0 a: Shared setup that pytest passes in
+ph1-l7#0 w3: A test that always passes, used as a placeholder
+ph1-l7#0 w2: A kind of assertion that compares two values
+ph1-l7#2 w0: It is required by Python for any function that calls an API
+ph1-l9#1 w2: Dict keys must be strings or numbers in Python
+ph1-l9#1 w3: It works, it is just slow for large dictionaries
+ph1-l9#2 a: Each += can copy the whole string: O(n²)
+ph1-l9#2 w3: It changes the original pieces as it goes along
+ph1-l9#2 w2: It raises an error once the string gets long
+ph1-l10#2 w2: When the list is sorted in ascending order
+ph1-l11#2 w0: Use heapq.reverse() on the heap
+ph1-l11#2 w2: Sort the heap list after each push
+ph1-l12#2 a: O(n): a chain
+ph1-l12#2 w3: O(n log n), like sorting
+ph1-l12#2 w0: O(log n), as for any BST
+ph1-l13#2 w0: The graph is disconnected, so Kahn's needs a second start node
+ph1-l14#0 w2: A global variable to count the depth
+ph1-l14#0 w3: A cache of earlier results
+ph1-l14#1 a: So the next choice starts clean
+ph1-l14#1 w3: To sort the results before they are returned
+ph1-l14#1 w2: Python requires it in recursive functions
+ph2-l1#1 w1: The positions (indexes) of the big values
+ph2-l1#2 w0: It uses less memory in every case, even for small arrays
+ph2-l1#2 w2: Loops are not allowed over NumPy arrays in any form
+ph2-l2#0 w2: pandas refuses to load the file and stops with an error
+ph2-l2#0 w3: It becomes a number counting days since 1970
+ph2-l2#2 w2: An error, because you cannot subtract dates
+ph2-l3#0 w2: pandas requires it before any change to a column
+ph2-l3#0 w3: To remove duplicate rows before cleaning starts
+ph2-l3#2 a: Rows changed, and why
+ph2-l3#2 w3: The time it took to run
+ph2-l4#1 w2: Some rows were dropped from the left table
+ph2-l4#2 w2: A DataFrame of all rows, sorted by agency
+ph2-l4#2 w3: The hours column sorted within each agency
+ph2-l5#0 w0: Mean (45.0)
+ph2-l5#0 w2: Max (300 h)
+ph2-l5#0 w3: Sum (315 h)
+ph2-l5#2 w0: The ranking of the groups by size
+ph2-l6#1 w2: WHERE closed = '' OR closed = 0
+ph2-l6#1 w3: WHERE closed IS NOT NULL
+ph2-l6#2 w0: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY
+ph2-l6#2 w2: FROM, SELECT, WHERE, GROUP BY, ORDER BY, HAVING
+ph2-l6#2 w3: ORDER BY first, then FROM, WHERE and SELECT
+ph2-l7#2 w1: Both give 1 and 2, in the order the rows were read
+ph2-l8#0 a: The value is sent as data, never as SQL
+ph2-l8#0 w2: f-strings do not work inside SQLite queries
+ph2-l8#0 w3: It is faster to type and easier to read later
+ph2-l8#1 a: Missing values (NULL vs NaN)
+ph2-l8#1 w1: SQL is always wrong when it disagrees
+ph2-l8#1 w2: pandas is always wrong with dates
+ph3-l1#0 w0: Moves the whole line up by w units
+ph3-l1#1 a: Choosing weights that make predictions good
+ph3-l1#1 w0: Writing the function that makes the predictions
+ph3-l1#1 w2: Collecting and labelling the data the model uses
+ph3-l1#2 a: A weighted sum plus a bias
+ph3-l1#2 w0: The largest of the three features
+ph3-l1#2 w2: The average of the three features
+ph3-l1#2 w3: A random number near the mean
+ph3-l3#2 w0: The one with the larger variance
+ph3-l4#1 w2: Only 5% of requests took 800 ms or less
+ph3-l4#1 w3: The slowest request of all took 800 ms
+ph3-l4#2 a: Look at the distribution first
+ph3-l4#2 w3: Remove all the large values first
+ph3-l4#2 w2: Always use the mean, it is standard
+ph3-l5#1 w0: Overfitting to the test set
+ph3-l6#0 w0: New data drawn fresh from the world
+ph3-l6#0 w2: Only the outliers, with replacement
+ph3-l6#1 a: Bootstrap the paired difference B − A and check if its interval excludes zero
+ph3-l6#1 w0: Conclude neither is better, because overlapping intervals mean no real difference
+ph3-l6#1 w2: Pick the model with the narrower interval, since its score is more certain
+ph3-l6#3 w3: It makes the interval wider, so the comparison stays on the cautious side
+ph3-l8#1 w0: It changes which answer the model converges to
+ph3-l8#1 w2: It removes the outliers from every feature
+ph3-l8#1 w3: It is only cosmetic, for nicer plots
+ph4-l1#0 w0: It is a legal requirement for every model that is used on real people's data
+ph4-l1#1 w3: There is no baseline for regression, only for classification
+ph4-l1#1 w0: A neural network trained on the same columns
+ph4-l1#2 a: Not useful yet
+ph4-l2#1 w3: distance_km (computed from the address)
+ph4-l2#3 a: Copies of test reviews are in training, so the test is not new text
+ph4-l2#3 w2: The test set is too large, so the small errors average out to almost nothing
+ph4-l2#3 w3: TF-IDF needs more n-grams to tell the near-copies apart from each other
+ph4-l3#0 a: So it learns from training data only
+ph4-l3#0 w3: It makes the model larger and so more accurate
+ph4-l3#0 w2: It is required by Python for any scaler
+ph4-l3#2 w2: Linear regression with many features
+ph4-l4#2 w0: 0.5, the same as for ROC-AUC
+ph4-l4#2 w2: 1.0, since every point is ranked
+ph4-l4#2 w3: 0, the score of an empty model
+ph4-l5#1 w0: A column named C in the training data's table

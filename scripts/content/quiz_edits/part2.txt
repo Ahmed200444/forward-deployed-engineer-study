@@ -1,0 +1,163 @@
+ph4-l6#0 w0: Its correlation with the label across all the rows
+ph4-l6#0 w3: How many missing values it has in the training data
+ph4-l6#1 a: A good overall score can hide a group that fails
+ph4-l6#1 w2: It improves accuracy automatically for every agency
+ph4-l6#1 w0: To make charts that are easier to present to a client
+ph4-l7#1 w0: It reports that there are no clusters to find
+ph4-l7#2 w0: A high silhouette score alone, whatever the groups mean
+ph4-l7#2 w2: It is the largest group in the data set
+ph4-l8#0 a: The whole pipeline
+ph4-l8#0 w0: Only the model coefficients, as a CSV file
+ph4-l8#0 w2: The training data only, to retrain later
+ph4-l8#2 w2: The model is perfect and needs no changes now
+ph4-l9#0 w0: Random KFold over all the rows, shuffled first
+ph4-l9#0 w2: TimeSeriesSplit ordered by the customer's first row
+ph4-l9#1 a: It is probably optimistic: the best of 50 noisy scores
+ph4-l9#1 w0: 0.91 is an unbiased estimate of the final model's score on new data
+ph4-l9#1 w3: Cross-validation removes all of the selection bias, so 0.91 holds
+ph4-l10#0 w3: The test set is too small for AUC to mean anything here
+ph4-l10#1 a: Data the base model was not fitted on, such as CV folds
+ph4-l10#1 w2: The same rows the model was trained on, so nothing is wasted
+ph4-l10#1 w3: Any data at all; calibration does not depend on which rows
+ph4-l11#0 a: Data version, code commit, seeded settings, lock file and model hash
+ph4-l11#0 w0: The final accuracy, the model's name and the date it was trained on
+ph4-l11#0 w2: The model file only, saved with joblib and kept in the same folder
+ph4-l11#0 w3: A screenshot of the notebook after every cell has run once
+ph4-l11#2 w2: The data must have changed between the two runs, so redo the split
+ph4-l11#2 w3: Seeds do not work on GPUs at all, so the result cannot be trusted and must be rerun on a CPU
+ph4-l12#0 w2: Only at the end of the whole run, once every batch is done and checked
+ph4-l12#0 w3: Never; recompute it every time from the newest row in the target table
+ph4-l12#1 a: Re-read a short look-back window and upsert by id
+ph4-l12#1 w2: Deleting the watermark daily so every run starts from the beginning
+ph4-l12#1 w3: Sorting each batch by timestamp before it is written
+ph4-l13#0 w2: Inner joins do not work in pandas when one table has missing values in the key column, so the merge would fail
+ph4-l13#1 a: Too early: few labels, maybe a biased subset
+ph4-l13#1 w0: The model improved, since 97% is above last month's score
+ph4-l13#1 w2: The model is broken, because 12% coverage is far too low
+ph4-l13#2 a: Keep the champion; investigate that region
+ph4-l13#2 w0: Promote it, because the overall score went up
+ph4-l13#2 w2: Average the two models so every region is covered
+ph4-l13#2 w3: Delete the region from the test data and compare again
+ph4-l15#0 w0: A deep neural network with several hidden layers
+ph4-l15#1 a: Trees can't predict past the training targets, so they underestimate
+ph4-l15#1 w2: It trains too slowly once there are many years of data to learn from
+ph4-l15#1 w3: It needs scaling first, or the trees split on the year column wrongly
+ph4-l15#2 a: Stops adding trees when validation stops improving
+ph4-l15#2 w0: Stops when training accuracy reaches 100% on the training rows
+ph4-l15#2 w2: Limits the depth of each tree so it cannot overfit
+ph4-l15#2 w3: Removes the weakest features after each new tree is added
+ph4-l16#2 w2: The number of features and the training time of the model
+ph4-l17#0 a: The same user sees both versions, so the views are not independent
+ph4-l17#0 w0: There are too many page views, so the test takes too long to run
+ph4-l17#0 w2: Page views cannot be counted reliably when caching is on for the site
+ph4-l17#1 a: Repeated looks inflate the false positive rate
+ph4-l17#1 w0: None; p is below 0.05, so the result is significant and final
+ph4-l17#1 w2: The test was too long, so seasonal effects crept in
+ph4-l17#1 w3: The lift is too large to be believable for any test
+ph4-l18#0 w0: PCA only works with values between 0 and 1, so unscaled columns make it fail with an error message
+ph4-l18#1 a: Inside each training fold, e.g. in a pipeline
+ph4-l18#1 w0: On all the data before splitting, so every fold uses the same components
+ph4-l18#1 w3: It does not matter, because PCA ignores the labels entirely
+ph4-l18#2 a: The class-separating direction has little variance; PCA ignores labels
+ph4-l18#2 w0: PCA failed to converge on the data and returned a random direction
+ph4-l18#2 w2: 98% is too low; the classifier needs at least 99.9% of the variance
+ph4-l18#2 w3: The classifier needs many more rows to learn from one single feature
+ph5-l1#1 w0: The caller made a mistake in the request body or URL
+ph5-l1#1 w2: The request succeeded but returned no content
+ph5-l2#0 a: A number from 0 to 100
+ph5-l2#0 w0: A string length of 0 to 100 characters
+ph5-l2#0 w2: A list size between 0 and 100 items
+ph5-l2#0 w3: Nothing at runtime; it is only a hint for docs
+ph5-l2#2 w3: The default values are used for the fields that failed validation
+ph5-l3#0 a: It takes the same time however much matches, so timing can't leak the key
+ph5-l3#0 w2: It encrypts the key before comparing, so the plain key never sits in memory
+ph5-l3#0 w3: It is required by HTTP for every header that carries a secret value
+ph5-l4#0 w1: In a committed config file that only the team can read
+ph5-l4#1 a: At start-up, naming the setting
+ph5-l4#1 w0: On the first user request that needs the setting
+ph5-l4#1 w3: Only when an admin checks the health page
+ph5-l4#2 a: Revoke it and make a new one
+ph5-l4#2 w0: Nothing; the deleted commit is gone from GitHub
+ph5-l4#2 w2: Make the repo private so nobody else can see it
+ph5-l4#2 w3: Rename the file that held the key
+ph5-l5#1 w2: SQLite cannot store JSON columns, so logs lose their fields
+ph5-l5#2 w0: Log everything, so the audit trail is complete
+ph5-l5#2 w2: Email it to yourself and delete it from the log
+ph5-l6#0 a: Loading the model per request
+ph5-l6#0 w0: Python is slow at maths compared with C
+ph5-l6#0 w2: JSON parsing of the request body
+ph5-l6#0 w3: Too many routes registered in the app
+ph5-l6#2 w2: It makes each request faster once the service recovers
+ph5-l7#0 a: The install layer stays cached when only code changes
+ph5-l7#0 w0: Docker requires lock files to be copied before any source file
+ph5-l7#0 w2: It makes the image smaller, because the lock file is compressed
+ph5-l7#1 a: The secret is baked into the image for anyone to read
+ph5-l7#1 w2: ENV is deprecated in Dockerfiles and ignored at run time
+ph5-l7#1 w3: It slows the build, because every layer re-reads the variable
+ph5-l8#0 w0: Deploys the app to production on every commit, without any checks first
+ph5-l8#1 a: Free services sleep when idle and must start
+ph5-l8#1 w0: A bug in the start-up code that loops for a while
+ph5-l8#1 w2: The model is wrong and has to be reloaded every time
+ph5-l8#2 a: Read the build log from the bottom
+ph5-l8#2 w0: Rewrite the app with a simpler framework
+ph5-l8#2 w2: Delete the repo and push it again
+ph5-l8#2 w3: Disable CI so the deploy goes through
+ph5-l9#2 w0: Nothing; async runs it in parallel with the other requests on a thread
+ph5-l10#1 a: dependency_overrides or a create_app(model=...) factory
+ph5-l10#1 w0: Edit the source before each test and restore it afterwards
+ph5-l10#1 w2: Start a second server that runs a smaller copy of the model
+ph5-l10#1 w3: Mock the network so the model's requests never leave the test
+ph5-l11#1 w2: Hashing is required by HTTP for any request that has a user id in it
+ph5-l11#2 a: Wait for the minimum sample before judging
+ph5-l11#2 w0: Roll back immediately, since any error is a failure
+ph5-l11#2 w3: Restart the server and count the requests again
+ph5-l12#0 a: One part needs very different scaling or hardware
+ph5-l12#0 w0: Microservices are the modern standard for any production team
+ph5-l12#0 w2: It makes local development simpler for both people on the team
+ph5-l12#0 w3: Each function should be its own service so it can be deployed alone
+ph5-l13#1 w0: In a Python set in the worker, which is fast to check on every message
+ph5-l13#2 a: Losing or inventing events in a crash between a DB write and a publish
+ph5-l13#2 w0: Slow consumers that fall behind and let the queue grow without bound
+ph5-l13#2 w3: Out-of-order delivery when several consumers read the same queue partition
+ph5-l14#0 a: Least outstanding requests
+ph5-l14#0 w0: Round robin over the replicas
+ph5-l14#0 w2: Random choice of replica each time
+ph5-l14#0 w3: Always the first healthy replica
+ph5-l14#2 w2: Accept it and process it slowly, after the requests already running
+ph5-l15#2 a: It passed its capacity; requests queue
+ph5-l15#2 w0: The test is broken and must be rerun from scratch
+ph5-l15#2 w2: The network got faster, so the server is waiting on it
+ph5-l15#2 w3: Nothing important; latency always grows like this
+ph5-l17#0 w0: Blocking a card payment at checkout when a fraud score from last night is above the limit
+ph5-l17#1 a: Write each chunk as its own part file; skip existing parts
+ph5-l17#1 w0: Retry the entire job from the start with a longer timeout
+ph5-l17#1 w3: Run the job twice and compare the two outputs row by row
+ph5-l17#2 a: A crash can never leave a half-written file that looks done
+ph5-l17#2 w0: Renaming compresses the file and checks that it is valid Parquet
+ph5-l17#2 w2: It makes the model faster, because it can read the file while it is written
+ph5-l17#2 w3: It hides the file from other users until the whole job has finished running
+ph7-l1#0 w0: The ticket text to classify, so the model treats it as a rule it must follow
+ph7-l1#1 a: It picks the likeliest tokens, so results are nearly repeatable
+ph7-l1#1 w0: It is cheaper per token, because the provider skips sampling
+ph7-l1#1 w3: It disables the safety filters that change the answers
+ph7-l1#2 a: No: batching and hardware still change results
+ph7-l1#2 w0: Yes, 0 means fully deterministic on every provider
+ph7-l1#2 w2: Only with a local model running on your own machine
+ph7-l1#2 w3: Only when you also set a seed in the request body
+ph7-l2#1 w0: Ask more politely and add 'please' so the model takes the categories more seriously
+ph7-l2#2 a: It marks where the data starts and ends, apart from the instructions
+ph7-l2#2 w0: It makes the model answer faster, because it can skip the quoted part
+ph7-l2#2 w2: It is required by the JSON format whenever text contains line breaks
+ph7-l3#0 a: It says what was wrong, so the retry is a correction, not a repeat
+ph7-l3#0 w0: It is required by the API whenever a request is sent for a second time
+ph7-l3#0 w2: It reduces the cost of the retry, because the error replaces the prompt
+ph7-l3#0 w3: It makes the output deterministic, so the second answer is always valid
+ph7-l3#2 w3: Because the keys are not quoted in the way Python's json module expects, so it would decode the wrong value
+ph7-l4#1 a: Output tokens usually cost more, and generation time grows with them
+ph7-l4#1 w2: Output is counted twice by every provider, once to generate and once to bill
+ph7-l4#1 w3: It does not; input and output are priced and timed the same way
+ph7-l4#2 a: No: it only makes the wait feel shorter
+ph7-l4#2 w0: Yes, roughly twice as fast for long answers
+ph7-l4#2 w2: Yes, because it skips the provider's request queue
+ph7-l4#2 w3: Only at temperature 0, when sampling is skipped
+ph7-l5#1 w2: Because providers reject retries that arrive with identical wait times between them

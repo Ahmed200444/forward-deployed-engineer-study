@@ -105,9 +105,9 @@ async function rvIdle(p){ await p.waitForFunction(()=>{ const s=document.querySe
   await p.check('#gh-rv-ack'); await p.click('[data-act="gh-confirm"]'); await p.waitForFunction(()=>/Published/.test(document.querySelector('#gh-status').textContent), null, {timeout:20000});
   await T('rename?repo=Ahmed200444/empty-test&from=main&to=trunk'); await verify();
   ok('P13 branch renamed: link unavailable, names the branch', /link unavailable/.test(await stateTxt()) && /branch main/.test(await stateTxt()), await stateTxt());
-  // P14 access lost: the record is kept with a separate note
+  // P14 access lost (repo deleted, renamed or app removed): v31.2 keeps the record, marks the link unavailable and says to choose another repository
   await T('revoke?repo=Ahmed200444/empty-test'); await verify();
-  const s14=await stateTxt(); ok('P14 access lost: record kept with a verification note', /Published/.test(s14) && /Could not check GitHub just now/.test(s14), s14);
+  const s14=await stateTxt(); ok('P14 access lost: record kept, link marked unavailable, next step named', /Previously published/.test(s14) && /link unavailable/.test(s14) && /Choose another repository/.test(s14) && /Clear this record/.test(s14), s14);
   // P15 app lacks the Workflows permission: clear message, nothing written, not marked failed
   await T('noworkflow?on=1'); await p.goto(B+'#/local/llm-client'); await p.waitForSelector('[data-act="gh-publish"]:visible'); const b15=(await commits()).length;
   await p.click('[data-act="gh-publish"]'); await rvIdle(p); await p.selectOption('#gh-rv-repo','Ahmed200444/fde-publish-test'); await rvIdle(p);
