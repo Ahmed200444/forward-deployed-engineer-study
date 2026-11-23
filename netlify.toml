@@ -18,6 +18,10 @@
   to = "/.netlify/functions/github-status"
   status = 200
 [[redirects]]
+  from = "/api/github/preview"
+  to = "/.netlify/functions/github-preview"
+  status = 200
+[[redirects]]
   from = "/api/github/publish"
   to = "/.netlify/functions/github-publish"
   status = 200
@@ -35,3 +39,21 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Python runtime (Pyodide 0.26.4) shipped with the site. See py/README.txt.
+[[headers]]
+  for = "/py/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+[[headers]]
+  for = "/py/*.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+[[headers]]
+  for = "/py/*.json"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+[[headers]]
+  for = "/py/*.js"
+  [headers.values]
+    Content-Type = "text/javascript; charset=utf-8"

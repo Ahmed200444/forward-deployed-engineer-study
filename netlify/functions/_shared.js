@@ -6,6 +6,9 @@ const COOKIE = 'fde_gh_session';
 const STATE_COOKIE = 'fde_gh_state';
 const API_VERSION = '2022-11-28';
 const SESSION_AGE = 60 * 60 * 24 * 180;
+// Overridable only so the functions can be tested against a local mock of GitHub; production uses the defaults.
+const API_BASE = (process.env.GITHUB_API_BASE || 'https://api.github.com').replace(/\/$/, '');
+const WEB_BASE = (process.env.GITHUB_WEB_BASE || 'https://github.com').replace(/\/$/, '');
 
 // App settings come from Netlify environment variables if they are set, otherwise from the
 // site's Netlify Blobs store, where the one-time setup (github-setup.js) saves them. The browser never sees them.
@@ -67,7 +70,7 @@ function originAllowed(event){ const allowed = siteUrl(), o = header(event, 'ori
 function csrfOk(event, s){ return originAllowed(event) && !!s && !!s.csrf && header(event, 'x-fde-csrf') === s.csrf; }
 
 async function gh(path, token, options = {}){
-  const r = await fetch(`https://api.github.com${path}`, { ...options, headers: {
+  const r = await fetch(`${API_BASE}${path}`, { ...options, headers: {
     Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': API_VERSION,
     'User-Agent': 'FDE-Study-Publisher', ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...(options.headers || {}) } });
   const text = await r.text(); let data = {}; try { data = text ? JSON.parse(text) : {}; } catch (e) {}
@@ -76,7 +79,7 @@ async function gh(path, token, options = {}){
 }
 async function tokenRequest(params){
   const body = new URLSearchParams({ client_id: cfg().clientId, client_secret: cfg().clientSecret, ...params });
-  const r = await fetch('https://github.com/login/oauth/access_token', { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+  const r = await fetch(`${WEB_BASE}/login/oauth/access_token`, { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' }, body });
   const d = await r.json().catch(() => ({}));
   if (!r.ok || d.error) throw new Error(d.error_description || d.error || 'GitHub sign-in failed.');
   return d;
@@ -108,4 +111,39 @@ function safePath(p){
   if (!p || p.length > 300 || p.split('/').some(x => !x || x === '.' || x === '..' || x === '.git' || !/^[A-Za-z0-9._ -]+$/.test(x))) { const e = new Error('Invalid file path: ' + p); e.status = 400; throw e; }
   return p;
 }
-module.exports = { COOKIE, STATE_COOKIE, SESSION_AGE, loadConfig, saveConfig, cfg, configured, siteUrl, encrypt, decrypt, cookies, cookie, json, redirect, header, csrfOk, gh, tokenRequest, sessionFrom, session, strongSecret, safePath };
+// The review token: what the learner saw on the review screen (destination, branch head, exact files),
+// signed with the session key. Publish refuses to write anything that does not match it.
+function gitBlobSha(content){ const b = Buffer.from(content, 'utf8'); return crypto.createHash('sha1').update(`blob ${b.length}\0`).update(b).digest('hex'); }
+function filesDigest(files){ const h = crypto.createHash('sha256'); for (const f of [...files].sort((a, b) => a.path < b.path ? -1 : 1)) h.update(f.path + '\0' + gitBlobSha(f.content) + '\n'); return h.digest('hex'); }
+function signReview(o){ const body = b64url(JSON.stringify(o)); return body + '.' + b64url(crypto.createHmac('sha256', key()).update('review.' + body).digest()); }
+function readReview(t){
+  const [body, mac] = String(t || '').split('.');
+  if (!body || !mac) return null;
+  const want = b64url(crypto.createHmac('sha256', key()).update('review.' + body).digest());
+  if (want.length !== mac.length || !crypto.timingSafeEqual(Buffer.from(want), Buffer.from(mac))) return null;
+  try { return JSON.parse(Buffer.from(body, 'base64url').toString('utf8')); } catch (e) { return null; }
+}
+function safeBranch(b){
+  b = String(b || '').trim();
+  if (!b) return '';
+  if (b.length > 100 || !/^[A-Za-z0-9._/-]+$/.test(b) || /(^|\/)\.|\.\.|\/\/|\/$|^\/|\.lock$|^-/.test(b)) { const e = new Error('Invalid branch name: ' + b); e.status = 400; throw e; }
+  return b;
+}
+// Check and normalise a publish request body (used by both preview and publish, so they agree exactly).
+function readRequest(b){
+  const repository = String(b.repository || '').trim();
+  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repository) || /\/\.+$/.test(repository)) { const e = new Error('Invalid repository name.'); e.status = 400; throw e; }
+  const folder = safePath(b.folder);
+  const names = Object.keys(b.files || {});
+  if (!names.length || names.length > 80) { const e = new Error('Nothing to publish, or too many files.'); e.status = 400; throw e; }
+  let total = 0;
+  const files = names.map(n => {
+    const content = String(b.files[n] ?? ''); total += Buffer.byteLength(content, 'utf8');
+    const found = strongSecret(content); if (found){ const e = new Error(`Remove the ${found} in ${n} before publishing.`); e.status = 400; throw e; }
+    return { name: n, path: safePath(folder + '/' + safePath(n)), content };
+  });
+  if (total > 2000000) { const e = new Error('These files are too large to publish from the browser.'); e.status = 413; throw e; }
+  if (!files.some(f => /\/README\.md$/.test(f.path))) { const e = new Error('The README is missing.'); e.status = 400; throw e; }
+  return { repository, folder, files, branch: safeBranch(b.branch) };
+}
+module.exports = { API_BASE, WEB_BASE, gitBlobSha, filesDigest, signReview, readReview, safeBranch, readRequest, COOKIE, STATE_COOKIE, SESSION_AGE, loadConfig, saveConfig, cfg, configured, siteUrl, encrypt, decrypt, cookies, cookie, json, redirect, header, csrfOk, gh, tokenRequest, sessionFrom, session, strongSecret, safePath };

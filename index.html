@@ -353,6 +353,28 @@ html[data-net-publish] .gh-card .card-h,html[data-net-publish] .gh-card p.meta,h
 html[data-net-publish] .gh-card .btn-row{margin-top:0}
 .gh-net .linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
 .view .gh-mode{margin:-4px 0 8px;max-width:none}
+.gh-review{margin:14px 0 4px;padding:16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);min-width:0}
+.gh-review:focus{outline:2px solid var(--accent);outline-offset:2px}
+.gh-review-h{margin:0 0 6px;font-size:17px}
+.gh-rv-note,.gh-rv-help{font-size:14px;margin:0 0 10px;color:var(--muted)}
+.gh-rv-fields .field{margin:8px 0}
+.gh-rv-fields select{width:100%;font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);min-width:0}
+.gh-rv-facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 14px;margin:14px 0;font-size:14.5px}
+.gh-rv-facts dt{color:var(--muted)}
+.gh-rv-facts dd{margin:0;overflow-wrap:anywhere}
+.gh-badge{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;border:1px solid currentColor}
+.gh-badge.pub{color:var(--warn,#b45309)}
+.gh-badge.priv{color:var(--good)}
+.gh-rv-warn ul{margin:8px 0;padding:10px 14px 10px 30px;border-left:3px solid var(--warn,#b45309);background:var(--accent-soft);border-radius:0 8px 8px 0;font-size:14.5px}
+.gh-rv-warn:empty{display:none}
+.gh-rv-sub{margin:12px 0 4px;font-size:14.5px}
+.gh-rv-files{list-style:none;margin:0 0 10px;padding:0;font-size:13.5px;max-height:220px;overflow:auto}
+.gh-rv-files li{padding:2px 0;overflow-wrap:anywhere}
+.gh-act{display:inline-block;min-width:4.5em;font-weight:700;font-size:12px}
+.gh-act.add{color:var(--good)}.gh-act.replace{color:var(--warn,#b45309)}.gh-act.unchanged,.gh-act.keep{color:var(--muted)}
+.gh-rv-ack{display:flex;gap:8px;align-items:flex-start;margin:10px 0;font-size:14.5px}
+.gh-rv-ack input{margin-top:3px;width:18px;height:18px;flex:none}
+.gh-review [hidden]{display:none!important}
 /* portfolio projects */
 .pf-back{margin:0 0 6px}
 .pf-why p{margin:0 0 8px}
@@ -39744,20 +39766,223 @@ if sys.platform == "emscripten":
   var STATE_KEYS = ["lessons","ex","quiz","drafts","tried","check","review","notes","log","hints","gh","qpass"];
   function fillState(){ STATE_KEYS.forEach(function(k){ if (!state[k] || typeof state[k] !== "object" || Array.isArray(state[k])) state[k] = {}; }); }
   fillState();
-  function save(){
-    var warning = document.getElementById("storage-warning");
-    try {
-      localStorage.setItem(KEY, JSON.stringify(state));
-      if (warning) warning.remove();
-    } catch(e){
-      if (!warning){
-        warning = document.createElement("p"); warning.id = "storage-warning";
-        warning.className = "callout"; warning.setAttribute("role", "alert");
-        document.body.insertBefore(warning, document.body.firstChild);
+  /* ---------- saving: one IndexedDB transaction per save, shared safely by every open tab ----------
+     Each save() works out what this tab changed since it last saw the saved state (its "base"), then, inside one
+     IndexedDB read-write transaction, applies only those changes to the latest saved state. Two tabs that change
+     different lessons, drafts or quizzes therefore keep both changes; activity counters are added, not overwritten;
+     a removal (Mark as not read, reset) is applied as a removal. After each commit the other tabs are told through
+     BroadcastChannel and refresh. A restore starts a new "epoch": a tab that was open before it drops its stale
+     changes instead of writing them over the restored progress.
+     The localStorage key above stays as a mirror (fast first paint, older copies of the site) and is never deleted.
+     The first run copies it into IndexedDB in one transaction that also keeps the original text, so an interrupted
+     upgrade leaves the old data where it was and simply runs again next time. */
+  var IDB_NAME = "fde-study", IDB_STORE = "kv", REC = "state", META_KEY = KEY + ".meta";
+  var TAB_ID = Math.random().toString(36).slice(2);
+  function clone(v){ return v === undefined ? undefined : JSON.parse(JSON.stringify(v)); }
+  function plain(v){ return !!v && typeof v === "object" && !Array.isArray(v); }
+  // Key order does not matter: {best, last} and {last, best} are the same record.
+  function canon(v){ return JSON.stringify(v, function(k, x){ if (plain(x)){ var o = {}; Object.keys(x).sort().forEach(function(key){ o[key] = x[key]; }); return o; } return x; }); }
+  function same(a, b){ return a === b || canon(a) === canon(b); }
+  function readMeta(){ try { var m = JSON.parse(localStorage.getItem(META_KEY)); return plain(m) ? m : null; } catch(e){ return null; } }
+  var store = { rev: 0, epoch: 0, base: clone(state), ready: null, db: null, mode: "starting", queue: Promise.resolve(), queued: false, onRemote: null };
+  (function(){ var m = readMeta(); if (m){ store.rev = m.rev || 0; store.epoch = m.epoch || 0; } })();
+
+  // The changes from a to b, as small operations. Records are compared one by one (state.lessons.l5, state.drafts.e1, ...);
+  // GitHub items one level deeper; study-log counters as differences to add.
+  function diffState(a, b){
+    var ops = [];
+    function rec(path, x, y, depth){
+      if (depth > 0 && plain(x) && plain(y)){
+        var keys = {}; Object.keys(x).forEach(function(k){ keys[k] = 1; }); Object.keys(y).forEach(function(k){ keys[k] = 1; });
+        Object.keys(keys).forEach(function(k){ rec(path.concat(k), x[k], y[k], depthOf(path.concat(k), depth - 1)); });
+        return;
       }
-      warning.textContent = "Your latest changes could not be saved in this browser. Keep this tab open and download a backup from Backup and restore before leaving.";
+      if (path[0] === "log" && path.length === 3 && (typeof x === "number" || x === undefined) && (typeof y === "number" || y === undefined)){
+        var d = (y || 0) - (x || 0); if (d) ops.push({ add: d, path: path }); return;
+      }
+      if (!same(x, y)) ops.push({ path: path, value: clone(y) });
     }
+    function depthOf(path, d){ if (path.length === 1 && (path[0] === "log" || path[0] === "gh")) return 2; return d; }
+    var ka = plain(a) ? a : {}, kb = plain(b) ? b : {}, keys = {};
+    Object.keys(ka).forEach(function(k){ keys[k] = 1; }); Object.keys(kb).forEach(function(k){ keys[k] = 1; });
+    Object.keys(keys).forEach(function(k){ rec([k], ka[k], kb[k], depthOf([k], STATE_KEYS.indexOf(k) >= 0 ? 1 : 0)); });
+    return ops;
   }
+  function applyOps(target, ops){
+    ops.forEach(function(op){
+      var o = target, p = op.path;
+      for (var i = 0; i < p.length - 1; i++){ if (!plain(o[p[i]])){ if (op.value === undefined && !op.add) return; o[p[i]] = {}; } o = o[p[i]]; }
+      var last = p[p.length - 1];
+      if (op.add) o[last] = (typeof o[last] === "number" ? o[last] : 0) + op.add;
+      else if (op.value === undefined) delete o[last];
+      else o[last] = clone(op.value);
+    });
+    return target;
+  }
+  // Make target equal to source without replacing nested objects, so code holding state.gh or state.drafts keeps working.
+  function syncInPlace(target, source){
+    Object.keys(target).forEach(function(k){ if (!(k in source)) delete target[k]; });
+    Object.keys(source).forEach(function(k){
+      if (plain(target[k]) && plain(source[k])) syncInPlace(target[k], source[k]);
+      else if (!same(target[k], source[k])) target[k] = clone(source[k]);
+    });
+  }
+  function storageWarning(show){
+    var warning = document.getElementById("storage-warning");
+    if (!show){ if (warning) warning.remove(); return; }
+    if (!warning){
+      warning = document.createElement("p"); warning.id = "storage-warning";
+      warning.className = "callout"; warning.setAttribute("role", "alert");
+      document.body.insertBefore(warning, document.body.firstChild);
+    }
+    warning.textContent = "Your latest changes could not be saved in this browser. Keep this tab open and download a backup from Backup and restore before leaving.";
+  }
+  function writeMirror(rec){
+    try {
+      var m = readMeta();
+      if (m && m.epoch > rec.epoch || m && m.epoch === rec.epoch && m.rev > rec.rev) return;   // another tab already mirrored something newer
+      localStorage.setItem(KEY, JSON.stringify(rec.state));
+      localStorage.setItem(META_KEY, JSON.stringify({ rev: rec.rev, epoch: rec.epoch, at: Date.now() }));
+    } catch(e){ if (store.mode !== "idb") throw e; }
+  }
+  function openDB(){
+    return new Promise(function(resolve){
+      if (!window.indexedDB){ resolve(null); return; }
+      var req;
+      try { req = indexedDB.open(IDB_NAME, 1); } catch(e){ resolve(null); return; }
+      req.onupgradeneeded = function(){ if (!req.result.objectStoreNames.contains(IDB_STORE)) req.result.createObjectStore(IDB_STORE); };
+      req.onsuccess = function(){ var db = req.result; db.onversionchange = function(){ db.close(); store.db = null; }; resolve(db); };
+      req.onerror = function(){ resolve(null); };
+      req.onblocked = function(){ resolve(null); };
+    });
+  }
+  // Read the saved record, let fn change it, write it back: all in one transaction. fn returns false to write nothing.
+  function transact(fn){
+    if (!store.db) return lockedLocal(fn);
+    return new Promise(function(resolve, reject){
+      var out = null, tx;
+      try { tx = store.db.transaction(IDB_STORE, "readwrite"); } catch(e){ store.db = null; lockedLocal(fn).then(resolve, reject); return; }
+      var os = tx.objectStore(IDB_STORE), g = os.get(REC);
+      g.onsuccess = function(){
+        var rec = g.result && plain(g.result.state) ? g.result : { state: {}, rev: 0, epoch: 1 };
+        var r = fn(rec);
+        out = r === false ? rec : r;
+        if (r !== false) os.put(out, REC);
+        if (r !== false && window.__STORE_TEST__ && window.__STORE_TEST__.abortNextWrite){ window.__STORE_TEST__.abortNextWrite = false; tx.abort(); }
+      };
+      tx.oncomplete = function(){ resolve(out); };
+      tx.onabort = tx.onerror = function(){ reject(tx.error || new Error("The save was interrupted.")); };
+    });
+  }
+  // No IndexedDB (some private windows): localStorage, serialised across tabs with the Web Locks API where it exists.
+  function lockedLocal(fn){
+    function run(){
+      var m = readMeta() || { rev: 0, epoch: 1 };
+      var rec = { state: load(), rev: m.rev || 0, epoch: m.epoch || 1 };
+      var r = fn(rec); if (r === false) return rec;
+      localStorage.setItem(KEY, JSON.stringify(r.state));
+      localStorage.setItem(META_KEY, JSON.stringify({ rev: r.rev, epoch: r.epoch, at: Date.now() }));
+      return r;
+    }
+    if (navigator.locks && navigator.locks.request) return navigator.locks.request("fde-study-state", function(){ return run(); });
+    return new Promise(function(resolve){ resolve(run()); });
+  }
+  var channel = null;
+  try { channel = new BroadcastChannel("fde-study-state"); } catch(e){}
+  function announce(rec, kind){
+    var msg = { type: kind || "saved", rev: rec.rev, epoch: rec.epoch, from: TAB_ID };
+    if (channel) try { channel.postMessage(msg); } catch(e){}
+  }
+  // Take a committed record as the new base, keeping any changes this tab made since `snap`.
+  var POSITION_KEYS = { last: 1, phase: 1 };   // where the learner is: changes here alone need no refresh
+  function adopt(rec, snap, why){
+    var local = snap ? diffState(snap, state) : [];
+    var next = applyOps(clone(rec.state), local);
+    if (why && why !== "restored" && diffState(state, next).every(function(op){ return POSITION_KEYS[op.path[0]]; })) why = null;
+    store.base = clone(rec.state); store.rev = rec.rev; store.epoch = rec.epoch;
+    syncInPlace(state, next); fillState();
+    if (local.length) save();
+    if (why && typeof store.onRemote === "function") store.onRemote(why);
+  }
+  function flushOnce(){
+    var snap = clone(state), ops = diffState(store.base, snap), epoch = store.epoch;
+    if (!ops.length) return Promise.resolve();
+    if (window.__STORE_TEST__ && window.__STORE_TEST__.onOps) window.__STORE_TEST__.onOps(ops);
+    return transact(function(rec){
+      if (rec.epoch !== epoch) return false;   // progress was restored in another tab since this tab last looked
+      applyOps(rec.state, ops); rec.rev = (rec.rev || 0) + 1; rec.savedAt = Date.now(); rec.by = TAB_ID; return rec;
+    }).then(function(rec){
+      if (rec.epoch !== epoch){ adopt(rec, null, "restored"); return; }
+      writeMirror(rec); storageWarning(false);
+      adopt(rec, snap); announce(rec);
+    });
+  }
+  function save(){
+    if (store.queued) return;
+    store.queued = true;
+    store.queue = store.queue.then(function(){ return store.ready; }).then(function(){ store.queued = false; return flushOnce(); })
+      .catch(function(){ store.queued = false; storageWarning(true); });
+  }
+  // Replace everything (restore from a backup, undo a restore). Starts a new epoch so stale tabs cannot write over it.
+  function replaceAll(next){
+    store.base = clone(next);
+    store.queue = store.queue.then(function(){ return store.ready; }).then(function(){
+      return transact(function(rec){ rec.state = clone(next); rec.rev = (rec.rev || 0) + 1; rec.epoch = (rec.epoch || 1) + 1; rec.savedAt = Date.now(); rec.by = TAB_ID; return rec; });
+    }).then(function(rec){
+      store.rev = rec.rev; store.epoch = rec.epoch; store.base = clone(rec.state);
+      writeMirror(rec); storageWarning(false); announce(rec, "restored");
+    }).catch(function(){ storageWarning(true); });
+    return store.queue;
+  }
+  function refreshFromStore(why){
+    store.queue = store.queue.then(function(){ return store.ready; }).then(function(){
+      return transact(function(){ return false; });
+    }).then(function(rec){
+      if (rec.epoch === store.epoch && rec.rev === store.rev) return;
+      // Same epoch: keep this tab's unsaved changes on top. New epoch (a restore): drop them.
+      var sameEpoch = rec.epoch === store.epoch;
+      adopt(rec, sameEpoch ? store.base : null, sameEpoch ? why || "saved" : "restored");
+    }).catch(function(){});
+  }
+  store.ready = openDB().then(function(db){
+    store.db = db; store.mode = db ? "idb" : "local";
+    if (!db) return;
+    // One-time move from localStorage, in a single transaction together with a copy of the original text.
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction(IDB_STORE, "readwrite"), os = tx.objectStore(IDB_STORE), g = os.get(REC), rec = null, migrated = false;
+      g.onsuccess = function(){
+        rec = g.result;
+        if (rec && plain(rec.state)) return;
+        var raw = null; try { raw = localStorage.getItem(KEY); } catch(e){}
+        rec = { state: load(), rev: 1, epoch: 1, migratedAt: Date.now(), from: "localStorage", by: TAB_ID };
+        os.put(raw, "legacy-localStorage"); os.put(rec, REC); migrated = true;
+        if (window.__STORE_TEST__ && window.__STORE_TEST__.abortMigration) tx.abort();
+      };
+      tx.oncomplete = function(){ resolve({ rec: rec, migrated: migrated }); };
+      tx.onabort = tx.onerror = function(){ reject(tx.error || new Error("migration interrupted")); };
+    }).then(function(r){
+      store.migrated = r.migrated;
+      var rec = r.rec, snap = store.base;
+      // This tab painted from the mirror. Switch to the saved record, keeping anything changed before IndexedDB opened.
+      if (!same(rec.state, snap) || rec.rev !== store.rev || rec.epoch !== store.epoch){
+        var local = diffState(snap, state);
+        store.base = clone(rec.state); store.rev = rec.rev; store.epoch = rec.epoch;
+        syncInPlace(state, applyOps(clone(rec.state), local)); fillState();
+        if (!same(rec.state, snap) && typeof store.onRemote === "function") store.onRemote("loaded");
+      }
+      try { writeMirror(rec); } catch(e){}
+    }, function(){
+      // Upgrade did not finish: keep using localStorage for this visit. Nothing was removed, so it runs again next time.
+      store.db = null; store.mode = "local"; db.close();
+    });
+  });
+  if (channel) channel.onmessage = function(ev){
+    var d = ev.data || {}; if (d.from === TAB_ID) return;
+    if (d.epoch !== store.epoch || d.rev !== store.rev) refreshFromStore(d.type);
+  };
+  window.addEventListener("storage", function(ev){ if (ev.key === META_KEY && !channel) refreshFromStore("saved"); });
+  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible") refreshFromStore("saved"); });
+  window.__FDE_STORE__ = { store: store, flush: function(){ save(); return store.queue; }, diffState: diffState, applyOps: applyOps };
 
   function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
   function trimBlock(s){ return s.replace(/^\s*\n/, "").replace(/\s+$/, "") + "\n"; }
@@ -40087,6 +40312,33 @@ if sys.platform == "emscripten":
     });
   }
 
+  // Python runs from the copy of Pyodide 0.26.4 shipped in this site's py/ folder (see py/README.txt).
+  // Check the two files every start needs before booting, so a broken deployment gets an honest message.
+  var PY_REQUIRED = ["pyodide.js", "pyodide-lock.json"];
+  var pyAssetsChecked = null;
+  function checkPyAssets(){
+    if (pyAssetsChecked) return pyAssetsChecked;
+    pyAssetsChecked = Promise.all(PY_REQUIRED.map(function(name){
+      return fetch(PY_BASE + name, { cache: "no-cache" }).then(function(r){
+        var type = r.headers.get("content-type") || "";
+        if (!r.ok || /text\/html/.test(type)){
+          var e = new Error("This copy of the site is missing its Python runtime: py/" + name + " returned " + (r.ok ? "a web page instead of the file" : "HTTP " + r.status) +
+            ". This is a problem with how the site was deployed, not with your internet connection or your code. Your code is still saved here.");
+          e.deploy = true; throw e;
+        }
+        return r.body && r.body.cancel ? r.body.cancel().catch(function(){}) : null;
+      }, function(){
+        var e = new Error("This site's Python files could not be downloaded. Check your internet connection"); throw e;
+      });
+    })).catch(function(err){ pyAssetsChecked = null; throw err; });
+    return pyAssetsChecked;
+  }
+  function pyStartMessage(err){
+    var m = String(err && err.message || err).replace(/[.!?\s]+$/, "");
+    if (err && err.deploy) return "Python could not start. " + m + ".";
+    return "Could not start Python: " + m + ". Check your internet connection and press Run again.";
+  }
+
   var WORKER_SRC = [
     "self.postMessage({ type: 'boot' });",
     "var py = null;",
@@ -40116,7 +40368,8 @@ if sys.platform == "emscripten":
 
   var runner = {
     worker: null, workerURL: null, ready: null, pending: null, prep: null,
-    mode: "worker", mainPy: null, mainReady: null, busy: false, serial: 0, onStatus: null,
+    // window.__PY_MODE__ is a test switch: "main" starts in compatibility mode, "worker" disables the fallback.
+    mode: window.__PY_MODE__ === "main" ? "main" : "worker", mainPy: null, mainReady: null, busy: false, serial: 0, onStatus: null,
     status: function(stage, message){
       document.documentElement.dataset.pyStage = stage;
       if (this.onStatus) this.onStatus(message);
@@ -40130,6 +40383,11 @@ if sys.platform == "emscripten":
       if (this.workerURL){ URL.revokeObjectURL(this.workerURL); this.workerURL = null; }
     },
     start: function(){
+      var self = this;
+      self.status("connect", "Checking this site's Python files…");
+      return checkPyAssets().then(function(){ return self.startRuntime(); });
+    },
+    startRuntime: function(){
       var self = this;
       if (self.mode === "main") return self.startMain();
       self.status("connect", "Connecting to Python…");
@@ -40178,6 +40436,7 @@ if sys.platform == "emscripten":
         } catch(err){ finish(err); }
       });
       return startup.catch(function(workerError){
+        if (window.__PY_MODE__ === "worker"){ self.discardWorker(); throw workerError; }
         self.discardWorker(); self.mode = "main";
         document.documentElement.dataset.pyMode = "main";
         return self.startMain().catch(function(mainError){
@@ -40278,7 +40537,7 @@ if sys.platform == "emscripten":
         return self.prepare(source, JSON.stringify(pieces), skip);
       }).then(function(libErr){
         if (libErr && !/SyntaxError|IndentationError|TokenError/.test(String(libErr))) return {
-          ok: false, libError: true, error: "The Python libraries this code needs could not be loaded (" + String(libErr).slice(0, 160) + "). Check your internet connection and press Run again.", tests: [], stdout: ""
+          ok: false, libError: true, error: "The Python libraries this code needs could not be loaded from this site (" + String(libErr).slice(0, 160) + "). Press Run again. If it keeps failing, this copy of the site is missing files in its py/ folder.", tests: [], stdout: ""
         };
         self.status("running", "Running…");
         if (self.mode === "main"){
@@ -40517,7 +40776,7 @@ if sys.platform == "emscripten":
           save(); paintNav(currentRoute().id);
         }
         renderResult(host, res, true);
-      }, function(err){ st.textContent = "Could not start Python: " + String(err.message || err).replace(/[.!?\s]+$/, "") + ". Check your internet connection and press Run again."; }).then(done);
+      }, function(err){ st.textContent = pyStartMessage(err); }).then(done);
     }
     function doRun(){ if (runBtn.disabled) return; runBtn.disabled = true; run(ta.value, status, result, true, function(){ runBtn.disabled = false; }); }
     var solRun = box.querySelector('[data-pq="sol-run"]');
@@ -40750,7 +41009,7 @@ if sys.platform == "emscripten":
             logEvent("runs"); save();
             renderResult(result, res, false);
           }, function(err){
-            status.textContent = /still in progress/.test(err.message) ? err.message : "Could not start Python: " + String(err.message || err).replace(/[.!?\s]+$/, "") + ". Check your internet connection and press Run again.";
+            status.textContent = /still in progress/.test(err.message) ? err.message : pyStartMessage(err);
           }).then(function(){ runBtn.disabled = false; });
         }
         wireEditor(ta, doRun, function(){ state.drafts[dkey] = ta.value; save(); if (snippetHook) snippetHook(); });
@@ -40979,7 +41238,7 @@ if sys.platform == "emscripten":
       (js ? jsRunner : runner).runSnippet(w.spec, ta.value, function(msg){ status.textContent = msg; started = Date.now(); }).then(function(res){
         status.textContent = "Finished in " + ((Date.now() - started) / 1000).toFixed(1) + " s."; renderResult(result, res, false);
       }, function(err){
-        status.textContent = /still in progress/.test(err.message) ? err.message : "Could not start Python: " + String(err.message || err).replace(/[.!?\s]+$/, "") + ". Check your internet connection and press Run again.";
+        status.textContent = /still in progress/.test(err.message) ? err.message : pyStartMessage(err);
       }).then(function(){ btn.disabled = false; });
     }
     wireEditor(ta, doRun, function(){ state.drafts[dkey] = ta.value; save(); });
@@ -41078,7 +41337,7 @@ if sys.platform == "emscripten":
       statusEl.textContent = js || runner.ready ? "Running…" : "Loading Python (first run only, about 10 MB)…";
       (js ? jsRunner : runner).run(ex, code, function(msg){ statusEl.textContent = msg; }).then(function(res){
         statusEl.textContent = label; renderResult(resultEl, res, true);
-      }, function(err){ statusEl.textContent = "Could not start Python: " + String(err.message || err).replace(/[.!?\s]+$/, "") + ". Check your internet connection and press Run again."; }).then(function(){ btn.disabled = false; });
+      }, function(err){ statusEl.textContent = pyStartMessage(err); }).then(function(){ btn.disabled = false; });
     }
     if (givenTa){
       var gRun = view.querySelector('[data-act="given-run"]'), gSt = view.querySelector("[data-given-status]"), gRes = view.querySelector("[data-given-result]");
@@ -41106,7 +41365,7 @@ if sys.platform == "emscripten":
         refreshPublish(res);
         paintNav(currentRoute().id);
       }, function(err){
-        status.textContent = "Could not start Python: " + String(err.message || err).replace(/[.!?\s]+$/, "") + ". Check your internet connection and press Run again.";
+        status.textContent = pyStartMessage(err);
       }).then(function(){ busy = false; runBtn.disabled = false; });
     }
     wireEditor(ta, doRun, function(){ state.drafts[ex.id] = ta.value; save(); });
@@ -41137,7 +41396,7 @@ if sys.platform == "emscripten":
       // Runs the model solution only to show its output. It does not mark the exercise as passed.
       (js ? jsRunner : runner).run(ex, solTa.value, function(msg){ solStatus.textContent = msg; }).then(function(res){
         solStatus.textContent = "This is the solution's output. It does not count as your pass."; renderResult(solResult, res, true);
-      }, function(err){ solStatus.textContent = "Could not start Python: " + String(err.message || err).replace(/[.!?\s]+$/, "") + ". Check your internet connection and press Run again."; }).then(function(){ solRun.disabled = false; });
+      }, function(err){ solStatus.textContent = pyStartMessage(err); }).then(function(){ solRun.disabled = false; });
     });
     view.querySelector('[data-act="reset"]').addEventListener("click", function(){
       if (!confirm("Reset to the starting code? Your current code will be lost.")) return;
@@ -41168,7 +41427,7 @@ if sys.platform == "emscripten":
       status.textContent = runner.ready ? "Running…" : "Loading Python (first run only, about 10 MB)…";
       var job = lang === "sql" ? runner.runSnippet(PLAY_SQL, ta.value, function(msg){ status.textContent = msg; }) : runner.run(null, ta.value, function(msg){ status.textContent = msg; });
       job.then(function(res){ status.textContent = ""; renderResult(result, res, false); },
-        function(err){ status.textContent = /still in progress/.test(err.message) ? err.message : "Could not start Python: " + String(err.message || err).replace(/[.!?\s]+$/, "") + ". Check your internet connection and press Run again."; }).then(function(){ btn.disabled = false; });
+        function(err){ status.textContent = /still in progress/.test(err.message) ? err.message : pyStartMessage(err); }).then(function(){ btn.disabled = false; });
     }
     wireEditor(ta, doRun, function(){ state.drafts[dkey] = ta.value; save(); });
     btn.addEventListener("click", doRun);
@@ -41588,6 +41847,25 @@ if sys.platform == "emscripten":
         '<button class="btn" type="button" data-act="gh-template" hidden>Go back to the automatic README</button>' +
         '<button class="btn" type="button" data-act="gh-zip">Download for GitHub (.zip)</button></div>' +
       '<p class="status" id="gh-status" role="status" aria-live="polite"></p>' +
+      '<section class="gh-review" data-gh-review hidden tabindex="-1" aria-labelledby="gh-review-h">' +
+        '<h3 class="gh-review-h" id="gh-review-h">Review before publishing</h3>' +
+        '<p class="gh-rv-note">Nothing has been written to GitHub yet. Check where these files will go, then press <b>Publish now</b>.</p>' +
+        '<div class="gh-rv-fields">' +
+          '<label class="field"><span>Repository</span><select id="gh-rv-repo" data-net-only></select><input id="gh-rv-repo-text" data-claude-only autocomplete="off" spellcheck="false" autocapitalize="off"></label>' +
+          '<label class="field" data-net-only><span>Branch</span><input id="gh-rv-branch" autocomplete="off" spellcheck="false" autocapitalize="off"></label>' +
+          '<label class="field"><span>Project folder</span><input id="gh-rv-folder" autocomplete="off" spellcheck="false" autocapitalize="off"></label>' +
+          '<div class="btn-row"><button class="btn" type="button" data-act="gh-rv-check" data-net-only>Check again</button>' +
+            '<button class="btn" type="button" data-act="gh-rv-testbranch" data-net-only>Use a test branch</button></div>' +
+          '<p class="gh-rv-help" data-net-only>For a safe test, <a href="https://github.com/new" target="_blank" rel="noopener">create a private repository</a>, <span data-gh-rv-install>give the publishing app access to it</span>, then press Check again and pick it above.</p>' +
+        '</div>' +
+        '<dl class="gh-rv-facts" data-gh-rv-facts></dl>' +
+        '<div class="gh-rv-warn" data-gh-rv-warn></div>' +
+        '<h4 class="gh-rv-sub">Files</h4><ul class="gh-rv-files" data-gh-rv-files></ul>' +
+        '<label class="gh-rv-ack" data-gh-rv-ack hidden><input type="checkbox" id="gh-rv-ack"> <span data-gh-rv-ack-text></span></label>' +
+        '<div class="btn-row"><button class="btn primary" type="button" data-act="gh-confirm" disabled>Publish now</button>' +
+          '<button class="btn" type="button" data-act="gh-cancel">Cancel</button></div>' +
+        '<p class="status" data-gh-rv-status role="status" aria-live="polite"></p>' +
+      '</section>' +
       '</div>';
   }
 
@@ -41679,8 +41957,14 @@ if sys.platform == "emscripten":
       placeCard();
       if (NET.connected && NET.user && NET.user.login.toLowerCase() !== GH_OWNER.toLowerCase() && repoIn.value.trim() === GH_DEFAULT_REPO && NET.repos.length){ repoIn.value = NET.repos[0].full_name; persist(); paintDest(); }
       refresh();
-      var j = NET.just; NET.just = "";
-      if (j === "connected" && NET.connected) st.textContent = "Signed in to GitHub as " + NET.user.login + ". Press Publish to GitHub to finish.";
+      var j = NET.just, flag = null; NET.just = "";
+      try { flag = sessionStorage.getItem("fde-gh-review"); } catch(e){}
+      if (flag === ex.id && (j === "connected" || NET.connected)){
+        try { sessionStorage.removeItem("fde-gh-review"); } catch(e){}
+        if (NET.connected){ setTimeout(function(){ if (document.body.contains(card)) openReview("Signed in to GitHub as " + NET.user.login + "."); }, 0); return; }
+      }
+      if (j === "error"){ try { sessionStorage.removeItem("fde-gh-review"); } catch(e){} }
+      if (j === "connected" && NET.connected) st.textContent = "Signed in to GitHub as " + NET.user.login + ". Press Publish to GitHub to review where it goes.";
       else if (j === "installed") st.textContent = "The publishing app is installed. Press Publish to GitHub.";
       else if (j === "error") st.textContent = "GitHub sign-in did not finish. Press Publish to GitHub to try again.";
     };
@@ -41726,74 +42010,185 @@ if sys.platform == "emscripten":
       offerFile(base + ".zip", makeZip(named)).then(function(){ st.textContent = "Saved " + base + ".zip. On github.com you can open the repository, choose Add file, then Upload files."; },
         function(e){ st.textContent = downloadErrorText(e); });
     });
-    publishBtn.addEventListener("click", function(){
-      regen();
-      var repo = repoIn.value.trim(), folder = folderIn.value.trim(), readme = readmeIn.value, c = checks();
-      if (!ex.pub && !ta.value.trim()){ st.textContent = "Write some code first."; ta.focus(); return; }
-      if (!validRepo(repo)){ st.textContent = NET.on ? "Write the repository as owner/name, for example " + GH_DEFAULT_REPO + "." : "Write the repository as " + GH_OWNER + "/name, for one of your own repositories."; card.querySelector(".gh-where").open = true; repoIn.focus(); return; }
-      if (!validFolder(folder)){ st.textContent = "Use a folder like exercises/phase-1/my-exercise: letters, numbers, - and _, separated by /."; card.querySelector(".gh-where").open = true; folderIn.focus(); return; }
-      if (!readme.trim()){ st.textContent = "The README is empty. Press Go back to the automatic README, or write one."; readmeIn.focus(); return; }
+    // Publishing always goes through the review panel: first click opens it, only "Publish now" writes.
+    var rv = card.querySelector("[data-gh-review]"), rvRepo = rv.querySelector("#gh-rv-repo"), rvRepoText = rv.querySelector("#gh-rv-repo-text");
+    var rvBranch = rv.querySelector("#gh-rv-branch"), rvFolder = rv.querySelector("#gh-rv-folder"), rvAck = rv.querySelector("#gh-rv-ack");
+    var rvConfirm = rv.querySelector('[data-act="gh-confirm"]'), rvStatus = rv.querySelector("[data-gh-rv-status]");
+    var review = null, reviewSerial = 0, REVIEW_FLAG = "fde-gh-review";
+    function currentRepo(){ return (NET.on ? rvRepo.value : rvRepoText.value).trim(); }
+    function buildRequest(){
+      var repo = currentRepo(), folder = rvFolder.value.trim(), readme = readmeIn.value;
       var files = publishFiles(ex, ta.value, readme);
-      var body = { kind: "ai-study-publish", status: "queued", repo: repo, folder: folder, title: itemTitle(ex),
-        message: "Publish " + itemTitle(ex) + (ex.portfolio ? " (portfolio project)" : ex.phase ? " (Phase " + PHASE_BY_ID[ex.phase].n + ")" : ""), files: files, source: ex.id,
-        section: sectionOf(ex), summary: summaryOf(ex).slice(0, 240), createdAt: Date.now() };
-      if (bytesOf(JSON.stringify(body)) > (NET.on ? 1900000 : GH_MAX_BYTES)){ st.textContent = "These files are too large to publish from here. Download the .zip and upload it on github.com instead."; return; }
-      if (NET.on && !NET.connected){ st.textContent = "Opening GitHub to sign in…"; location.assign("/api/github/authorize?return=" + encodeURIComponent(location.hash)); return; }
-      if (NET.on && !NET.repos.some(function(r){ return r.full_name.toLowerCase() === repo.toLowerCase(); })){
-        st.innerHTML = "The publishing app can't write to <b>" + esc(repo) + "</b> yet. " + (NET.installUrl ? '<a href="' + esc(NET.installUrl) + '" target="_blank" rel="noopener">Give it access to that repository</a>, then press Publish again.' : "Install the app on that repository, then press Publish again.") +
-          (NET.repos.length ? " It can write to: " + NET.repos.map(function(r){ return esc(r.full_name); }).join(", ") + "." : "");
-        card.querySelector(".gh-where").open = true; return;
-      }
-      var warn = ex.pub || c.passed === c.total ? "" : "\n\nNot every check passes yet, so the README calls it a work in progress.";
-      if (!NET.on && !confirm("Publish " + Object.keys(files).length + " files to github.com/" + repo + " in the folder " + folder + "? If the repository is public, anyone can see them." + warn)) return;
+      return { repo: repo, folder: folder, branch: NET.on ? rvBranch.value.trim() : "", files: files,
+        message: "Publish " + itemTitle(ex) + (ex.portfolio ? " (portfolio project)" : ex.phase ? " (Phase " + PHASE_BY_ID[ex.phase].n + ")" : "") };
+    }
+    function paintConfirm(){
+      var needAck = !rv.querySelector("[data-gh-rv-ack]").hidden;
+      rvConfirm.disabled = !review || review.noop || (needAck && !rvAck.checked);
+    }
+    function invalidate(msg){ review = null; paintConfirm(); if (msg) rvStatus.textContent = msg; }
+    function fact(k, v){ return "<dt>" + esc(k) + "</dt><dd>" + v + "</dd>"; }
+    function paintReview(p, reqd){
+      var facts = rv.querySelector("[data-gh-rv-facts]"), warn = rv.querySelector("[data-gh-rv-warn]"), list = rv.querySelector("[data-gh-rv-files]");
+      var ack = rv.querySelector("[data-gh-rv-ack]"), ackText = rv.querySelector("[data-gh-rv-ack-text]"), w = [], needAck = false;
       if (NET.on){
-        publishBtn.disabled = true; st.textContent = "Publishing to GitHub…";
-        fetch("/api/github/publish", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-FDE-CSRF": NET.csrf || "" },
-          body: JSON.stringify({ repository: repo, folder: folder, files: files, message: body.message }) }).then(function(r){
-          return r.json().catch(function(){ return {}; }).then(function(d){ return { status: r.status, d: d }; });
-        }).then(function(x){
-          var it = item(); it.repo = repo; it.folder = folder; it.sentAt = Date.now(); it.requestId = "";
-          if (x.status === 200 && x.d.ok){
-            it.status = "published"; it.url = x.d.folderUrl || ""; it.repoUrl = x.d.repoUrl || ""; it.commitUrl = x.d.commitUrl || ""; it.doneAt = Date.now(); it.error = ""; save(); refresh();
-            st.textContent = x.d.unchanged ? "GitHub already has exactly these files, so nothing new was committed." : "Published " + x.d.files + " files to GitHub in one commit.";
-          } else if (x.status === 401){
-            NET.connected = false; NET.csrf = null; refresh(); st.textContent = "Your GitHub sign-in has expired. Press Publish to GitHub to sign in again.";
-          } else {
-            it.status = "failed"; it.error = String(x.d.error || "GitHub returned an error (" + x.status + ").").slice(0, 300); save(); refresh();
-            st.textContent = "Not published. " + it.error;
-          }
-        }, function(){ st.textContent = "Could not reach the publishing service. Check your connection and try again. Nothing was published."; })
-        .then(function(){ publishBtn.disabled = false; });
+        var replaced = p.files.filter(function(f){ return f.action === "replace"; }).length, same = p.files.filter(function(f){ return f.action === "unchanged"; }).length;
+        facts.innerHTML = fact("GitHub account", "<b>" + esc(p.account) + "</b>") +
+          fact("Repository", '<a href="' + esc(p.repoUrl) + '" target="_blank" rel="noopener">' + esc(p.repository) + '</a> <span class="gh-badge ' + (p.private ? "priv" : "pub") + '">' + esc(p.private ? "Private" : "Public") + "</span>") +
+          fact("Branch", "<code>" + esc(p.branch) + "</code>" + (p.branchExists ? (p.branch === p.defaultBranch ? " (the default branch)" : "") : p.empty ? " (the repository is empty; this is its first commit)" : " (new: it will be created from <code>" + esc(p.defaultBranch) + "</code>)")) +
+          fact("Project folder", "<code>" + esc(p.folder) + "/</code>" + (p.folderExists ? " (already exists)" : " (new)"));
+        if (!p.private) { w.push("<b>" + esc(p.repository) + "</b> is public. Anyone on the internet can see these files, and the commit stays in its history even if you delete it later."); needAck = true; }
+        if (!p.private && p.branch === p.defaultBranch) w.push("This writes straight to <code>" + esc(p.branch) + "</code>, the branch people see first. For a test, press <b>Use a test branch</b> or pick a private repository.");
+        if (p.repository.toLowerCase() === GH_DEFAULT_REPO.toLowerCase()){ w.push("This is your existing portfolio repository."); needAck = true; }
+        if (p.folderExists){ w.push("This updates a project that is already there: " + replaced + (replaced === 1 ? " file is" : " files are") + " replaced, " + same + " already " + (same === 1 ? "matches" : "match") + (p.others.length ? ", and " + p.others.length + " other " + (p.others.length === 1 ? "file" : "files") + " in the folder stay as they are" : "") + "."); if (replaced) needAck = true; }
+        if (p.treeTruncated) w.push("GitHub returned only part of this repository's file list, so some files marked Add may already exist.");
+        list.innerHTML = p.files.map(function(f){ var label = f.action === "add" ? "Add" : f.action === "replace" ? "Replace" : "No change";
+          return '<li><span class="gh-act ' + f.action + '">' + label + "</span> <code>" + esc(f.path) + "</code></li>"; }).join("") +
+          p.others.slice(0, 8).map(function(x){ return '<li><span class="gh-act keep">Keep</span> <code>' + esc(x) + "</code></li>"; }).join("") +
+          (p.others.length > 8 ? "<li>and " + (p.others.length - 8) + " more files that stay as they are</li>" : "");
+        review = { token: p.token, req: reqd, json: JSON.stringify(reqd.files), noop: p.changes === 0 };
+        if (review.noop) w.push("GitHub already has exactly these files there, so publishing would not change anything.");
+        ackText.textContent = "I have checked the account, repository, branch and folder above and want to publish there.";
+      } else {
+        facts.innerHTML = fact("GitHub account", "Your GitHub account, through Claude") + fact("Repository", "<code>" + esc(reqd.repo) + "</code>") +
+          fact("Branch", "The repository's default branch") + fact("Project folder", "<code>" + esc(reqd.folder) + "/</code>");
+        w.push("This page cannot see whether the repository is public or whether the folder already exists. If it is public, anyone can see the files. Files with the same names in that folder are replaced.");
+        list.innerHTML = Object.keys(reqd.files).map(function(n){ return '<li><span class="gh-act add">Add or replace</span> <code>' + esc(reqd.folder + "/" + n) + "</code></li>"; }).join("");
+        review = { token: null, req: reqd, json: JSON.stringify(reqd.files), noop: false }; needAck = true;
+        ackText.textContent = "I have checked the repository and folder above and want to publish there.";
+      }
+      var c = checks(); if (!ex.pub && c.passed !== c.total) w.push("Not every check passes yet, so the README calls it a work in progress.");
+      warn.innerHTML = w.length ? "<ul>" + w.map(function(x){ return "<li>" + x + "</li>"; }).join("") + "</ul>" : "";
+      ack.hidden = !needAck; rvAck.checked = false; paintConfirm();
+      rvStatus.textContent = review.noop ? "Nothing to publish." : "Ready. Press Publish now to write " + (NET.on ? p.changes + (p.changes === 1 ? " file" : " files") : Object.keys(reqd.files).length + " files") + ", or Cancel.";
+    }
+    function runPreview(note){
+      var reqd = buildRequest();
+      if (!validRepo(reqd.repo)){ invalidate("Write the repository as owner/name."); return; }
+      if (!validFolder(reqd.folder)){ invalidate("Use a folder like exercises/phase-1/my-exercise: letters, numbers, - and _, separated by /."); return; }
+      if (NET.on && reqd.branch && !/^[A-Za-z0-9._\/-]{1,100}$/.test(reqd.branch)){ invalidate("Use a branch name with letters, numbers, ., _, - and /."); return; }
+      repoIn.value = reqd.repo; folderIn.value = reqd.folder; item().branch = reqd.branch; persist(); paintDest();
+      if (!NET.on){ paintReview(null, reqd); if (note) rvStatus.textContent = note + " " + rvStatus.textContent; return; }
+      var my = ++reviewSerial; invalidate("Checking " + reqd.repo + " on GitHub…");
+      rv.querySelector("[data-gh-rv-facts]").innerHTML = ""; rv.querySelector("[data-gh-rv-files]").innerHTML = ""; rv.querySelector("[data-gh-rv-warn]").innerHTML = "";
+      if (!NET.repos.some(function(r){ return r.full_name.toLowerCase() === reqd.repo.toLowerCase(); })){
+        rvStatus.innerHTML = "The publishing app can't write to <b>" + esc(reqd.repo) + "</b>. " + (NET.installUrl ? '<a href="' + esc(NET.installUrl) + '" target="_blank" rel="noopener">Give it access to that repository</a>, then press Check again.' : "Install the app on that repository, then press Check again.");
         return;
       }
-      publishBtn.disabled = true; st.textContent = "Connecting…";
-      Promise.all([claudeUse("db"), claudeUse("mcp")]).then(function(cc){
-        var db = cc[0], mcp = cc[1];
-        if (!db || !mcp){ st.textContent = "Publishing works only when this site is open on claude.ai. You can download the .zip and upload it on github.com instead."; return; }
-        var id = "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8), ref = db.doc("publish/" + id), stored = false;
-        st.textContent = "Saving your files…";
-        return ref.set(body).then(function(){
-          stored = true; st.textContent = "Asking Claude to publish…";
-          return mcp.callTool("Claude Code Remote", "fire_trigger", { trigger_id: GH_TRIGGER });
-        }).then(function(){
-          var it = item(); it.status = "queued"; it.requestId = id; it.sentAt = Date.now(); it.repo = repo; it.folder = folder; it.url = ""; it.error = "";
-          save(); refresh(); watch(id);
-          st.textContent = "Sent. Claude is publishing it now, which usually takes a few minutes. You can leave this page.";
-        }, function(e){
-          var code = e && e.code;
-          var maybeRan = code === "server_unavailable" || code === "upstream_error";
-          if (stored && !maybeRan) ref.delete().catch(function(){});
-          if (!stored) st.textContent = "Your files could not be saved for publishing (" + (code || "error") + "). Nothing was sent.";
-          else if (maybeRan){
-            var it = item(); it.status = "queued"; it.requestId = id; it.sentAt = Date.now(); it.repo = repo; it.folder = folder; save(); refresh(); watch(id);
-            st.textContent = "Claude may or may not have started. Wait a few minutes and check this page before you press Publish again.";
-          }
-          else if (code === "approval_required" || code === "not_in_manifest") st.textContent = "Publishing needs your permission for Claude Code Remote. Press Publish again and choose Allow.";
-          else if (code === "server_not_connected" || code === "needs_reauth") st.textContent = "Claude Code Remote is not connected for your account. Check claude.ai Settings, Connectors, then try again.";
-          else st.textContent = "Claude could not be started (" + (code || "error") + "). Nothing was published.";
-        });
-      }).then(function(){ publishBtn.disabled = false; }, function(){ publishBtn.disabled = false; st.textContent = "Something went wrong. Nothing was published."; });
+      fetch("/api/github/preview", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-FDE-CSRF": NET.csrf || "" },
+        body: JSON.stringify({ repository: reqd.repo, folder: reqd.folder, branch: reqd.branch, files: reqd.files }) }).then(function(r){
+        return r.json().catch(function(){ return {}; }).then(function(d){ return { status: r.status, d: d }; });
+      }).then(function(x){
+        if (my !== reviewSerial || rv.hidden) return;
+        if (x.status === 200 && x.d.ok){ paintReview(x.d, reqd); if (note) rvStatus.textContent = note + " " + rvStatus.textContent; }
+        else if (x.status === 401){ NET.connected = false; NET.csrf = null; refresh(); invalidate("Your GitHub sign-in has expired. Press Publish to GitHub to sign in again. Nothing was published."); }
+        else invalidate(String(x.d.error || "GitHub returned an error (" + x.status + ").").slice(0, 300) + " Nothing was published.");
+      }, function(){ if (my === reviewSerial) invalidate("Could not reach the publishing service to check the destination. Nothing was published."); });
+    }
+    function openReview(note){
+      rv.hidden = false; st.textContent = "";
+      var cur = repoIn.value.trim(), it = item();
+      if (NET.on){
+        var opts = NET.repos.slice(), known = opts.some(function(r){ return r.full_name.toLowerCase() === cur.toLowerCase(); });
+        if (cur && !known) opts.unshift({ full_name: cur, missing: true });
+        rvRepo.innerHTML = opts.map(function(r){ return '<option value="' + esc(r.full_name) + '">' + esc(r.full_name) + (r.missing ? " (app has no access)" : r.private ? " · private" : " · public") + "</option>"; }).join("");
+        rvRepo.value = known || !opts.length ? (opts.filter(function(r){ return r.full_name.toLowerCase() === cur.toLowerCase(); })[0] || opts[0] || {}).full_name || "" : cur;
+        rvBranch.value = it.branch || "";
+        rvBranch.placeholder = "default branch";
+        var inst = rv.querySelector("[data-gh-rv-install]");
+        inst.innerHTML = NET.installUrl ? '<a href="' + esc(NET.installUrl) + '" target="_blank" rel="noopener">give the publishing app access to it</a>' : "give the publishing app access to it";
+      } else rvRepoText.value = cur;
+      rvFolder.value = folderIn.value.trim() || defaultFolder(ex);
+      rv.querySelectorAll("[data-net-only]").forEach(function(el){ el.hidden = !NET.on; });
+      rv.querySelectorAll("[data-claude-only]").forEach(function(el){ el.hidden = NET.on; });
+      runPreview(note);
+      rv.focus();
+    }
+    function closeReview(msg){ rv.hidden = true; review = null; reviewSerial++; if (msg) st.textContent = msg; publishBtn.focus(); }
+    rvRepo.addEventListener("change", function(){ runPreview(); });
+    [rvBranch, rvFolder, rvRepoText].forEach(function(el){ el.addEventListener("input", function(){ invalidate(NET.on ? "Press Check again to review this destination." : ""); if (!NET.on) runPreview(); }); });
+    rvAck.addEventListener("change", paintConfirm);
+    rv.querySelector('[data-act="gh-rv-check"]').addEventListener("click", function(){ runPreview(); });
+    rv.querySelector('[data-act="gh-rv-testbranch"]').addEventListener("click", function(){ rvBranch.value = "fde-test-" + dayKey(); runPreview(); });
+    rv.querySelector('[data-act="gh-cancel"]').addEventListener("click", function(){ closeReview("Cancelled. Nothing was published."); });
+    rv.addEventListener("keydown", function(e){ if (e.key === "Escape") closeReview("Cancelled. Nothing was published."); });
+    publishBtn.addEventListener("click", function(){
+      regen();
+      if (!ex.pub && !ta.value.trim()){ st.textContent = "Write some code first."; ta.focus(); return; }
+      if (!readmeIn.value.trim()){ st.textContent = "The README is empty. Press Go back to the automatic README, or write one."; readmeIn.focus(); return; }
+      var body = { files: publishFiles(ex, ta.value, readmeIn.value) };
+      if (bytesOf(JSON.stringify(body)) > (NET.on ? 1900000 : GH_MAX_BYTES)){ st.textContent = "These files are too large to publish from here. Download the .zip and upload it on github.com instead."; return; }
+      if (NET.on && !NET.connected){
+        try { sessionStorage.setItem(REVIEW_FLAG, ex.id); } catch(e){}
+        st.textContent = "Opening GitHub to sign in… You will review the destination before anything is published.";
+        location.assign("/api/github/authorize?return=" + encodeURIComponent(location.hash)); return;
+      }
+      openReview();
     });
+    rvConfirm.addEventListener("click", function(){
+      if (!review || rvConfirm.disabled) return;
+      var now = buildRequest();
+      if (JSON.stringify(now.files) !== review.json || now.repo !== review.req.repo || now.folder !== review.req.folder || now.branch !== review.req.branch){
+        runPreview("Your files or the destination changed since this review, so it was checked again."); return;
+      }
+      var reqd = review.req, repo = reqd.repo, folder = reqd.folder, files = reqd.files;
+      rvConfirm.disabled = true;
+      if (NET.on){
+        rvStatus.textContent = "Publishing to GitHub…";
+        fetch("/api/github/publish", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-FDE-CSRF": NET.csrf || "" },
+          body: JSON.stringify({ repository: repo, folder: folder, branch: reqd.branch, files: files, message: reqd.message, review: review.token, confirmed: true }) }).then(function(r){
+          return r.json().catch(function(){ return {}; }).then(function(d){ return { status: r.status, d: d }; });
+        }).then(function(x){
+          var it = item();
+          if (x.status === 200 && x.d.ok){
+            it.repo = x.d.repository || repo; it.folder = folder; it.branch = x.d.branch || reqd.branch; it.sentAt = Date.now(); it.requestId = "";
+            it.status = "published"; it.url = x.d.folderUrl || ""; it.repoUrl = x.d.repoUrl || ""; it.commitUrl = x.d.commitUrl || ""; it.sha = x.d.sha || ""; it.doneAt = Date.now(); it.error = ""; save(); refresh();
+            closeReview(x.d.unchanged ? "GitHub already has exactly these files, so nothing new was committed." : "Published " + x.d.files + " files to " + it.repo + " (" + it.branch + ") in one commit.");
+          } else if (x.status === 401){
+            NET.connected = false; NET.csrf = null; refresh(); invalidate("Your GitHub sign-in has expired. Press Publish to GitHub to sign in again. Nothing was published.");
+          } else if (x.d && x.d.changed){
+            runPreview(String(x.d.error || "Something changed since the review.") + " Nothing was published.");
+          } else {
+            it.status = "failed"; it.error = String(x.d.error || "GitHub returned an error (" + x.status + ").").slice(0, 300); save(); refresh();
+            invalidate("Not published. " + it.error);
+          }
+        }, function(){ invalidate("Could not reach the publishing service. Check your connection and try again. Nothing was published."); });
+        return;
+      }
+      sendViaClaude(repo, folder, files, reqd.message);
+      closeReview("");
+    });
+    function sendViaClaude(repo, folder, files, message){
+        var body = { kind: "ai-study-publish", status: "queued", repo: repo, folder: folder, title: itemTitle(ex), message: message, files: files, source: ex.id,
+          section: sectionOf(ex), summary: summaryOf(ex).slice(0, 240), createdAt: Date.now() };
+        publishBtn.disabled = true; st.textContent = "Connecting…";
+        Promise.all([claudeUse("db"), claudeUse("mcp")]).then(function(cc){
+          var db = cc[0], mcp = cc[1];
+          if (!db || !mcp){ st.textContent = "Publishing works only when this site is open on claude.ai. You can download the .zip and upload it on github.com instead."; return; }
+          var id = "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8), ref = db.doc("publish/" + id), stored = false;
+          st.textContent = "Saving your files…";
+          return ref.set(body).then(function(){
+            stored = true; st.textContent = "Asking Claude to publish…";
+            return mcp.callTool("Claude Code Remote", "fire_trigger", { trigger_id: GH_TRIGGER });
+          }).then(function(){
+            var it = item(); it.status = "queued"; it.requestId = id; it.sentAt = Date.now(); it.repo = repo; it.folder = folder; it.url = ""; it.error = "";
+            save(); refresh(); watch(id);
+            st.textContent = "Sent. Claude is publishing it now, which usually takes a few minutes. You can leave this page.";
+          }, function(e){
+            var code = e && e.code;
+            var maybeRan = code === "server_unavailable" || code === "upstream_error";
+            if (stored && !maybeRan) ref.delete().catch(function(){});
+            if (!stored) st.textContent = "Your files could not be saved for publishing (" + (code || "error") + "). Nothing was sent.";
+            else if (maybeRan){
+              var it = item(); it.status = "queued"; it.requestId = id; it.sentAt = Date.now(); it.repo = repo; it.folder = folder; save(); refresh(); watch(id);
+              st.textContent = "Claude may or may not have started. Wait a few minutes and check this page before you press Publish again.";
+            }
+            else if (code === "approval_required" || code === "not_in_manifest") st.textContent = "Publishing needs your permission for Claude Code Remote. Press Publish again and choose Allow.";
+            else if (code === "server_not_connected" || code === "needs_reauth") st.textContent = "Claude Code Remote is not connected for your account. Check claude.ai Settings, Connectors, then try again.";
+            else st.textContent = "Claude could not be started (" + (code || "error") + "). Nothing was published.";
+          });
+        }).then(function(){ publishBtn.disabled = false; }, function(){ publishBtn.disabled = false; st.textContent = "Something went wrong. Nothing was published."; });
+    }
     paintDest(); paintMode(); refresh();
     var it0 = g.items[ex.id];
     if (it0 && it0.status === "queued" && it0.requestId) watch(it0.requestId);
@@ -42309,7 +42704,7 @@ if sys.platform == "emscripten":
     return { state: st, exportedAt: obj && obj.exportedAt };
   }
   function replaceState(next){
-    state = JSON.parse(JSON.stringify(next)); fillState(); save();
+    syncInPlace(state, JSON.parse(JSON.stringify(next))); fillState(); replaceAll(state);
     if (state.theme) rootEl.setAttribute("data-theme", state.theme); else rootEl.removeAttribute("data-theme");
     paintThemeBtns(); navPhase = null; SEARCH_INDEX = null;
   }
@@ -42385,8 +42780,11 @@ if sys.platform == "emscripten":
       if (!t.parentElement.classList.contains("table-wrap")){ var w = document.createElement("div"); w.className = "table-wrap"; t.parentNode.insertBefore(w, t); w.appendChild(t); }
     });
     paintPager(r);
-    if (ph){ state.phase = ph.id; }
-    if (r.id !== "home" && !r.tool){ state.last = r.id; }
+    // "Continue where you left off" follows the page the learner opened, not a refresh caused by another tab.
+    if (!store.quiet){
+      if (ph){ state.phase = ph.id; }
+      if (r.id !== "home" && !r.tool){ state.last = r.id; }
+    }
     save();
     paintNav(r.id);
     document.title = (r.id === "home" ? "" : r.title + " · ") + "Forward Deployed Engineer Study";
@@ -42415,6 +42813,20 @@ if sys.platform == "emscripten":
     pager.innerHTML = h;
   }
   var details = document.getElementById("mobile-details");
+  // Another tab saved (or restored a backup): show the new progress here.
+  store.onRemote = function(why){
+    if (state.theme) rootEl.setAttribute("data-theme", state.theme); else rootEl.removeAttribute("data-theme");
+    paintThemeBtns(); SEARCH_INDEX = null;
+    var a = document.activeElement, typing = a && view.contains(a) && /^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName);
+    if (why === "restored") navPhase = null;
+    store.quiet = true;
+    try { if (why === "restored" || !typing) render(); else paintNav(currentRoute().id); } finally { store.quiet = false; }
+    if (why === "restored"){
+      var n = document.createElement("p"); n.className = "callout"; n.setAttribute("role", "status");
+      n.textContent = "Your progress was restored from a backup in another tab, so this page now shows the restored progress. Changes this tab had not saved yet were not applied.";
+      view.insertBefore(n, view.firstChild);
+    }
+  };
   window.addEventListener("hashchange", function(){
     if (details) details.open = false;
     render(); window.scrollTo(0, 0);
